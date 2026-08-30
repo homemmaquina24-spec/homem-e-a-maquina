@@ -1081,3 +1081,47 @@ button {
         height: min(62vw, 270px);
     }
    }
+/* =====================================================
+   REAÇÃO AO ÁUDIO REAL
+===================================================== */
+
+.machine[data-state="listening"] {
+    transform:
+        translate3d(0, 0, 0)
+        scale(
+            calc(
+                1 + (var(--voice-intensity, 0) * 0.08)
+            )
+        );
+}
+
+.machine[data-state="listening"] .machine-core {
+    transform:
+        scale(
+            calc(
+                1 + (var(--voice-intensity, 0) * 0.22)
+            )
+        );
+
+    filter:
+        brightness(
+            calc(
+                1 + (var(--voice-intensity, 0) * 0.35)
+            )
+        );
+}
+
+.machine[data-state="listening"] .machine-aura {
+    transform:
+        translate(-50%, -50%)
+        scale(
+            calc(
+                1 + (var(--voice-intensity, 0) * 0.18)
+            )
+        );
+
+    opacity:
+        calc(
+            0.72 + (var(--voice-intensity, 0) * 0.28)
+        );
+   }
