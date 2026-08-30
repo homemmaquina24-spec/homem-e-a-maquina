@@ -1,7 +1,7 @@
 /* =====================================================
    HOMEM E A MÁQUINA
-   TELA PRINCIPAL V1
-   CONTROLO VISUAL DA MÁQUINA
+   TELA PRINCIPAL V1.2
+   COMPORTAMENTO VISUAL DA MÁQUINA
 ===================================================== */
 
 const machine = document.querySelector(".machine");
@@ -9,9 +9,16 @@ const voiceButton = document.querySelector(".test-voice");
 const keyboardButton = document.querySelector(".test-keyboard");
 
 
-/* =========================
-   ESTADO DA MÁQUINA
-========================= */
+/* =====================================================
+   ESTADO ATUAL
+===================================================== */
+
+let currentState = "idle";
+
+
+/* =====================================================
+   ALTERAR ESTADO
+===================================================== */
 
 function setMachineState(state) {
 
@@ -19,61 +26,93 @@ function setMachineState(state) {
         return;
     }
 
+    currentState = state;
+
     machine.dataset.state = state;
 }
 
 
-/* =========================
-   CICLO VISUAL DE DEMONSTRAÇÃO
-========================= */
+/* =====================================================
+   CICLO DA PRESENÇA
+===================================================== */
 
-function startMachineDemo() {
+function machinePresenceCycle() {
 
     setMachineState("idle");
 
     setTimeout(() => {
+
         setMachineState("presence");
-    }, 7000);
+
+    }, 6500);
+
 
     setTimeout(() => {
-        setMachineState("listening");
-    }, 10000);
 
-    setTimeout(() => {
-        setMachineState("thinking");
-    }, 15000);
-
-    setTimeout(() => {
-        setMachineState("speaking");
-    }, 20000);
-
-    setTimeout(() => {
-        setMachineState("pause");
-    }, 25000);
-
-    setTimeout(() => {
         setMachineState("idle");
-    }, 30000);
+
+    }, 9500);
 }
 
 
-/* =========================
-   REPETIR DEMONSTRAÇÃO
-========================= */
+/* =====================================================
+   DEMONSTRAÇÃO DE ESCUTA
+===================================================== */
 
-function repeatDemo() {
+function demonstrateListening() {
 
-    startMachineDemo();
+    setMachineState("listening");
 
-    setInterval(() => {
-        startMachineDemo();
-    }, 37000);
+
+    setTimeout(() => {
+
+        setMachineState("thinking");
+
+    }, 4200);
+
+
+    setTimeout(() => {
+
+        setMachineState("speaking");
+
+    }, 8200);
+
+
+    setTimeout(() => {
+
+        setMachineState("pause");
+
+    }, 11800);
+
+
+    setTimeout(() => {
+
+        setMachineState("idle");
+
+    }, 15000);
 }
 
 
-/* =========================
-   CONTROLO DO BOTÃO DE VOZ
-========================= */
+/* =====================================================
+   CICLO AUTOMÁTICO
+===================================================== */
+
+function startPresence() {
+
+    machinePresenceCycle();
+
+
+    setTimeout(() => {
+
+        demonstrateListening();
+
+    }, 11000);
+}
+
+
+/* =====================================================
+   BOTÃO DE VOZ
+===================================================== */
 
 if (voiceButton) {
 
@@ -86,9 +125,9 @@ if (voiceButton) {
 }
 
 
-/* =========================
-   CONTROLO DO TECLADO
-========================= */
+/* =====================================================
+   BOTÃO DE TECLADO
+===================================================== */
 
 if (keyboardButton) {
 
@@ -101,8 +140,25 @@ if (keyboardButton) {
 }
 
 
-/* =========================
-   INICIALIZAÇÃO
-========================= */
+/* =====================================================
+   INÍCIO
+===================================================== */
 
-startMachineDemo();
+setMachineState("idle");
+
+startPresence();
+
+
+/* =====================================================
+   REPETIÇÃO CONTROLADA
+===================================================== */
+
+setInterval(() => {
+
+    if (currentState === "idle") {
+
+        startPresence();
+
+    }
+
+}, 28000);
