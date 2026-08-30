@@ -1,6 +1,6 @@
 /* =====================================================
-   TESTE DE DIAGNÓSTICO
-   HOMEM E A MÁQUINA
+   BASE 0 — HOMEM E A MÁQUINA
+   ETAPA 1 — IDENTIDADE VISUAL DO HM
 ===================================================== */
 
 * {
@@ -48,11 +48,16 @@ body {
     justify-content: space-between;
 }
 
+
+/* =========================
+   HM — LOGO 3D
+========================= */
+
 .test-logo {
     position: relative;
 
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
 
     display: flex;
     align-items: center;
@@ -62,33 +67,119 @@ body {
 
     background:
         radial-gradient(
-            circle at 35% 30%,
-            #ffffff 0%,
-            #dce7ff 7%,
-            #5d82ff 24%,
-            #172b63 55%,
-            #091126 100%
+            circle at 50% 45%,
+            rgba(255, 255, 255, 0.16),
+            rgba(35, 70, 150, 0.18) 34%,
+            rgba(5, 8, 20, 0.96) 72%
         );
 
-    color: #ffffff;
-
-    font-size: 17px;
-    font-weight: 800;
-    letter-spacing: -1px;
-
-    text-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(105, 145, 255, 0.35);
 
     box-shadow:
-        inset 1px 1px 2px rgba(255, 255, 255, 0.45),
-        inset -2px -3px 5px rgba(0, 0, 0, 0.45),
-        0 5px 12px rgba(0, 0, 0, 0.45),
-        0 0 14px rgba(48, 90, 255, 0.22);
+        inset 1px 1px 2px rgba(255, 255, 255, 0.18),
+        inset -3px -4px 7px rgba(0, 0, 0, 0.7),
+        0 6px 14px rgba(0, 0, 0, 0.55),
+        0 0 18px rgba(40, 90, 255, 0.18);
 
-    border: 1px solid rgba(130, 160, 255, 0.35);
+    perspective: 180px;
 
     overflow: hidden;
 }
+
+
+/* =========================
+   H
+========================= */
+
+.logo-h {
+    position: absolute;
+
+    left: 9px;
+    top: 10px;
+
+    color: #f7fbff;
+
+    font-family: Arial, sans-serif;
+    font-size: 25px;
+    font-weight: 900;
+    line-height: 1;
+
+    transform:
+        translateZ(12px)
+        rotateY(-10deg);
+
+    text-shadow:
+        1px 2px 0 #7585a8,
+        2px 4px 0 #35415f,
+        3px 5px 5px rgba(0, 0, 0, 0.7);
+
+    z-index: 3;
+}
+
+
+/* =========================
+   M
+========================= */
+
+.logo-m {
+    position: absolute;
+
+    right: 7px;
+    top: 10px;
+
+    color: #dce8ff;
+
+    font-family: Arial, sans-serif;
+    font-size: 25px;
+    font-weight: 900;
+    line-height: 1;
+
+    transform:
+        translateZ(16px)
+        rotateY(10deg);
+
+    text-shadow:
+        1px 2px 0 #6277a8,
+        2px 4px 0 #293653,
+        3px 5px 5px rgba(0, 0, 0, 0.7);
+
+    z-index: 3;
+}
+
+
+/* =========================
+   NÚCLEO DO HM
+========================= */
+
+.logo-core {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 7px;
+    height: 7px;
+
+    transform:
+        translate(-50%, -50%)
+        translateZ(22px);
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 4px #ffffff,
+        0 0 9px rgba(80, 140, 255, 0.9),
+        0 0 16px rgba(50, 100, 255, 0.6);
+
+    z-index: 5;
+}
+
+
+/* =========================
+   DEFINIÇÕES
+========================= */
 
 .test-settings {
     width: 40px;
@@ -146,6 +237,11 @@ body {
     gap: 22px;
 }
 
+
+/* =========================
+   VOZ
+========================= */
+
 .test-voice {
     width: 58px;
     height: 58px;
@@ -158,6 +254,11 @@ body {
 
     font-size: 23px;
 }
+
+
+/* =========================
+   TECLADO
+========================= */
 
 .test-keyboard {
     width: 44px;
