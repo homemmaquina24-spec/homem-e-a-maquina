@@ -1,25 +1,20 @@
 /* =====================================================
    HOMEM E A MÁQUINA
-   TELA PRINCIPAL V1.4
-   PRESENÇA ORGÂNICA
+   TESTE 01 — AUDIÇÃO REAL
 ===================================================== */
 
 const machine = document.querySelector(".machine");
 const voiceButton = document.querySelector(".test-voice");
-const keyboardButton = document.querySelector(".test-keyboard");
+
+let audioContext = null;
+let analyser = null;
+let microphone = null;
+let audioStream = null;
+let listening = false;
 
 
 /* =====================================================
-   ESTADO
-===================================================== */
-
-let currentState = "idle";
-
-let presenceTimer = null;
-
-
-/* =====================================================
-   ALTERAR ESTADO
+   ESTADO VISUAL
 ===================================================== */
 
 function setMachineState(state) {
@@ -28,116 +23,185 @@ function setMachineState(state) {
         return;
     }
 
-    currentState = state;
-
     machine.dataset.state = state;
 }
 
 
 /* =====================================================
-   PRESENÇA ESPONTÂNEA
+   INICIAR MICROFONE
 ===================================================== */
 
-function spontaneousPresence() {
+async function startMicrophone() {
 
-    if (currentState !== "idle") {
+    if (listening) {
         return;
     }
 
-    setMachineState("presence");
+    try {
 
-    const duration =
-        1400 +
-        Math.random() * 2200;
+        audioStream = await navigator.mediaDevices.getUserMedia({
+            audio: true
+        });
 
-    setTimeout(() => {
+        audioContext =
+            new (window.AudioContext ||
+            window.webkitAudioContext)();
 
-        if (currentState === "presence") {
-            setMachineState("idle");
-        }
+        analyser =
+            audioContext.createAnalyser();
 
-    }, duration);
+        analyser.fftSize = 256;
+
+        microphone =
+            audioContext.createMediaStreamSource(
+                audioStream
+            );
+
+        microphone.connect(analyser);
+
+        listening = true;
+
+        setMachineState("listening");
+
+        monitorAudio();
+
+    } catch (error) {
+
+        console.error(
+            "Não foi possível acessar o microfone:",
+            error
+        );
+
+        setMachineState("idle");
+    }
 }
 
 
 /* =====================================================
-   AGENDAR PRÓXIMA VARIAÇÃO
+   MONITORAR ÁUDIO
 ===================================================== */
 
-function schedulePresence() {
+function monitorAudio() {
 
-    clearTimeout(presenceTimer);
+    if (!listening || !analyser) {
+        return;
+    }
 
-    const delay =
-        5500 +
-        Math.random() * 10500;
+    const data =
+        new Uint8Array(
+            analyser.fftSize
+        );
 
-    presenceTimer = setTimeout(() => {
+    analyser.getByteTimeDomainData(data);
 
-        spontaneousPresence();
 
-        schedulePresence();
+    let total = 0;
 
-    }, delay);
+    for (let i = 0; i < data.length; i++) {
+
+        const value =
+            (data[i] - 128) / 128;
+
+        total += value * value;
+    }
+
+
+    const volume =
+        Math.sqrt(
+            total / data.length
+        );
+
+
+    const intensity =
+        Math.min(
+            1,
+            volume * 8
+        );
+
+
+    if (machine) {
+
+        machine.style.setProperty(
+            "--voice-intensity",
+            intensity.toFixed(3)
+        );
+
+    }
+
+
+    requestAnimationFrame(
+        monitorAudio
+    );
 }
 
 
 /* =====================================================
-   ESCUTA
+   PARAR MICROFONE
 ===================================================== */
 
-function startListening() {
+function stopMicrophone() {
 
-    setMachineState("listening");
+    listening = false;
 
+    if (audioStream) {
+
+        audioStream
+            .getTracks()
+            .forEach(track => track.stop());
+
+        audioStream = null;
+    }
+
+    if (audioContext) {
+
+        audioContext.close();
+
+        audioContext = null;
+    }
+
+    analyser = null;
+    microphone = null;
+
+    if (machine) {
+
+        machine.style.setProperty(
+            "--voice-intensity",
+            "0"
+        );
+
+    }
+
+    setMachineState("idle");
 }
 
 
 /* =====================================================
-   TECLADO
-===================================================== */
-
-function startWritingPresence() {
-
-    setMachineState("presence");
-
-}
-
-
-/* =====================================================
-   BOTÃO DE VOZ
+   BOTÃO 🎙️
 ===================================================== */
 
 if (voiceButton) {
 
-    voiceButton.addEventListener("click", () => {
+    voiceButton.addEventListener(
+        "click",
+        async () => {
 
-        startListening();
+            if (listening) {
 
-    });
+                stopMicrophone();
 
+            } else {
+
+                await startMicrophone();
+
+            }
+
+        }
+    );
 }
 
 
 /* =====================================================
-   BOTÃO DE TECLADO
-===================================================== */
-
-if (keyboardButton) {
-
-    keyboardButton.addEventListener("click", () => {
-
-        startWritingPresence();
-
-    });
-
-}
-
-
-/* =====================================================
-   INICIALIZAÇÃO
+   ESTADO INICIAL
 ===================================================== */
 
 setMachineState("idle");
-
-schedulePresence();
