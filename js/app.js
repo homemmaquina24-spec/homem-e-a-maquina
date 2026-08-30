@@ -1,7 +1,7 @@
 /* =====================================================
    HOMEM E A MÁQUINA
-   TELA PRINCIPAL V1.3
-   PRESENÇA VIVA
+   TELA PRINCIPAL V1.4
+   PRESENÇA ORGÂNICA
 ===================================================== */
 
 const machine = document.querySelector(".machine");
@@ -14,6 +14,7 @@ const keyboardButton = document.querySelector(".test-keyboard");
 ===================================================== */
 
 let currentState = "idle";
+
 let presenceTimer = null;
 
 
@@ -34,10 +35,10 @@ function setMachineState(state) {
 
 
 /* =====================================================
-   PEQUENAS VARIAÇÕES DE PRESENÇA
+   PRESENÇA ESPONTÂNEA
 ===================================================== */
 
-function subtlePresence() {
+function spontaneousPresence() {
 
     if (currentState !== "idle") {
         return;
@@ -45,18 +46,22 @@ function subtlePresence() {
 
     setMachineState("presence");
 
+    const duration =
+        1400 +
+        Math.random() * 2200;
+
     setTimeout(() => {
 
         if (currentState === "presence") {
             setMachineState("idle");
         }
 
-    }, 1800 + Math.random() * 1800);
+    }, duration);
 }
 
 
 /* =====================================================
-   PRÓXIMA OBSERVAÇÃO
+   AGENDAR PRÓXIMA VARIAÇÃO
 ===================================================== */
 
 function schedulePresence() {
@@ -64,12 +69,12 @@ function schedulePresence() {
     clearTimeout(presenceTimer);
 
     const delay =
-        5000 +
-        Math.random() * 9000;
+        5500 +
+        Math.random() * 10500;
 
     presenceTimer = setTimeout(() => {
 
-        subtlePresence();
+        spontaneousPresence();
 
         schedulePresence();
 
@@ -89,7 +94,7 @@ function startListening() {
 
 
 /* =====================================================
-   PRESENÇA AO ESCREVER
+   TECLADO
 ===================================================== */
 
 function startWritingPresence() {
@@ -130,7 +135,7 @@ if (keyboardButton) {
 
 
 /* =====================================================
-   INÍCIO
+   INICIALIZAÇÃO
 ===================================================== */
 
 setMachineState("idle");
