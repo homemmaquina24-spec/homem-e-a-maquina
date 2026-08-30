@@ -1,12 +1,7 @@
 /* =====================================================
+   TESTE DE DIAGNÓSTICO
    HOMEM E A MÁQUINA
-   NOVA INTERFACE — ESTRUTURA BASE
 ===================================================== */
-
-
-/* =========================
-   RESET
-========================= */
 
 * {
     margin: 0;
@@ -14,49 +9,22 @@
     box-sizing: border-box;
 }
 
-
-/* =========================
-   DOCUMENTO
-========================= */
-
 html,
 body {
     width: 100%;
     height: 100%;
+    margin: 0;
+    padding: 0;
     overflow: hidden;
-
     background: #050814;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
+    font-family: Arial, sans-serif;
 }
 
-
-/* =========================
-   APLICAÇÃO
-========================= */
-
-.app {
+.test-screen {
+    position: relative;
     width: 100%;
-    height: 100vh;
-
-    display: grid;
-
-    grid-template-rows:
-        60px
-        minmax(0, 1fr)
-        90px;
-
-    overflow: hidden;
-
-    background:
-        linear-gradient(
-            180deg,
-            #050814 0%,
-            #02040a 100%
-        );
+    height: 100%;
+    background: #050814;
 }
 
 
@@ -64,72 +32,50 @@ body {
    TOPO
 ========================= */
 
-.top-area {
+.test-top {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
     width: 100%;
-    height: 60px;
+    height: 70px;
+
+    padding: 12px 18px;
 
     display: flex;
-
     align-items: center;
     justify-content: space-between;
-
-    padding:
-        0 16px;
 }
 
-
-/* LOGO */
-
-.hm-logo {
-    width: 44px;
-    height: 44px;
+.test-logo {
+    width: 45px;
+    height: 45px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
-    border-radius: 13px;
+    background: #18233d;
+    color: white;
 
-    background:
-        linear-gradient(
-            145deg,
-            #596b99,
-            #101827
-        );
+    border-radius: 12px;
 
-    color: #ffffff;
-
-    font-size: 19px;
-    font-weight: 900;
-
-    box-shadow:
-        0 6px 18px rgba(0, 0, 0, 0.45),
-        inset 0 2px 4px rgba(255, 255, 255, 0.18);
+    font-size: 18px;
+    font-weight: bold;
 }
 
-
-/* DEFINIÇÕES */
-
-.settings-button {
+.test-settings {
     width: 40px;
     height: 40px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
 
     border: none;
     border-radius: 50%;
 
     background: #141c2d;
-
-    color: #ffffff;
+    color: white;
 
     font-size: 18px;
-
-    cursor: pointer;
 }
 
 
@@ -137,138 +83,66 @@ body {
    CENTRO
 ========================= */
 
-.center-area {
-    min-width: 0;
-    min-height: 0;
+.test-center {
+    position: absolute;
+
+    top: 70px;
+    left: 0;
 
     width: 100%;
-    height: 100%;
+
+    height: calc(100% - 160px);
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
-    overflow: hidden;
+    color: #555;
 }
 
 
 /* =========================
-   CONTROLES INFERIORES
+   FUNDO
 ========================= */
 
-.controls-area {
+.test-bottom {
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
     width: 100%;
     height: 90px;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
     gap: 22px;
-
-    padding:
-        8px 16px;
 }
 
-
-/* BOTÃO FALAR */
-
-.voice-button {
+.test-voice {
     width: 58px;
     height: 58px;
-
-    flex-shrink: 0;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
 
     border: none;
     border-radius: 50%;
 
-    background:
-        linear-gradient(
-            145deg,
-            #7d98ff,
-            #304da8
-        );
-
-    color: #ffffff;
+    background: #304da8;
+    color: white;
 
     font-size: 23px;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 0 20px rgba(100, 140, 255, 0.35);
 }
 
-
-/* BOTÃO TECLADO */
-
-.keyboard-button {
+.test-keyboard {
     width: 44px;
     height: 44px;
-
-    flex-shrink: 0;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
 
     border: none;
     border-radius: 50%;
 
     background: #141c2d;
-
-    color: #ffffff;
+    color: white;
 
     font-size: 18px;
-
-    cursor: pointer;
-}
-
-
-/* =========================
-   TELAS PEQUENAS
-========================= */
-
-@media (max-height: 650px) {
-
-    .app {
-        grid-template-rows:
-            54px
-            minmax(0, 1fr)
-            76px;
-    }
-
-
-    .top-area {
-        height: 54px;
-    }
-
-
-    .controls-area {
-        height: 76px;
-
-        padding:
-            6px 12px;
-    }
-
-
-    .voice-button {
-        width: 52px;
-        height: 52px;
-    }
-
-
-    .keyboard-button {
-        width: 40px;
-        height: 40px;
-    }
-
    }
