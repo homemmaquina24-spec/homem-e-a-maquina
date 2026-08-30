@@ -1,7 +1,7 @@
 /* =====================================================
    HOMEM E A MÁQUINA
-   TELA PRINCIPAL V1.2
-   COMPORTAMENTO VISUAL DA MÁQUINA
+   TELA PRINCIPAL V1.3
+   PRESENÇA VIVA
 ===================================================== */
 
 const machine = document.querySelector(".machine");
@@ -10,10 +10,11 @@ const keyboardButton = document.querySelector(".test-keyboard");
 
 
 /* =====================================================
-   ESTADO ATUAL
+   ESTADO
 ===================================================== */
 
 let currentState = "idle";
+let presenceTimer = null;
 
 
 /* =====================================================
@@ -33,80 +34,68 @@ function setMachineState(state) {
 
 
 /* =====================================================
-   CICLO DA PRESENÇA
+   PEQUENAS VARIAÇÕES DE PRESENÇA
 ===================================================== */
 
-function machinePresenceCycle() {
+function subtlePresence() {
 
-    setMachineState("idle");
+    if (currentState !== "idle") {
+        return;
+    }
 
-    setTimeout(() => {
-
-        setMachineState("presence");
-
-    }, 6500);
-
+    setMachineState("presence");
 
     setTimeout(() => {
 
-        setMachineState("idle");
+        if (currentState === "presence") {
+            setMachineState("idle");
+        }
 
-    }, 9500);
+    }, 1800 + Math.random() * 1800);
 }
 
 
 /* =====================================================
-   DEMONSTRAÇÃO DE ESCUTA
+   PRÓXIMA OBSERVAÇÃO
 ===================================================== */
 
-function demonstrateListening() {
+function schedulePresence() {
+
+    clearTimeout(presenceTimer);
+
+    const delay =
+        5000 +
+        Math.random() * 9000;
+
+    presenceTimer = setTimeout(() => {
+
+        subtlePresence();
+
+        schedulePresence();
+
+    }, delay);
+}
+
+
+/* =====================================================
+   ESCUTA
+===================================================== */
+
+function startListening() {
 
     setMachineState("listening");
 
-
-    setTimeout(() => {
-
-        setMachineState("thinking");
-
-    }, 4200);
-
-
-    setTimeout(() => {
-
-        setMachineState("speaking");
-
-    }, 8200);
-
-
-    setTimeout(() => {
-
-        setMachineState("pause");
-
-    }, 11800);
-
-
-    setTimeout(() => {
-
-        setMachineState("idle");
-
-    }, 15000);
 }
 
 
 /* =====================================================
-   CICLO AUTOMÁTICO
+   PRESENÇA AO ESCREVER
 ===================================================== */
 
-function startPresence() {
+function startWritingPresence() {
 
-    machinePresenceCycle();
+    setMachineState("presence");
 
-
-    setTimeout(() => {
-
-        demonstrateListening();
-
-    }, 11000);
 }
 
 
@@ -118,7 +107,7 @@ if (voiceButton) {
 
     voiceButton.addEventListener("click", () => {
 
-        setMachineState("listening");
+        startListening();
 
     });
 
@@ -133,7 +122,7 @@ if (keyboardButton) {
 
     keyboardButton.addEventListener("click", () => {
 
-        setMachineState("presence");
+        startWritingPresence();
 
     });
 
@@ -146,19 +135,4 @@ if (keyboardButton) {
 
 setMachineState("idle");
 
-startPresence();
-
-
-/* =====================================================
-   REPETIÇÃO CONTROLADA
-===================================================== */
-
-setInterval(() => {
-
-    if (currentState === "idle") {
-
-        startPresence();
-
-    }
-
-}, 28000);
+schedulePresence();
