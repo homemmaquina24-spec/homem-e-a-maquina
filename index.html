@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Teste HM</title>
+    <title>Homem e a Máquina</title>
 
     <link
         rel="stylesheet"
@@ -24,46 +24,103 @@
 
     <div class="test-screen">
 
+        <!-- =========================
+             TOPO
+        ========================== -->
 
         <div class="test-top">
 
-            <div class="test-logo" aria-label="Homem e a Máquina">
-    <span class="logo-h">H</span>
-    <span class="logo-m">M</span>
-    <span class="logo-core"></span>
+            <div
+                class="test-logo"
+                aria-label="Homem e a Máquina"
+            >
+                <span class="logo-h">H</span>
+                <span class="logo-m">M</span>
+                <span class="logo-core"></span>
             </div>
 
-            <button class="test-settings">
+
+            <button
+                class="test-settings"
+                type="button"
+                aria-label="Definições"
+            >
                 ⚙️
             </button>
 
         </div>
 
 
+        <!-- =========================
+             CENTRO — A MÁQUINA
+        ========================== -->
 
         <div class="test-center">
 
-            CENTRO
+            <div
+                class="machine"
+                data-state="idle"
+                aria-label="A Máquina"
+            >
+
+                <div class="machine-aura"></div>
+
+                <div class="machine-orbit machine-orbit-one"></div>
+
+                <div class="machine-orbit machine-orbit-two"></div>
+
+                <div class="machine-field">
+
+                    <div class="machine-particle particle-one"></div>
+                    <div class="machine-particle particle-two"></div>
+                    <div class="machine-particle particle-three"></div>
+                    <div class="machine-particle particle-four"></div>
+                    <div class="machine-particle particle-five"></div>
+                    <div class="machine-particle particle-six"></div>
+
+                </div>
+
+                <div class="machine-core">
+
+                    <div class="core-inner"></div>
+
+                </div>
+
+            </div>
 
         </div>
 
 
+        <!-- =========================
+             FUNDO
+        ========================== -->
 
         <div class="test-bottom">
 
-            <button class="test-voice">
+            <button
+                class="test-voice"
+                type="button"
+                aria-label="Falar com a Máquina"
+            >
                 🎙️
             </button>
 
-            <button class="test-keyboard">
+
+            <button
+                class="test-keyboard"
+                type="button"
+                aria-label="Escrever para a Máquina"
+            >
                 ⌨️
             </button>
 
         </div>
 
-
     </div>
+
+
+    <script src="js/app.js"></script>
 
 </body>
 
-            </html>
+    </html>
