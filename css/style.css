@@ -49,20 +49,45 @@ body {
 }
 
 .test-logo {
-    width: 45px;
-    height: 45px;
+    position: relative;
+
+    width: 48px;
+    height: 48px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    background: #18233d;
-    color: white;
+    border-radius: 14px;
 
-    border-radius: 12px;
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #ffffff 0%,
+            #dce7ff 7%,
+            #5d82ff 24%,
+            #172b63 55%,
+            #091126 100%
+        );
 
-    font-size: 18px;
-    font-weight: bold;
+    color: #ffffff;
+
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -1px;
+
+    text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.7);
+
+    box-shadow:
+        inset 1px 1px 2px rgba(255, 255, 255, 0.45),
+        inset -2px -3px 5px rgba(0, 0, 0, 0.45),
+        0 5px 12px rgba(0, 0, 0, 0.45),
+        0 0 14px rgba(48, 90, 255, 0.22);
+
+    border: 1px solid rgba(130, 160, 255, 0.35);
+
+    overflow: hidden;
 }
 
 .test-settings {
