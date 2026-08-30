@@ -1,6 +1,7 @@
 /* =====================================================
    HOMEM E A MÁQUINA
-   TESTE 01 — AUDIÇÃO REAL
+   TESTE 02 — CONVERSAÇÃO CONTÍNUA
+   DETECÇÃO DE TURNOS
 ===================================================== */
 
 const machine = document.querySelector(".machine");
@@ -10,7 +11,32 @@ let audioContext = null;
 let analyser = null;
 let microphone = null;
 let audioStream = null;
-let listening = false;
+
+let conversationActive = false;
+let speechActive = false;
+
+let speechStartedAt = 0;
+let lastSoundAt = 0;
+
+let animationFrame = null;
+
+
+/* =====================================================
+   CONFIGURAÇÃO
+===================================================== */
+
+/*
+   Estes valores são apenas para o primeiro teste.
+   Não são os valores finais da Máquina.
+*/
+
+const SPEECH_THRESHOLD = 0.035;
+
+const START_CONFIRMATION_MS = 180;
+
+const END_SILENCE_MS = 1500;
+
+const MIN_SPEECH_MS = 250;
 
 
 /* =====================================================
@@ -28,72 +54,100 @@ function setMachineState(state) {
 
 
 /* =====================================================
-   INICIAR MICROFONE
+   INICIAR CONVERSA
 ===================================================== */
 
-async function startMicrophone() {
+async function startConversation() {
 
-    if (listening) {
+    if (conversationActive) {
         return;
     }
 
     try {
 
-        audioStream = await navigator.mediaDevices.getUserMedia({
-            audio: true
-        });
+        if (
+            !navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia
+        ) {
+
+            console.error(
+                "Este navegador não disponibiliza acesso ao microfone."
+            );
+
+            return;
+        }
+
+
+        audioStream =
+            await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            });
+
 
         audioContext =
-            new (window.AudioContext ||
-            window.webkitAudioContext)();
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+
+        if (audioContext.state === "suspended") {
+            await audioContext.resume();
+        }
+
 
         analyser =
             audioContext.createAnalyser();
 
-        analyser.fftSize = 256;
+        analyser.fftSize = 512;
+
+        analyser.smoothingTimeConstant = 0.72;
+
 
         microphone =
             audioContext.createMediaStreamSource(
                 audioStream
             );
 
+
         microphone.connect(analyser);
 
-        listening = true;
+
+        conversationActive = true;
+
+        speechActive = false;
+
+        speechStartedAt = 0;
+
+        lastSoundAt = 0;
+
 
         setMachineState("listening");
 
-        monitorAudio();
+
+        monitorMicrophone();
 
     } catch (error) {
 
         console.error(
-            "Não foi possível acessar o microfone:",
+            "Erro ao iniciar o microfone:",
             error
         );
 
-        setMachineState("idle");
+        stopConversation();
     }
 }
 
 
 /* =====================================================
-   MONITORAR ÁUDIO
+   MEDIR ENERGIA DO ÁUDIO
 ===================================================== */
 
-function monitorAudio() {
-
-    if (!listening || !analyser) {
-        return;
-    }
-
-    const data =
-        new Uint8Array(
-            analyser.fftSize
-        );
-
-    analyser.getByteTimeDomainData(data);
-
+function getAudioLevel(data) {
 
     let total = 0;
 
@@ -105,17 +159,51 @@ function monitorAudio() {
         total += value * value;
     }
 
+    return Math.sqrt(
+        total / data.length
+    );
+}
 
-    const volume =
-        Math.sqrt(
-            total / data.length
+
+/* =====================================================
+   MONITORAR MICROFONE
+===================================================== */
+
+function monitorMicrophone() {
+
+    if (
+        !conversationActive ||
+        !analyser
+    ) {
+        return;
+    }
+
+
+    const data =
+        new Uint8Array(
+            analyser.fftSize
         );
 
+
+    analyser.getByteTimeDomainData(data);
+
+
+    const level =
+        getAudioLevel(data);
+
+
+    const now =
+        performance.now();
+
+
+    /*
+       Reação visual baseada no áudio real.
+    */
 
     const intensity =
         Math.min(
             1,
-            volume * 8
+            level * 8
         );
 
 
@@ -129,28 +217,180 @@ function monitorAudio() {
     }
 
 
-    requestAnimationFrame(
-        monitorAudio
-    );
+    /*
+       =================================================
+       INÍCIO DA FALA
+       =================================================
+    */
+
+    if (
+        level > SPEECH_THRESHOLD &&
+        !speechActive
+    ) {
+
+        if (!speechStartedAt) {
+
+            speechStartedAt = now;
+
+        }
+
+
+        /*
+           O som precisa permanecer acima
+           do limite por alguns milissegundos.
+        */
+
+        if (
+            now - speechStartedAt >=
+            START_CONFIRMATION_MS
+        ) {
+
+            speechActive = true;
+
+            speechStartedAt = now;
+
+            lastSoundAt = now;
+
+            setMachineState("listening");
+
+        }
+
+    }
+
+
+    /*
+       =================================================
+       FALA CONTINUA
+       =================================================
+    */
+
+    if (
+        level > SPEECH_THRESHOLD &&
+        speechActive
+    ) {
+
+        lastSoundAt = now;
+
+    }
+
+
+    /*
+       =================================================
+       FIM DO TURNO
+       =================================================
+    */
+
+    if (
+        speechActive &&
+        lastSoundAt > 0 &&
+        now - lastSoundAt >= END_SILENCE_MS
+    ) {
+
+        finishSpeechTurn();
+
+    }
+
+
+    animationFrame =
+        requestAnimationFrame(
+            monitorMicrophone
+        );
 }
 
 
 /* =====================================================
-   PARAR MICROFONE
+   TERMINAR UM TURNO
 ===================================================== */
 
-function stopMicrophone() {
+function finishSpeechTurn() {
 
-    listening = false;
+    const duration =
+        performance.now() -
+        speechStartedAt;
+
+
+    /*
+       Ignora ruídos extremamente curtos.
+    */
+
+    if (duration < MIN_SPEECH_MS) {
+
+        speechActive = false;
+
+        speechStartedAt = 0;
+
+        lastSoundAt = 0;
+
+        return;
+    }
+
+
+    /*
+       Neste momento ainda não existe
+       reconhecimento das palavras.
+
+       Estamos apenas provando que
+       um turno terminou.
+    */
+
+    console.log(
+        "Turno de fala terminado."
+    );
+
+
+    speechActive = false;
+
+    speechStartedAt = 0;
+
+    lastSoundAt = 0;
+
+
+    /*
+       A sessão continua aberta.
+       A Máquina volta imediatamente
+       para a escuta.
+    */
+
+    setMachineState("listening");
+}
+
+
+/* =====================================================
+   ENCERRAR TODA A SESSÃO
+===================================================== */
+
+function stopConversation() {
+
+    conversationActive = false;
+
+    speechActive = false;
+
+    speechStartedAt = 0;
+
+    lastSoundAt = 0;
+
+
+    if (animationFrame) {
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+        animationFrame = null;
+    }
+
 
     if (audioStream) {
 
         audioStream
             .getTracks()
-            .forEach(track => track.stop());
+            .forEach(
+                track => track.stop()
+            );
 
         audioStream = null;
     }
+
 
     if (audioContext) {
 
@@ -159,8 +399,11 @@ function stopMicrophone() {
         audioContext = null;
     }
 
+
     analyser = null;
+
     microphone = null;
+
 
     if (machine) {
 
@@ -170,6 +413,7 @@ function stopMicrophone() {
         );
 
     }
+
 
     setMachineState("idle");
 }
@@ -185,13 +429,13 @@ if (voiceButton) {
         "click",
         async () => {
 
-            if (listening) {
+            if (conversationActive) {
 
-                stopMicrophone();
+                stopConversation();
 
             } else {
 
-                await startMicrophone();
+                await startConversation();
 
             }
 
