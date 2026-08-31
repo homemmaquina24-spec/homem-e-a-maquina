@@ -1621,3 +1621,546 @@ console.log(
     "Idioma configurado:",
     MachineVoice.language
 );
+/* =====================================================
+   MACHINE VOICE — V6.3
+   MOTOR DE VOZ + FALLBACK GRATUITO
+
+   IMPORTANTE:
+   - Não controla o microfone.
+   - Não controla o reconhecimento.
+   - Não encerra a conversa.
+   - Não altera a reação visual à voz.
+   - Não usa API paga.
+===================================================== */
+
+const MachineVoice = {
+
+    /* =================================================
+       CONFIGURAÇÃO
+    ================================================= */
+
+    provider: "browser",
+
+    voiceName: "",
+
+    language: "pt-PT",
+
+    gender: "male",
+
+    speed: 0.95,
+
+    pitch: 0.80,
+
+    volume: 1.0,
+
+    speaking: false,
+
+    currentUtterance: null,
+
+
+    /* =================================================
+       LISTAR VOZES DISPONÍVEIS
+    ================================================= */
+
+    getVoices() {
+
+        if (
+            !("speechSynthesis" in window)
+        ) {
+
+            console.warn(
+                "Speech Synthesis não disponível."
+            );
+
+            return [];
+        }
+
+
+        return window
+            .speechSynthesis
+            .getVoices();
+    },
+
+
+    /* =================================================
+       ENCONTRAR VOZ
+    ================================================= */
+
+    findVoice() {
+
+        const voices =
+            this.getVoices();
+
+
+        if (!voices.length) {
+
+            return null;
+        }
+
+
+        /*
+           Primeiro procuramos exatamente
+           o idioma configurado.
+        */
+
+        let voice =
+            voices.find(
+                item =>
+                    item.lang ===
+                    this.language
+            );
+
+
+        /*
+           Depois procuramos português
+           independentemente da região.
+        */
+
+        if (!voice) {
+
+            voice =
+                voices.find(
+                    item =>
+                        item.lang
+                            .toLowerCase()
+                            .startsWith("pt")
+                );
+        }
+
+
+        return voice || null;
+    },
+
+
+    /* =================================================
+       CONFIGURAR
+    ================================================= */
+
+    configure(options = {}) {
+
+        if (
+            typeof options.language ===
+            "string"
+        ) {
+
+            this.language =
+                options.language;
+        }
+
+
+        if (
+            typeof options.gender ===
+            "string"
+        ) {
+
+            this.gender =
+                options.gender;
+        }
+
+
+        if (
+            typeof options.voiceName ===
+            "string"
+        ) {
+
+            this.voiceName =
+                options.voiceName;
+        }
+
+
+        if (
+            typeof options.speed ===
+            "number"
+        ) {
+
+            this.speed =
+                Math.max(
+                    0.5,
+                    Math.min(
+                        2,
+                        options.speed
+                    )
+                );
+        }
+
+
+        if (
+            typeof options.pitch ===
+            "number"
+        ) {
+
+            this.pitch =
+                Math.max(
+                    0,
+                    Math.min(
+                        2,
+                        options.pitch
+                    )
+                );
+        }
+
+
+        if (
+            typeof options.volume ===
+            "number"
+        ) {
+
+            this.volume =
+                Math.max(
+                    0,
+                    Math.min(
+                        1,
+                        options.volume
+                    )
+                );
+        }
+
+
+        console.log(
+            "MachineVoice configurada:",
+            {
+                provider:
+                    this.provider,
+
+                language:
+                    this.language,
+
+                gender:
+                    this.gender,
+
+                voiceName:
+                    this.voiceName,
+
+                speed:
+                    this.speed,
+
+                pitch:
+                    this.pitch
+            }
+        );
+    },
+
+
+    /* =================================================
+       FALAR
+    ================================================= */
+
+    speak(text) {
+
+        return new Promise(
+            (resolve, reject) => {
+
+                const cleanText =
+                    String(
+                        text || ""
+                    ).trim();
+
+
+                if (!cleanText) {
+
+                    resolve();
+
+                    return;
+                }
+
+
+                if (
+                    !("speechSynthesis" in window)
+                ) {
+
+                    console.warn(
+                        "Este navegador não possui TTS."
+                    );
+
+                    resolve();
+
+                    return;
+                }
+
+
+                /*
+                   Evita duas falas simultâneas.
+                */
+
+                this.stopSpeaking();
+
+
+                const utterance =
+                    new SpeechSynthesisUtterance(
+                        cleanText
+                    );
+
+
+                const selectedVoice =
+                    this.findVoice();
+
+
+                if (selectedVoice) {
+
+                    utterance.voice =
+                        selectedVoice;
+
+                    utterance.lang =
+                        selectedVoice.lang;
+
+                } else {
+
+                    utterance.lang =
+                        this.language;
+                }
+
+
+                utterance.rate =
+                    this.speed;
+
+
+                utterance.pitch =
+                    this.pitch;
+
+
+                utterance.volume =
+                    this.volume;
+
+
+                this.currentUtterance =
+                    utterance;
+
+
+                utterance.onstart =
+                    () => {
+
+                        this.speaking =
+                            true;
+
+
+                        if (
+                            typeof setMachineState ===
+                            "function"
+                        ) {
+
+                            setMachineState(
+                                STATE.SPEAKING
+                            );
+                        }
+
+
+                        console.log(
+                            "MachineVoice → falando"
+                        );
+                    };
+
+
+                utterance.onend =
+                    () => {
+
+                        this.speaking =
+                            false;
+
+                        this.currentUtterance =
+                            null;
+
+
+                        if (
+                            typeof setMachineState ===
+                            "function"
+                        ) {
+
+                            if (
+                                microphoneActive
+                            ) {
+
+                                setMachineState(
+                                    STATE.LISTENING
+                                );
+
+                            } else {
+
+                                setMachineState(
+                                    STATE.IDLE
+                                );
+                            }
+                        }
+
+
+                        console.log(
+                            "MachineVoice → terminou"
+                        );
+
+
+                        resolve();
+                    };
+
+
+                utterance.onerror =
+                    (event) => {
+
+                        this.speaking =
+                            false;
+
+                        this.currentUtterance =
+                            null;
+
+
+                        console.warn(
+                            "MachineVoice:",
+                            event.error
+                        );
+
+
+                        if (
+                            typeof setMachineState ===
+                            "function"
+                        ) {
+
+                            setMachineState(
+                                microphoneActive
+                                    ? STATE.LISTENING
+                                    : STATE.IDLE
+                            );
+                        }
+
+
+                        resolve();
+                    };
+
+
+                window
+                    .speechSynthesis
+                    .speak(
+                        utterance
+                    );
+            }
+        );
+    },
+
+
+    /* =================================================
+       PARAR
+    ================================================= */
+
+    stopSpeaking() {
+
+        if (
+            !("speechSynthesis" in window)
+        ) {
+
+            return;
+        }
+
+
+        try {
+
+            window
+                .speechSynthesis
+                .cancel();
+
+        } catch (error) {
+
+            console.warn(
+                "Não foi possível parar a voz.",
+                error
+            );
+        }
+
+
+        this.speaking =
+            false;
+
+
+        this.currentUtterance =
+            null;
+    },
+
+
+    /* =================================================
+       ESTADO
+    ================================================= */
+
+    isSpeaking() {
+
+        return this.speaking;
+    }
+};
+
+
+/* =====================================================
+   CONFIGURAÇÃO INICIAL
+
+   Estes valores são apenas para teste.
+   NÃO significam que esta será a voz definitiva.
+===================================================== */
+
+MachineVoice.configure({
+
+    language: "pt-PT",
+
+    gender: "male",
+
+    speed: 0.95,
+
+    pitch: 0.80,
+
+    volume: 1.0
+});
+
+
+/* =====================================================
+   CARREGAR VOZES DO NAVEGADOR
+===================================================== */
+
+if (
+    "speechSynthesis" in window
+) {
+
+    window
+        .speechSynthesis
+        .addEventListener(
+            "voiceschanged",
+            function() {
+
+                const voices =
+                    MachineVoice.getVoices();
+
+
+                console.log(
+                    "Vozes disponíveis:",
+                    voices
+                );
+
+
+                const portugueseVoices =
+                    voices.filter(
+                        voice =>
+                            voice.lang
+                                .toLowerCase()
+                                .startsWith("pt")
+                    );
+
+
+                console.log(
+                    "Vozes portuguesas:",
+                    portugueseVoices
+                );
+            }
+        );
+}
+
+
+/* =====================================================
+   TESTE MANUAL
+   -----------------------------------------------------
+   Não é chamado automaticamente.
+===================================================== */
+
+window.testMachineVoice =
+    function() {
+
+        MachineVoice.speak(
+            "Olá. Eu sou a Máquina. Estou aqui contigo."
+        );
+    };
+
+
+console.log(
+    "MachineVoice V6.3 carregada."
+);
