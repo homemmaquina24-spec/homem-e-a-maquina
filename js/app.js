@@ -1052,3 +1052,572 @@ if (voiceButton) {
 setMachineState(
     STATE.IDLE
 );
+/* =====================================================
+   HOMEM E A MÁQUINA
+   V6.2 — PARTE 2/2
+   ÁUDIO ESTÁVEL + REAÇÃO À VOZ + MACHINE VOICE
+===================================================== */
+
+
+/* =====================================================
+   PARAR RECONHECIMENTO
+===================================================== */
+
+function stopRecognition() {
+
+    recognitionWanted =
+        false;
+
+
+    if (
+        !recognition
+    ) {
+        return;
+    }
+
+
+    try {
+
+        recognition.stop();
+
+    } catch (error) {
+
+        console.log(
+            "Reconhecimento já estava parado."
+        );
+    }
+
+
+    recognitionRunning =
+        false;
+}
+
+
+/* =====================================================
+   INICIAR MICROFONE
+===================================================== */
+
+async function startMicrophone() {
+
+    if (
+        microphoneActive
+    ) {
+        return;
+    }
+
+
+    try {
+
+        audioStream =
+            await navigator.mediaDevices.getUserMedia({
+
+                audio: {
+
+                    echoCancellation: true,
+
+                    noiseSuppression: true,
+
+                    autoGainControl: true
+
+                }
+
+            });
+
+
+        audioContext =
+            new (
+
+                window.AudioContext ||
+
+                window.webkitAudioContext
+
+            )();
+
+
+        if (
+            audioContext.state ===
+            "suspended"
+        ) {
+
+            await audioContext.resume();
+        }
+
+
+        analyser =
+            audioContext.createAnalyser();
+
+
+        analyser.fftSize =
+            FFT_SIZE;
+
+
+        analyser.smoothingTimeConstant =
+            0.75;
+
+
+        microphoneSource =
+            audioContext.createMediaStreamSource(
+                audioStream
+            );
+
+
+        microphoneSource.connect(
+            analyser
+        );
+
+
+        microphoneActive =
+            true;
+
+
+        visualIntensity =
+            0;
+
+
+        setMachineState(
+            STATE.LISTENING
+        );
+
+
+        monitorAudio();
+
+
+        recognitionWanted =
+            true;
+
+
+        startRecognition();
+
+
+        console.log(
+            "Sessão de áudio iniciada."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Erro no microfone:",
+            error
+        );
+
+
+        cleanupMicrophone();
+    }
+}
+
+
+/* =====================================================
+   MONITORAR ÁUDIO
+===================================================== */
+
+function monitorAudio() {
+
+    if (
+        !microphoneActive ||
+        !analyser
+    ) {
+        return;
+    }
+
+
+    const data =
+        new Uint8Array(
+            analyser.fftSize
+        );
+
+
+    analyser.getByteTimeDomainData(
+        data
+    );
+
+
+    let total =
+        0;
+
+
+    for (
+        let i = 0;
+
+        i < data.length;
+
+        i++
+    ) {
+
+        const value =
+            (
+                data[i] -
+                128
+            ) / 128;
+
+
+        total +=
+            value *
+            value;
+    }
+
+
+    const level =
+        Math.sqrt(
+            total /
+            data.length
+        );
+
+
+    /*
+       Pequena zona morta contra
+       ruído ambiente.
+    */
+
+    const usableLevel =
+        Math.max(
+
+            0,
+
+            level -
+            AUDIO_NOISE_FLOOR
+
+        );
+
+
+    /*
+       Intensidade visual.
+    */
+
+    const targetIntensity =
+        Math.min(
+
+            1,
+
+            usableLevel /
+            AUDIO_VOICE_LEVEL
+
+        );
+
+
+    /*
+       Suavização da reação.
+
+       Isto NÃO controla:
+       - microfone
+       - reconhecimento
+       - encerramento
+       - pausa
+    */
+
+    visualIntensity +=
+
+        (
+            targetIntensity -
+            visualIntensity
+        ) * 0.22;
+
+
+    if (machine) {
+
+        machine.style.setProperty(
+
+            "--voice-intensity",
+
+            visualIntensity.toFixed(3)
+
+        );
+    }
+
+
+    animationFrame =
+        requestAnimationFrame(
+
+            monitorAudio
+
+        );
+}
+
+
+/* =====================================================
+   ESPERA
+===================================================== */
+
+function enterWaitingMode() {
+
+    console.log(
+        "MÁQUINA → ESPERA"
+    );
+
+
+    setMachineState(
+        STATE.WAITING
+    );
+
+
+    /*
+       Paramos o reconhecimento
+       e liberamos o microfone físico.
+
+       A Máquina NÃO fica ouvindo
+       enquanto o utilizador pediu
+       para esperar.
+    */
+
+    stopRecognition();
+
+    cleanupMicrophoneOnly();
+
+
+    console.log(
+        "Escuta suspensa."
+    );
+}
+
+
+/* =====================================================
+   RETOMAR
+===================================================== */
+
+async function resumeConversation() {
+
+    if (
+        microphoneActive
+    ) {
+
+        return;
+    }
+
+
+    console.log(
+        "MÁQUINA → RETOMANDO"
+    );
+
+
+    setMachineState(
+        STATE.LISTENING
+    );
+
+
+    await startMicrophone();
+}
+
+
+/* =====================================================
+   ENCERRAR
+===================================================== */
+
+function closeConversation() {
+
+    console.log(
+        "MÁQUINA → ENCERRADA"
+    );
+
+
+    /*
+       Se a Máquina estiver falando
+       no futuro, a fala também será
+       interrompida.
+    */
+
+    MachineVoice.stopSpeaking();
+
+
+    stopRecognition();
+
+    cleanupMicrophoneOnly();
+
+
+    recognition =
+        null;
+
+
+    resetTurn();
+
+
+    setMachineState(
+        STATE.IDLE
+    );
+}
+
+
+/* =====================================================
+   LIMPAR MICROFONE
+===================================================== */
+
+function cleanupMicrophoneOnly() {
+
+    microphoneActive =
+        false;
+
+
+    visualIntensity =
+        0;
+
+
+    if (animationFrame) {
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+        animationFrame =
+            null;
+    }
+
+
+    if (microphoneSource) {
+
+        try {
+
+            microphoneSource.disconnect();
+
+        } catch (error) {}
+
+
+        microphoneSource =
+            null;
+    }
+
+
+    analyser =
+        null;
+
+
+    if (audioStream) {
+
+        audioStream
+            .getTracks()
+            .forEach(
+
+                track =>
+                    track.stop()
+
+            );
+
+
+        audioStream =
+            null;
+    }
+
+
+    if (audioContext) {
+
+        try {
+
+            audioContext.close();
+
+        } catch (error) {}
+
+
+        audioContext =
+            null;
+    }
+
+
+    if (machine) {
+
+        machine.style.setProperty(
+
+            "--voice-intensity",
+
+            "0"
+
+        );
+    }
+}
+
+
+/* =====================================================
+   LIMPEZA COMPLETA
+===================================================== */
+
+function cleanupMicrophone() {
+
+    MachineVoice.stopSpeaking();
+
+
+    stopRecognition();
+
+
+    cleanupMicrophoneOnly();
+
+
+    recognition =
+        null;
+
+
+    resetTurn();
+
+
+    setMachineState(
+        STATE.IDLE
+    );
+}
+
+
+/* =====================================================
+   BOTÃO
+===================================================== */
+
+if (voiceButton) {
+
+    voiceButton.addEventListener(
+
+        "click",
+
+        async function() {
+
+            /*
+               Um toque inicia a sessão.
+
+               Outro toque encerra.
+
+               A sessão de escuta não é
+               desligada por pequenas pausas
+               na fala.
+            */
+
+            if (
+                microphoneActive
+            ) {
+
+                closeConversation();
+
+            } else {
+
+                await startMicrophone();
+
+            }
+
+        }
+
+    );
+}
+
+
+/* =====================================================
+   INICIAL
+===================================================== */
+
+setMachineState(
+    STATE.IDLE
+);
+
+
+/* =====================================================
+   DEBUG DA MACHINE VOICE
+   -----------------------------------------------------
+   Não inicia nenhuma voz.
+   Serve apenas para confirmar que
+   a camada foi carregada corretamente.
+===================================================== */
+
+console.log(
+    "MachineVoice disponível:",
+    MachineVoice
+);
+
+console.log(
+    "Voz configurada:",
+    MachineVoice.voice
+);
+
+console.log(
+    "Idioma configurado:",
+    MachineVoice.language
+);
