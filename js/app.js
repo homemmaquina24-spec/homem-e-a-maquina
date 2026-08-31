@@ -1,10 +1,19 @@
 /* =====================================================
    HOMEM E A MÁQUINA
-   V6.1 — ÁUDIO ESTÁVEL + REAÇÃO À VOZ
+   V6.4 — ÁUDIO ESTÁVEL + REAÇÃO À VOZ + MACHINE VOICE
 ===================================================== */
 
-const machine = document.querySelector(".machine");
-const voiceButton = document.querySelector(".test-voice");
+
+/* =====================================================
+   ELEMENTOS
+===================================================== */
+
+const machine =
+    document.querySelector(".machine");
+
+const voiceButton =
+    document.querySelector(".test-voice");
+
 
 const SpeechRecognition =
     window.SpeechRecognition ||
@@ -16,77 +25,114 @@ const SpeechRecognition =
 ===================================================== */
 
 const STATE = {
-    IDLE: "idle",
-    LISTENING: "listening",
-    THINKING: "thinking",
-    SPEAKING: "speaking",
-    WAITING: "waiting"
+
+    IDLE:
+        "idle",
+
+    LISTENING:
+        "listening",
+
+    THINKING:
+        "thinking",
+
+    SPEAKING:
+        "speaking",
+
+    WAITING:
+        "waiting"
 };
 
-let state = STATE.IDLE;
+
+let state =
+    STATE.IDLE;
 
 
 /* =====================================================
    ÁUDIO
 ===================================================== */
 
-let audioStream = null;
-let audioContext = null;
-let analyser = null;
-let microphoneSource = null;
-let animationFrame = null;
+let audioStream =
+    null;
 
-let microphoneActive = false;
+let audioContext =
+    null;
+
+let analyser =
+    null;
+
+let microphoneSource =
+    null;
+
+let animationFrame =
+    null;
+
+let microphoneActive =
+    false;
 
 
 /* =====================================================
    RECONHECIMENTO
 ===================================================== */
 
-let recognition = null;
-let recognitionRunning = false;
+let recognition =
+    null;
 
-let recognitionWanted = false;
+let recognitionRunning =
+    false;
 
-let finalTranscript = "";
+let recognitionWanted =
+    false;
 
-let turnActive = false;
+let finalTranscript =
+    "";
+
+let turnActive =
+    false;
 
 
 /* =====================================================
    CONFIGURAÇÃO
 ===================================================== */
 
-const LANGUAGE = "pt-MZ";
+const LANGUAGE =
+    "pt-MZ";
 
-const FFT_SIZE = 512;
-
-
-/*
-   Parâmetros usados SOMENTE para a reação visual.
-
-   Não controlam o microfone.
-   Não desligam o microfone.
-   Não encerram a conversa.
-*/
-
-const AUDIO_NOISE_FLOOR = 0.008;
-const AUDIO_VOICE_LEVEL = 0.055;
-
-let visualIntensity = 0;
+const FFT_SIZE =
+    512;
 
 
 /* =====================================================
-   ESTADO VISUAL
+   REAÇÃO VISUAL
 ===================================================== */
 
-function setMachineState(newState) {
+const AUDIO_NOISE_FLOOR =
+    0.008;
 
-    state = newState;
+const AUDIO_VOICE_LEVEL =
+    0.055;
+
+let visualIntensity =
+    0;
+
+
+/* =====================================================
+   ESTADO DA MÁQUINA
+===================================================== */
+
+function setMachineState(
+    newState
+) {
+
+    state =
+        newState;
+
 
     if (machine) {
-        machine.dataset.state = newState;
+
+        machine.dataset.state =
+            newState;
     }
+
 
     console.log(
         "Estado:",
@@ -99,7 +145,9 @@ function setMachineState(newState) {
    NORMALIZAÇÃO
 ===================================================== */
 
-function normalizeText(text) {
+function normalizeText(
+    text
+) {
 
     return text
         .toLowerCase()
@@ -124,18 +172,29 @@ function normalizeText(text) {
    COMANDO DE ESPERA
 ===================================================== */
 
-function isWaitingCommand(text) {
+function isWaitingCommand(
+    text
+) {
 
     const commands = [
+
         "espera",
+
         "espera maquina",
+
         "maquina espera",
+
         "espera um pouco",
+
         "espera um bocadinho",
+
         "fica em espera",
+
         "aguarda um pouco",
+
         "volto ja"
     ];
+
 
     return commands.some(
         command =>
@@ -149,17 +208,27 @@ function isWaitingCommand(text) {
    COMANDO DE RETOMA
 ===================================================== */
 
-function isResumeCommand(text) {
+function isResumeCommand(
+    text
+) {
 
     const commands = [
+
         "voltei",
+
         "maquina voltei",
+
         "ja voltei",
+
         "podemos continuar",
+
         "vamos continuar",
+
         "continua",
+
         "maquina continua"
     ];
+
 
     return commands.some(
         command =>
@@ -173,22 +242,37 @@ function isResumeCommand(text) {
    COMANDO DE ENCERRAMENTO
 ===================================================== */
 
-function isCloseCommand(text) {
+function isCloseCommand(
+    text
+) {
 
     const commands = [
+
         "encerra a conversa",
+
         "encerrar a conversa",
+
         "podes encerrar a conversa",
+
         "pode encerrar a conversa",
+
         "fecha a conversa",
+
         "fechar a conversa",
+
         "encerra a sessao",
+
         "encerrar a sessao",
+
         "fecha a sessao",
+
         "fechar a sessao",
+
         "vamos parar por aqui",
+
         "ate logo maquina"
     ];
+
 
     return commands.some(
         command =>
@@ -209,7 +293,9 @@ function processTranscript() {
 
 
     if (!text) {
+
         resetTurn();
+
         return;
     }
 
@@ -229,7 +315,9 @@ function processTranscript() {
     --------------------------------------------- */
 
     if (
-        isCloseCommand(normalized)
+        isCloseCommand(
+            normalized
+        )
     ) {
 
         resetTurn();
@@ -245,7 +333,9 @@ function processTranscript() {
     --------------------------------------------- */
 
     if (
-        isWaitingCommand(normalized)
+        isWaitingCommand(
+            normalized
+        )
     ) {
 
         resetTurn();
@@ -261,7 +351,9 @@ function processTranscript() {
     --------------------------------------------- */
 
     if (
-        isResumeCommand(normalized)
+        isResumeCommand(
+            normalized
+        )
     ) {
 
         resetTurn();
@@ -287,24 +379,27 @@ function processTranscript() {
 
 
     /*
-       A inteligência da Máquina será adicionada
-       posteriormente.
+       A inteligência da Máquina
+       será ligada posteriormente.
     */
 
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        if (
-            microphoneActive &&
-            state === STATE.THINKING
-        ) {
+            if (
+                microphoneActive &&
+                state === STATE.THINKING
+            ) {
 
-            setMachineState(
-                STATE.LISTENING
-            );
-        }
+                setMachineState(
+                    STATE.LISTENING
+                );
+            }
 
-    }, 500);
+        },
+        500
+    );
 
 
     resetTurn();
@@ -317,9 +412,11 @@ function processTranscript() {
 
 function resetTurn() {
 
-    finalTranscript = "";
+    finalTranscript =
+        "";
 
-    turnActive = false;
+    turnActive =
+        false;
 }
 
 
@@ -346,14 +443,11 @@ function createRecognition() {
     recognizer.lang =
         LANGUAGE;
 
-
     recognizer.continuous =
         true;
 
-
     recognizer.interimResults =
         true;
-
 
     recognizer.maxAlternatives =
         1;
@@ -366,12 +460,15 @@ function createRecognition() {
     recognizer.onresult =
         function(event) {
 
-            let transcript = "";
+            let transcript =
+                "";
 
 
             for (
                 let i = event.resultIndex;
+
                 i < event.results.length;
+
                 i++
             ) {
 
@@ -386,6 +483,7 @@ function createRecognition() {
 
 
                 if (!text) {
+
                     continue;
                 }
 
@@ -398,7 +496,8 @@ function createRecognition() {
                     result.isFinal
                 ) {
 
-                    turnActive = true;
+                    turnActive =
+                        true;
                 }
             }
 
@@ -430,20 +529,14 @@ function createRecognition() {
                 !microphoneActive ||
                 state === STATE.WAITING
             ) {
+
                 return;
             }
 
 
-            turnActive = true;
+            turnActive =
+                true;
 
-
-            /*
-               Mantemos o estado LISTENING.
-
-               A reação à intensidade real
-               é feita separadamente pelo
-               analisador de áudio.
-            */
 
             if (
                 state !== STATE.THINKING &&
@@ -468,6 +561,7 @@ function createRecognition() {
                 !microphoneActive ||
                 state === STATE.WAITING
             ) {
+
                 return;
             }
 
@@ -513,10 +607,8 @@ function createRecognition() {
 
 
             /*
-               NÃO reiniciamos automaticamente.
-
-               Isso preserva a estabilidade
-               que acabámos de validar.
+               Não reiniciamos automaticamente.
+               Mantemos a estabilidade validada.
             */
         };
 
@@ -536,6 +628,7 @@ function startRecognition() {
         !microphoneActive ||
         state === STATE.WAITING
     ) {
+
         return;
     }
 
@@ -543,6 +636,7 @@ function startRecognition() {
     if (
         recognitionRunning
     ) {
+
         return;
     }
 
@@ -555,6 +649,7 @@ function startRecognition() {
 
 
     if (!recognition) {
+
         return;
     }
 
@@ -565,6 +660,7 @@ function startRecognition() {
 
         recognitionRunning =
             true;
+
 
         console.log(
             "Reconhecimento iniciado."
@@ -594,9 +690,8 @@ function stopRecognition() {
         false;
 
 
-    if (
-        !recognition
-    ) {
+    if (!recognition) {
+
         return;
     }
 
@@ -627,6 +722,7 @@ async function startMicrophone() {
     if (
         microphoneActive
     ) {
+
         return;
     }
 
@@ -634,13 +730,21 @@ async function startMicrophone() {
     try {
 
         audioStream =
-            await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    autoGainControl: true
-                }
-            });
+            await navigator.mediaDevices
+                .getUserMedia({
+
+                    audio: {
+
+                        echoCancellation:
+                            true,
+
+                        noiseSuppression:
+                            true,
+
+                        autoGainControl:
+                            true
+                    }
+                });
 
 
         audioContext =
@@ -672,9 +776,10 @@ async function startMicrophone() {
 
 
         microphoneSource =
-            audioContext.createMediaStreamSource(
-                audioStream
-            );
+            audioContext
+                .createMediaStreamSource(
+                    audioStream
+                );
 
 
         microphoneSource.connect(
@@ -732,490 +837,7 @@ function monitorAudio() {
         !microphoneActive ||
         !analyser
     ) {
-        return;
-    }
 
-
-    const data =
-        new Uint8Array(
-            analyser.fftSize
-        );
-
-
-    analyser.getByteTimeDomainData(
-        data
-    );
-
-
-    let total = 0;
-
-
-    for (
-        let i = 0;
-        i < data.length;
-        i++
-    ) {
-
-        const value =
-            (data[i] - 128) / 128;
-
-
-        total +=
-            value * value;
-    }
-
-
-    const level =
-        Math.sqrt(
-            total / data.length
-        );
-
-
-    /*
-       Retiramos uma pequena faixa de ruído
-       ambiente para que a Máquina não
-       fique reagindo exageradamente.
-    */
-
-    const usableLevel =
-        Math.max(
-            0,
-            level - AUDIO_NOISE_FLOOR
-        );
-
-
-    /*
-       Transformamos o áudio em uma escala
-       visual de 0 a 1.
-    */
-
-    const targetIntensity =
-        Math.min(
-            1,
-            usableLevel /
-            AUDIO_VOICE_LEVEL
-        );
-
-
-    /*
-       Suavização.
-
-       Evita que a Máquina fique tremendo
-       de forma artificial a cada pequena
-       variação do microfone.
-    */
-
-    visualIntensity +=
-        (
-            targetIntensity -
-            visualIntensity
-        ) * 0.22;
-
-
-    if (machine) {
-
-        machine.style.setProperty(
-            "--voice-intensity",
-            visualIntensity.toFixed(3)
-        );
-    }
-
-
-    /*
-       A intensidade visual NÃO liga
-       nem desliga o microfone.
-
-       Ela apenas controla a presença
-       visual da Máquina.
-    */
-
-
-    animationFrame =
-        requestAnimationFrame(
-            monitorAudio
-        );
-}
-
-
-/* =====================================================
-   ESPERA
-===================================================== */
-
-function enterWaitingMode() {
-
-    console.log(
-        "MÁQUINA → ESPERA"
-    );
-
-
-    setMachineState(
-        STATE.WAITING
-    );
-
-
-    stopRecognition();
-
-    cleanupMicrophoneOnly();
-
-
-    console.log(
-        "Escuta suspensa."
-    );
-}
-
-
-/* =====================================================
-   RETOMAR
-===================================================== */
-
-async function resumeConversation() {
-
-    if (
-        microphoneActive
-    ) {
-        return;
-    }
-
-
-    console.log(
-        "MÁQUINA → RETOMANDO"
-    );
-
-
-    setMachineState(
-        STATE.LISTENING
-    );
-
-
-    await startMicrophone();
-}
-
-
-/* =====================================================
-   ENCERRAR
-===================================================== */
-
-function closeConversation() {
-
-    console.log(
-        "MÁQUINA → ENCERRADA"
-    );
-
-
-    stopRecognition();
-
-    cleanupMicrophoneOnly();
-
-
-    recognition =
-        null;
-
-
-    resetTurn();
-
-
-    setMachineState(
-        STATE.IDLE
-    );
-}
-
-
-/* =====================================================
-   LIMPAR MICROFONE
-===================================================== */
-
-function cleanupMicrophoneOnly() {
-
-    microphoneActive =
-        false;
-
-
-    visualIntensity =
-        0;
-
-
-    if (animationFrame) {
-
-        cancelAnimationFrame(
-            animationFrame
-        );
-
-        animationFrame =
-            null;
-    }
-
-
-    if (microphoneSource) {
-
-        try {
-
-            microphoneSource.disconnect();
-
-        } catch (error) {}
-
-        microphoneSource =
-            null;
-    }
-
-
-    analyser =
-        null;
-
-
-    if (audioStream) {
-
-        audioStream
-            .getTracks()
-            .forEach(
-                track => track.stop()
-            );
-
-        audioStream =
-            null;
-    }
-
-
-    if (audioContext) {
-
-        try {
-
-            audioContext.close();
-
-        } catch (error) {}
-
-        audioContext =
-            null;
-    }
-
-
-    if (machine) {
-
-        machine.style.setProperty(
-            "--voice-intensity",
-            "0"
-        );
-    }
-}
-
-
-/* =====================================================
-   LIMPEZA COMPLETA
-===================================================== */
-
-function cleanupMicrophone() {
-
-    stopRecognition();
-
-    cleanupMicrophoneOnly();
-
-    recognition =
-        null;
-
-    resetTurn();
-
-    setMachineState(
-        STATE.IDLE
-    );
-}
-
-
-/* =====================================================
-   BOTÃO
-===================================================== */
-
-if (voiceButton) {
-
-    voiceButton.addEventListener(
-        "click",
-        async function() {
-
-            if (
-                microphoneActive
-            ) {
-
-                closeConversation();
-
-            } else {
-
-                await startMicrophone();
-            }
-
-        }
-    );
-}
-
-
-/* =====================================================
-   INICIAL
-===================================================== */
-
-setMachineState(
-    STATE.IDLE
-);
-/* =====================================================
-   HOMEM E A MÁQUINA
-   V6.2 — PARTE 2/2
-   ÁUDIO ESTÁVEL + REAÇÃO À VOZ + MACHINE VOICE
-===================================================== */
-
-
-/* =====================================================
-   PARAR RECONHECIMENTO
-===================================================== */
-
-function stopRecognition() {
-
-    recognitionWanted =
-        false;
-
-
-    if (
-        !recognition
-    ) {
-        return;
-    }
-
-
-    try {
-
-        recognition.stop();
-
-    } catch (error) {
-
-        console.log(
-            "Reconhecimento já estava parado."
-        );
-    }
-
-
-    recognitionRunning =
-        false;
-}
-
-
-/* =====================================================
-   INICIAR MICROFONE
-===================================================== */
-
-async function startMicrophone() {
-
-    if (
-        microphoneActive
-    ) {
-        return;
-    }
-
-
-    try {
-
-        audioStream =
-            await navigator.mediaDevices.getUserMedia({
-
-                audio: {
-
-                    echoCancellation: true,
-
-                    noiseSuppression: true,
-
-                    autoGainControl: true
-
-                }
-
-            });
-
-
-        audioContext =
-            new (
-
-                window.AudioContext ||
-
-                window.webkitAudioContext
-
-            )();
-
-
-        if (
-            audioContext.state ===
-            "suspended"
-        ) {
-
-            await audioContext.resume();
-        }
-
-
-        analyser =
-            audioContext.createAnalyser();
-
-
-        analyser.fftSize =
-            FFT_SIZE;
-
-
-        analyser.smoothingTimeConstant =
-            0.75;
-
-
-        microphoneSource =
-            audioContext.createMediaStreamSource(
-                audioStream
-            );
-
-
-        microphoneSource.connect(
-            analyser
-        );
-
-
-        microphoneActive =
-            true;
-
-
-        visualIntensity =
-            0;
-
-
-        setMachineState(
-            STATE.LISTENING
-        );
-
-
-        monitorAudio();
-
-
-        recognitionWanted =
-            true;
-
-
-        startRecognition();
-
-
-        console.log(
-            "Sessão de áudio iniciada."
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Erro no microfone:",
-            error
-        );
-
-
-        cleanupMicrophone();
-    }
-}
-
-
-/* =====================================================
-   MONITORAR ÁUDIO
-===================================================== */
-
-function monitorAudio() {
-
-    if (
-        !microphoneActive ||
-        !analyser
-    ) {
         return;
     }
 
@@ -1251,8 +873,7 @@ function monitorAudio() {
 
 
         total +=
-            value *
-            value;
+            value * value;
     }
 
 
@@ -1263,49 +884,23 @@ function monitorAudio() {
         );
 
 
-    /*
-       Pequena zona morta contra
-       ruído ambiente.
-    */
-
     const usableLevel =
         Math.max(
-
             0,
-
             level -
             AUDIO_NOISE_FLOOR
-
         );
 
-
-    /*
-       Intensidade visual.
-    */
 
     const targetIntensity =
         Math.min(
-
             1,
-
             usableLevel /
             AUDIO_VOICE_LEVEL
-
         );
 
 
-    /*
-       Suavização da reação.
-
-       Isto NÃO controla:
-       - microfone
-       - reconhecimento
-       - encerramento
-       - pausa
-    */
-
     visualIntensity +=
-
         (
             targetIntensity -
             visualIntensity
@@ -1319,16 +914,13 @@ function monitorAudio() {
             "--voice-intensity",
 
             visualIntensity.toFixed(3)
-
         );
     }
 
 
     animationFrame =
         requestAnimationFrame(
-
             monitorAudio
-
         );
 }
 
@@ -1348,15 +940,6 @@ function enterWaitingMode() {
         STATE.WAITING
     );
 
-
-    /*
-       Paramos o reconhecimento
-       e liberamos o microfone físico.
-
-       A Máquina NÃO fica ouvindo
-       enquanto o utilizador pediu
-       para esperar.
-    */
 
     stopRecognition();
 
@@ -1395,8 +978,6 @@ async function resumeConversation() {
 
     await startMicrophone();
 }
-
-
 /* =====================================================
    ENCERRAR
 ===================================================== */
@@ -1409,12 +990,17 @@ function closeConversation() {
 
 
     /*
-       Se a Máquina estiver falando
-       no futuro, a fala também será
-       interrompida.
+       Se a Máquina estiver falando,
+       a fala também será interrompida.
     */
 
-    MachineVoice.stopSpeaking();
+    if (
+        typeof MachineVoice !==
+        "undefined"
+    ) {
+
+        MachineVoice.stopSpeaking();
+    }
 
 
     stopRecognition();
@@ -1483,10 +1069,8 @@ function cleanupMicrophoneOnly() {
         audioStream
             .getTracks()
             .forEach(
-
                 track =>
                     track.stop()
-
             );
 
 
@@ -1516,7 +1100,6 @@ function cleanupMicrophoneOnly() {
             "--voice-intensity",
 
             "0"
-
         );
     }
 }
@@ -1528,11 +1111,16 @@ function cleanupMicrophoneOnly() {
 
 function cleanupMicrophone() {
 
-    MachineVoice.stopSpeaking();
+    if (
+        typeof MachineVoice !==
+        "undefined"
+    ) {
+
+        MachineVoice.stopSpeaking();
+    }
 
 
     stopRecognition();
-
 
     cleanupMicrophoneOnly();
 
@@ -1563,13 +1151,12 @@ if (voiceButton) {
         async function() {
 
             /*
-               Um toque inicia a sessão.
+               Um toque inicia.
 
                Outro toque encerra.
 
-               A sessão de escuta não é
-               desligada por pequenas pausas
-               na fala.
+               Pequenas pausas na fala
+               não desligam o microfone.
             */
 
             if (
@@ -1581,85 +1168,49 @@ if (voiceButton) {
             } else {
 
                 await startMicrophone();
-
             }
-
         }
-
     );
 }
 
 
 /* =====================================================
-   INICIAL
-===================================================== */
-
-setMachineState(
-    STATE.IDLE
-);
-
-
-/* =====================================================
-   DEBUG DA MACHINE VOICE
-   -----------------------------------------------------
-   Não inicia nenhuma voz.
-   Serve apenas para confirmar que
-   a camada foi carregada corretamente.
-===================================================== */
-
-console.log(
-    "MachineVoice disponível:",
-    MachineVoice
-);
-
-console.log(
-    "Voz configurada:",
-    MachineVoice.voice
-);
-
-console.log(
-    "Idioma configurado:",
-    MachineVoice.language
-);
-/* =====================================================
-   MACHINE VOICE — V6.3
-   MOTOR DE VOZ + FALLBACK GRATUITO
-
-   IMPORTANTE:
-   - Não controla o microfone.
-   - Não controla o reconhecimento.
-   - Não encerra a conversa.
-   - Não altera a reação visual à voz.
-   - Não usa API paga.
+   MACHINE VOICE — V6.4
+   FALLBACK GRATUITO DO NAVEGADOR
 ===================================================== */
 
 const MachineVoice = {
 
+    provider:
+        "browser",
+
+    voiceName:
+        "",
+
+    language:
+        "pt-PT",
+
+    gender:
+        "male",
+
+    speed:
+        0.95,
+
+    pitch:
+        0.80,
+
+    volume:
+        1.0,
+
+    speaking:
+        false,
+
+    currentUtterance:
+        null,
+
+
     /* =================================================
-       CONFIGURAÇÃO
-    ================================================= */
-
-    provider: "browser",
-
-    voiceName: "",
-
-    language: "pt-PT",
-
-    gender: "male",
-
-    speed: 0.95,
-
-    pitch: 0.80,
-
-    volume: 1.0,
-
-    speaking: false,
-
-    currentUtterance: null,
-
-
-    /* =================================================
-       LISTAR VOZES DISPONÍVEIS
+       LISTAR VOZES
     ================================================= */
 
     getVoices() {
@@ -1683,60 +1234,32 @@ const MachineVoice = {
 
 
     /* =================================================
-       ENCONTRAR VOZ
-    ================================================= */
-
-    findVoice() {
-
-        const voices =
-            this.getVoices();
-
-
-        if (!voices.length) {
-
-            return null;
-        }
-
-
-        /*
-           Primeiro procuramos exatamente
-           o idioma configurado.
-        */
-
-        let voice =
-            voices.find(
-                item =>
-                    item.lang ===
-                    this.language
-            );
-
-
-        /*
-           Depois procuramos português
-           independentemente da região.
-        */
-
-        if (!voice) {
-
-            voice =
-                voices.find(
-                    item =>
-                        item.lang
-                            .toLowerCase()
-                            .startsWith("pt")
-                );
-        }
-
-
-        return voice || null;
-    },
-
-
-    /* =================================================
        CONFIGURAR
     ================================================= */
 
-    configure(options = {}) {
+    configure(
+        options = {}
+    ) {
+
+        if (
+            typeof options.provider ===
+            "string"
+        ) {
+
+            this.provider =
+                options.provider;
+        }
+
+
+        if (
+            typeof options.voiceName ===
+            "string"
+        ) {
+
+            this.voiceName =
+                options.voiceName;
+        }
+
 
         if (
             typeof options.language ===
@@ -1759,23 +1282,13 @@ const MachineVoice = {
 
 
         if (
-            typeof options.voiceName ===
-            "string"
-        ) {
-
-            this.voiceName =
-                options.voiceName;
-        }
-
-
-        if (
             typeof options.speed ===
             "number"
         ) {
 
             this.speed =
                 Math.max(
-                    0.5,
+                    0.1,
                     Math.min(
                         2,
                         options.speed
@@ -1819,6 +1332,7 @@ const MachineVoice = {
         console.log(
             "MachineVoice configurada:",
             {
+
                 provider:
                     this.provider,
 
@@ -1842,21 +1356,111 @@ const MachineVoice = {
 
 
     /* =================================================
+       ESCOLHER VOZ
+    ================================================= */
+
+    selectVoice() {
+
+        const voices =
+            this.getVoices();
+
+
+        if (!voices.length) {
+
+            return null;
+        }
+
+
+        if (this.voiceName) {
+
+            const exact =
+                voices.find(
+                    voice =>
+                        voice.name ===
+                        this.voiceName
+                );
+
+
+            if (exact) {
+
+                return exact;
+            }
+        }
+
+
+        const language =
+            this.language
+                .toLowerCase();
+
+
+        const languageVoices =
+            voices.filter(
+                voice =>
+                    voice.lang
+                        .toLowerCase()
+                        .startsWith(
+                            language
+                                .split("-")[0]
+                        )
+            );
+
+
+        if (!languageVoices.length) {
+
+            return null;
+        }
+
+
+        /*
+           Se o navegador fornecer
+           indicação de género no nome,
+           tentamos respeitar a escolha.
+        */
+
+        if (
+            this.gender
+        ) {
+
+            const gender =
+                this.gender
+                    .toLowerCase();
+
+
+            const genderVoice =
+                languageVoices.find(
+                    voice =>
+                        voice.name
+                            .toLowerCase()
+                            .includes(gender)
+                );
+
+
+            if (genderVoice) {
+
+                return genderVoice;
+            }
+        }
+
+
+        return languageVoices[0];
+    },
+
+
+    /* =================================================
        FALAR
     ================================================= */
 
-    speak(text) {
+    speak(
+        text
+    ) {
 
         return new Promise(
-            (resolve, reject) => {
+            resolve => {
 
-                const cleanText =
-                    String(
-                        text || ""
-                    ).trim();
-
-
-                if (!cleanText) {
+                if (
+                    !text ||
+                    !text.trim()
+                ) {
 
                     resolve();
 
@@ -1869,7 +1473,7 @@ const MachineVoice = {
                 ) {
 
                     console.warn(
-                        "Este navegador não possui TTS."
+                        "Speech Synthesis não disponível."
                     );
 
                     resolve();
@@ -1878,30 +1482,26 @@ const MachineVoice = {
                 }
 
 
-                /*
-                   Evita duas falas simultâneas.
-                */
-
                 this.stopSpeaking();
 
 
                 const utterance =
                     new SpeechSynthesisUtterance(
-                        cleanText
+                        text
                     );
 
 
-                const selectedVoice =
-                    this.findVoice();
+                const voice =
+                    this.selectVoice();
 
 
-                if (selectedVoice) {
+                if (voice) {
 
                     utterance.voice =
-                        selectedVoice;
+                        voice;
 
                     utterance.lang =
-                        selectedVoice.lang;
+                        voice.lang;
 
                 } else {
 
@@ -1956,6 +1556,7 @@ const MachineVoice = {
                         this.speaking =
                             false;
 
+
                         this.currentUtterance =
                             null;
 
@@ -1997,6 +1598,7 @@ const MachineVoice = {
                         this.speaking =
                             false;
 
+
                         this.currentUtterance =
                             null;
 
@@ -2013,6 +1615,7 @@ const MachineVoice = {
                         ) {
 
                             setMachineState(
+
                                 microphoneActive
                                     ? STATE.LISTENING
                                     : STATE.IDLE
@@ -2085,22 +1688,24 @@ const MachineVoice = {
 
 /* =====================================================
    CONFIGURAÇÃO INICIAL
-
-   Estes valores são apenas para teste.
-   NÃO significam que esta será a voz definitiva.
 ===================================================== */
 
 MachineVoice.configure({
 
-    language: "pt-PT",
+    language:
+        "pt-PT",
 
-    gender: "male",
+    gender:
+        "male",
 
-    speed: 0.95,
+    speed:
+        0.95,
 
-    pitch: 0.80,
+    pitch:
+        0.80,
 
-    volume: 1.0
+    volume:
+        1.0
 });
 
 
@@ -2115,7 +1720,9 @@ if (
     window
         .speechSynthesis
         .addEventListener(
+
             "voiceschanged",
+
             function() {
 
                 const voices =
@@ -2130,6 +1737,7 @@ if (
 
                 const portugueseVoices =
                     voices.filter(
+
                         voice =>
                             voice.lang
                                 .toLowerCase()
@@ -2148,8 +1756,6 @@ if (
 
 /* =====================================================
    TESTE MANUAL
-   -----------------------------------------------------
-   Não é chamado automaticamente.
 ===================================================== */
 
 window.testMachineVoice =
@@ -2161,6 +1767,34 @@ window.testMachineVoice =
     };
 
 
+/* =====================================================
+   DEBUG
+===================================================== */
+
 console.log(
-    "MachineVoice V6.3 carregada."
+    "MachineVoice disponível:",
+    MachineVoice
+);
+
+console.log(
+    "Voz configurada:",
+    MachineVoice.voiceName
+);
+
+console.log(
+    "Idioma configurado:",
+    MachineVoice.language
+);
+
+console.log(
+    "MachineVoice V6.4 carregada."
+);
+
+
+/* =====================================================
+   INICIAL
+===================================================== */
+
+setMachineState(
+    STATE.IDLE
 );
