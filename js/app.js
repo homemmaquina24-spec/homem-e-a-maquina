@@ -1,35 +1,63 @@
 /* =====================================================
    HOMEM E A MÁQUINA
-   VOZ V5 — MICROFONE ESTÁVEL
-
-   OBJETIVO DESTA ETAPA:
-   - Abrir o microfone uma única vez.
-   - Não reiniciar o microfone durante silêncio.
-   - Não gravar a sessão inteira.
-   - Não criar sons pelo JavaScript.
-   - Testar somente o ciclo de vida do áudio.
+   V6 — ÁUDIO ESTÁVEL + RECONHECIMENTO CONTROLADO
 ===================================================== */
 
 const machine = document.querySelector(".machine");
 const voiceButton = document.querySelector(".test-voice");
 
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
 
 /* =====================================================
-   ESTADO
+   ESTADOS
+===================================================== */
+
+const STATE = {
+    IDLE: "idle",
+    LISTENING: "listening",
+    THINKING: "thinking",
+    SPEAKING: "speaking",
+    WAITING: "waiting"
+};
+
+let state = STATE.IDLE;
+
+
+/* =====================================================
+   ÁUDIO
 ===================================================== */
 
 let audioStream = null;
 let audioContext = null;
 let analyser = null;
 let microphoneSource = null;
+let animationFrame = null;
 
 let microphoneActive = false;
-let animationFrame = null;
+
+
+/* =====================================================
+   RECONHECIMENTO
+===================================================== */
+
+let recognition = null;
+let recognitionRunning = false;
+
+let recognitionWanted = false;
+
+let finalTranscript = "";
+
+let turnActive = false;
 
 
 /* =====================================================
    CONFIGURAÇÃO
 ===================================================== */
+
+const LANGUAGE = "pt-MZ";
 
 const FFT_SIZE = 512;
 
@@ -38,13 +66,550 @@ const FFT_SIZE = 512;
    ESTADO VISUAL
 ===================================================== */
 
-function setMachineState(state) {
+function setMachineState(newState) {
 
-    if (!machine) {
+    state = newState;
+
+    if (machine) {
+        machine.dataset.state = newState;
+    }
+
+    console.log(
+        "Estado:",
+        newState
+    );
+}
+
+
+/* =====================================================
+   NORMALIZAÇÃO
+===================================================== */
+
+function normalizeText(text) {
+
+    return text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .replace(
+            /[.,!?;:]/g,
+            " "
+        )
+        .replace(
+            /\s+/g,
+            " "
+        )
+        .trim();
+}
+
+
+/* =====================================================
+   COMANDO DE ESPERA
+===================================================== */
+
+function isWaitingCommand(text) {
+
+    const commands = [
+        "espera",
+        "espera maquina",
+        "maquina espera",
+        "espera um pouco",
+        "espera um bocadinho",
+        "fica em espera",
+        "aguarda um pouco",
+        "volto ja"
+    ];
+
+    return commands.some(
+        command =>
+            text === command ||
+            text.includes(command)
+    );
+}
+
+
+/* =====================================================
+   COMANDO DE RETOMA
+===================================================== */
+
+function isResumeCommand(text) {
+
+    const commands = [
+        "voltei",
+        "maquina voltei",
+        "ja voltei",
+        "podemos continuar",
+        "vamos continuar",
+        "continua",
+        "maquina continua"
+    ];
+
+    return commands.some(
+        command =>
+            text === command ||
+            text.includes(command)
+    );
+}
+
+
+/* =====================================================
+   COMANDO DE ENCERRAMENTO
+===================================================== */
+
+function isCloseCommand(text) {
+
+    const commands = [
+        "encerra a conversa",
+        "encerrar a conversa",
+        "podes encerrar a conversa",
+        "pode encerrar a conversa",
+        "fecha a conversa",
+        "fechar a conversa",
+        "encerra a sessao",
+        "encerrar a sessao",
+        "fecha a sessao",
+        "fechar a sessao",
+        "vamos parar por aqui",
+        "ate logo maquina"
+    ];
+
+    return commands.some(
+        command =>
+            text === command ||
+            text.includes(command)
+    );
+}
+
+
+/* =====================================================
+   PROCESSAR TEXTO
+===================================================== */
+
+function processTranscript() {
+
+    const text =
+        finalTranscript.trim();
+
+
+    if (!text) {
+        resetTurn();
         return;
     }
 
-    machine.dataset.state = state;
+
+    console.log(
+        "TURNO:",
+        text
+    );
+
+
+    const normalized =
+        normalizeText(text);
+
+
+    /* ---------------------------------------------
+       ENCERRAR
+    --------------------------------------------- */
+
+    if (
+        isCloseCommand(normalized)
+    ) {
+
+        resetTurn();
+
+        closeConversation();
+
+        return;
+    }
+
+
+    /* ---------------------------------------------
+       ESPERA
+    --------------------------------------------- */
+
+    if (
+        isWaitingCommand(normalized)
+    ) {
+
+        resetTurn();
+
+        enterWaitingMode();
+
+        return;
+    }
+
+
+    /* ---------------------------------------------
+       RETOMAR
+    --------------------------------------------- */
+
+    if (
+        isResumeCommand(normalized)
+    ) {
+
+        resetTurn();
+
+        resumeConversation();
+
+        return;
+    }
+
+
+    /* ---------------------------------------------
+       TURNO NORMAL
+    --------------------------------------------- */
+
+    console.log(
+        "Turno normal recebido."
+    );
+
+
+    setState(
+        STATE.THINKING
+    );
+
+
+    /*
+       A inteligência da Máquina será adicionada
+       posteriormente.
+
+       Por enquanto apenas validamos
+       o fluxo de voz.
+    */
+
+
+    setTimeout(() => {
+
+        if (
+            microphoneActive &&
+            state === STATE.THINKING
+        ) {
+
+            setState(
+                STATE.LISTENING
+            );
+        }
+
+    }, 500);
+
+
+    resetTurn();
+}
+
+
+/* =====================================================
+   RESETAR TURNO
+===================================================== */
+
+function resetTurn() {
+
+    finalTranscript = "";
+
+    turnActive = false;
+}
+
+
+/* =====================================================
+   CRIAR RECONHECIMENTO
+===================================================== */
+
+function createRecognition() {
+
+    if (!SpeechRecognition) {
+
+        console.error(
+            "SpeechRecognition não suportado."
+        );
+
+        return null;
+    }
+
+
+    const recognizer =
+        new SpeechRecognition();
+
+
+    recognizer.lang =
+        LANGUAGE;
+
+
+    /*
+       O reconhecimento pode receber
+       vários resultados durante a sessão.
+    */
+
+    recognizer.continuous =
+        true;
+
+
+    recognizer.interimResults =
+        true;
+
+
+    recognizer.maxAlternatives =
+        1;
+
+
+    /* =================================================
+       RESULTADO
+    ================================================= */
+
+    recognizer.onresult =
+        function(event) {
+
+            let transcript = "";
+
+
+            for (
+                let i = event.resultIndex;
+                i < event.results.length;
+                i++
+            ) {
+
+                const result =
+                    event.results[i];
+
+
+                const text =
+                    result[0]
+                        .transcript
+                        .trim();
+
+
+                if (!text) {
+                    continue;
+                }
+
+
+                transcript +=
+                    text + " ";
+
+
+                if (
+                    result.isFinal
+                ) {
+
+                    turnActive = true;
+                }
+            }
+
+
+            if (
+                transcript.trim()
+            ) {
+
+                finalTranscript +=
+                    transcript;
+            }
+
+
+            console.log(
+                "Reconhecido:",
+                finalTranscript.trim()
+            );
+        };
+
+
+    /* =================================================
+       FALA
+    ================================================= */
+
+    recognizer.onspeechstart =
+        function() {
+
+            if (
+                !microphoneActive ||
+                state === STATE.WAITING
+            ) {
+                return;
+            }
+
+
+            turnActive = true;
+
+
+            setState(
+                STATE.LISTENING
+            );
+        };
+
+
+    /* =================================================
+       FIM DA FALA
+    ================================================= */
+
+    recognizer.onspeechend =
+        function() {
+
+            if (
+                !microphoneActive ||
+                state === STATE.WAITING
+            ) {
+                return;
+            }
+
+
+            /*
+               NÃO desligamos o microfone.
+
+               Apenas processamos o turno
+               reconhecido.
+            */
+
+            if (
+                turnActive &&
+                finalTranscript.trim()
+            ) {
+
+                processTranscript();
+            }
+        };
+
+
+    /* =================================================
+       ERRO
+    ================================================= */
+
+    recognizer.onerror =
+        function(event) {
+
+            console.log(
+                "Reconhecimento:",
+                event.error
+            );
+
+
+            /*
+               Um erro do reconhecimento
+               não encerra a sessão de áudio.
+            */
+        };
+
+
+    /* =================================================
+       FIM DO RECONHECIMENTO
+    ================================================= */
+
+    recognizer.onend =
+        function() {
+
+            recognitionRunning =
+                false;
+
+
+            console.log(
+                "Reconhecimento terminou."
+            );
+
+
+            /*
+               IMPORTANTE:
+
+               Não iniciamos novamente
+               automaticamente nesta versão.
+
+               O microfone continua separado.
+            */
+        };
+
+
+    return recognizer;
+}
+
+
+/* =====================================================
+   INICIAR RECONHECIMENTO
+===================================================== */
+
+function startRecognition() {
+
+    if (
+        !recognitionWanted ||
+        !microphoneActive ||
+        state === STATE.WAITING
+    ) {
+        return;
+    }
+
+
+    if (
+        recognitionRunning
+    ) {
+        return;
+    }
+
+
+    if (!recognition) {
+
+        recognition =
+            createRecognition();
+    }
+
+
+    if (!recognition) {
+        return;
+    }
+
+
+    try {
+
+        recognition.start();
+
+        recognitionRunning =
+            true;
+
+        console.log(
+            "Reconhecimento iniciado."
+        );
+
+    } catch (error) {
+
+        console.log(
+            "Não foi possível iniciar reconhecimento:",
+            error
+        );
+
+
+        recognitionRunning =
+            false;
+    }
+}
+
+
+/* =====================================================
+   PARAR RECONHECIMENTO
+===================================================== */
+
+function stopRecognition() {
+
+    recognitionWanted =
+        false;
+
+
+    if (
+        !recognition
+    ) {
+        return;
+    }
+
+
+    try {
+
+        recognition.stop();
+
+    } catch (error) {
+
+        console.log(
+            "Reconhecimento já estava parado."
+        );
+    }
+
+
+    recognitionRunning =
+        false;
 }
 
 
@@ -54,36 +619,14 @@ function setMachineState(state) {
 
 async function startMicrophone() {
 
-    /*
-       Proteção contra chamadas duplicadas.
-    */
-
-    if (microphoneActive) {
-        return;
-    }
-
-
     if (
-        !navigator.mediaDevices ||
-        !navigator.mediaDevices.getUserMedia
+        microphoneActive
     ) {
-
-        console.error(
-            "O navegador não disponibiliza acesso ao microfone."
-        );
-
         return;
     }
 
 
     try {
-
-        /*
-           IMPORTANTE:
-
-           getUserMedia é chamado apenas UMA VEZ
-           para esta sessão.
-        */
 
         audioStream =
             await navigator.mediaDevices.getUserMedia({
@@ -94,10 +637,6 @@ async function startMicrophone() {
                 }
             });
 
-
-        /*
-           Criar o contexto de áudio.
-        */
 
         audioContext =
             new (
@@ -115,14 +654,6 @@ async function startMicrophone() {
         }
 
 
-        /*
-           Analisador.
-
-           Ele NÃO grava o áudio.
-           Apenas permite medir o sinal
-           em tempo real.
-        */
-
         analyser =
             audioContext.createAnalyser();
 
@@ -134,10 +665,6 @@ async function startMicrophone() {
         analyser.smoothingTimeConstant =
             0.75;
 
-
-        /*
-           Conectar o microfone ao analisador.
-        */
 
         microphoneSource =
             audioContext.createMediaStreamSource(
@@ -154,23 +681,33 @@ async function startMicrophone() {
             true;
 
 
-        setMachineState(
-            "listening"
-        );
-
-
-        console.log(
-            "Microfone iniciado uma única vez."
+        setState(
+            STATE.LISTENING
         );
 
 
         monitorAudio();
 
 
+        /*
+           O reconhecimento começa uma vez.
+        */
+
+        recognitionWanted =
+            true;
+
+
+        startRecognition();
+
+
+        console.log(
+            "Sessão de áudio iniciada."
+        );
+
     } catch (error) {
 
         console.error(
-            "Erro ao acessar o microfone:",
+            "Erro no microfone:",
             error
         );
 
@@ -205,10 +742,6 @@ function monitorAudio() {
     );
 
 
-    /*
-       Calcular energia do sinal.
-    */
-
     let total = 0;
 
 
@@ -233,12 +766,6 @@ function monitorAudio() {
         );
 
 
-    /*
-       Intensidade visual.
-
-       Isto não grava o áudio.
-    */
-
     const intensity =
         Math.min(
             1,
@@ -255,10 +782,6 @@ function monitorAudio() {
     }
 
 
-    /*
-       Próxima leitura.
-    */
-
     animationFrame =
         requestAnimationFrame(
             monitorAudio
@@ -267,18 +790,104 @@ function monitorAudio() {
 
 
 /* =====================================================
-   ENCERRAR MICROFONE
+   ESPERA
 ===================================================== */
 
-function cleanupMicrophone() {
+function enterWaitingMode() {
+
+    console.log(
+        "MÁQUINA → ESPERA"
+    );
+
+
+    setState(
+        STATE.WAITING
+    );
+
+
+    /*
+       O microfone físico é liberado.
+
+       Não fica ouvindo enquanto o Homem
+       pediu privacidade.
+    */
+
+    stopRecognition();
+
+    cleanupMicrophoneOnly();
+
+
+    console.log(
+        "Escuta suspensa."
+    );
+}
+
+
+/* =====================================================
+   RETOMAR
+===================================================== */
+
+async function resumeConversation() {
+
+    if (
+        microphoneActive
+    ) {
+        return;
+    }
+
+
+    console.log(
+        "MÁQUINA → RETOMANDO"
+    );
+
+
+    setState(
+        STATE.LISTENING
+    );
+
+
+    await startMicrophone();
+}
+
+
+/* =====================================================
+   ENCERRAR
+===================================================== */
+
+function closeConversation() {
+
+    console.log(
+        "MÁQUINA → ENCERRADA"
+    );
+
+
+    stopRecognition();
+
+    cleanupMicrophoneOnly();
+
+
+    recognition =
+        null;
+
+
+    resetTurn();
+
+
+    setState(
+        STATE.IDLE
+    );
+}
+
+
+/* =====================================================
+   LIMPAR MICROFONE
+===================================================== */
+
+function cleanupMicrophoneOnly() {
 
     microphoneActive =
         false;
 
-
-    /*
-       Parar o monitoramento visual.
-    */
 
     if (animationFrame) {
 
@@ -286,13 +895,10 @@ function cleanupMicrophone() {
             animationFrame
         );
 
-        animationFrame = null;
+        animationFrame =
+            null;
     }
 
-
-    /*
-       Desconectar o analisador.
-    */
 
     if (microphoneSource) {
 
@@ -300,24 +906,16 @@ function cleanupMicrophone() {
 
             microphoneSource.disconnect();
 
-        } catch (error) {
+        } catch (error) {}
 
-            console.log(
-                "Fonte de áudio já desconectada."
-            );
-        }
-
-        microphoneSource = null;
+        microphoneSource =
+            null;
     }
 
 
-    analyser = null;
+    analyser =
+        null;
 
-
-    /*
-       SOMENTE aqui liberamos
-       o microfone físico.
-    */
 
     if (audioStream) {
 
@@ -327,13 +925,10 @@ function cleanupMicrophone() {
                 track => track.stop()
             );
 
-        audioStream = null;
+        audioStream =
+            null;
     }
 
-
-    /*
-       Fechar contexto de áudio.
-    */
 
     if (audioContext) {
 
@@ -341,14 +936,10 @@ function cleanupMicrophone() {
 
             audioContext.close();
 
-        } catch (error) {
+        } catch (error) {}
 
-            console.log(
-                "Contexto de áudio já encerrado."
-            );
-        }
-
-        audioContext = null;
+        audioContext =
+            null;
     }
 
 
@@ -359,21 +950,32 @@ function cleanupMicrophone() {
             "0"
         );
     }
+}
 
 
-    setMachineState(
-        "idle"
-    );
+/* =====================================================
+   LIMPEZA COMPLETA
+===================================================== */
 
+function cleanupMicrophone() {
 
-    console.log(
-        "Microfone encerrado."
+    stopRecognition();
+
+    cleanupMicrophoneOnly();
+
+    recognition =
+        null;
+
+    resetTurn();
+
+    setState(
+        STATE.IDLE
     );
 }
 
 
 /* =====================================================
-   BOTÃO 🎙️
+   BOTÃO
 ===================================================== */
 
 if (voiceButton) {
@@ -386,19 +988,9 @@ if (voiceButton) {
                 microphoneActive
             ) {
 
-                /*
-                   Segundo toque:
-                   encerra a sessão.
-                */
-
-                cleanupMicrophone();
+                closeConversation();
 
             } else {
-
-                /*
-                   Primeiro toque:
-                   inicia a sessão.
-                */
 
                 await startMicrophone();
             }
@@ -409,9 +1001,9 @@ if (voiceButton) {
 
 
 /* =====================================================
-   ESTADO INICIAL
+   INICIAL
 ===================================================== */
 
 setMachineState(
-    "idle"
+    STATE.IDLE
 );
