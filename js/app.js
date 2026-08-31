@@ -1,6 +1,6 @@
 /* =====================================================
    HOMEM E A MÁQUINA
-   V6 — ÁUDIO ESTÁVEL + RECONHECIMENTO CONTROLADO
+   V6.1 — ÁUDIO ESTÁVEL + REAÇÃO À VOZ
 ===================================================== */
 
 const machine = document.querySelector(".machine");
@@ -60,6 +60,20 @@ let turnActive = false;
 const LANGUAGE = "pt-MZ";
 
 const FFT_SIZE = 512;
+
+
+/*
+   Parâmetros usados SOMENTE para a reação visual.
+
+   Não controlam o microfone.
+   Não desligam o microfone.
+   Não encerram a conversa.
+*/
+
+const AUDIO_NOISE_FLOOR = 0.008;
+const AUDIO_VOICE_LEVEL = 0.055;
+
+let visualIntensity = 0;
 
 
 /* =====================================================
@@ -267,7 +281,7 @@ function processTranscript() {
     );
 
 
-    setState(
+    setMachineState(
         STATE.THINKING
     );
 
@@ -275,9 +289,6 @@ function processTranscript() {
     /*
        A inteligência da Máquina será adicionada
        posteriormente.
-
-       Por enquanto apenas validamos
-       o fluxo de voz.
     */
 
 
@@ -288,7 +299,7 @@ function processTranscript() {
             state === STATE.THINKING
         ) {
 
-            setState(
+            setMachineState(
                 STATE.LISTENING
             );
         }
@@ -335,11 +346,6 @@ function createRecognition() {
     recognizer.lang =
         LANGUAGE;
 
-
-    /*
-       O reconhecimento pode receber
-       vários resultados durante a sessão.
-    */
 
     recognizer.continuous =
         true;
@@ -414,7 +420,7 @@ function createRecognition() {
 
 
     /* =================================================
-       FALA
+       INÍCIO DA FALA
     ================================================= */
 
     recognizer.onspeechstart =
@@ -431,9 +437,23 @@ function createRecognition() {
             turnActive = true;
 
 
-            setState(
-                STATE.LISTENING
-            );
+            /*
+               Mantemos o estado LISTENING.
+
+               A reação à intensidade real
+               é feita separadamente pelo
+               analisador de áudio.
+            */
+
+            if (
+                state !== STATE.THINKING &&
+                state !== STATE.SPEAKING
+            ) {
+
+                setMachineState(
+                    STATE.LISTENING
+                );
+            }
         };
 
 
@@ -451,13 +471,6 @@ function createRecognition() {
                 return;
             }
 
-
-            /*
-               NÃO desligamos o microfone.
-
-               Apenas processamos o turno
-               reconhecido.
-            */
 
             if (
                 turnActive &&
@@ -480,12 +493,6 @@ function createRecognition() {
                 "Reconhecimento:",
                 event.error
             );
-
-
-            /*
-               Um erro do reconhecimento
-               não encerra a sessão de áudio.
-            */
         };
 
 
@@ -506,12 +513,10 @@ function createRecognition() {
 
 
             /*
-               IMPORTANTE:
+               NÃO reiniciamos automaticamente.
 
-               Não iniciamos novamente
-               automaticamente nesta versão.
-
-               O microfone continua separado.
+               Isso preserva a estabilidade
+               que acabámos de validar.
             */
         };
 
@@ -681,17 +686,17 @@ async function startMicrophone() {
             true;
 
 
-        setState(
+        visualIntensity =
+            0;
+
+
+        setMachineState(
             STATE.LISTENING
         );
 
 
         monitorAudio();
 
-
-        /*
-           O reconhecimento começa uma vez.
-        */
 
         recognitionWanted =
             true;
@@ -766,20 +771,63 @@ function monitorAudio() {
         );
 
 
-    const intensity =
+    /*
+       Retiramos uma pequena faixa de ruído
+       ambiente para que a Máquina não
+       fique reagindo exageradamente.
+    */
+
+    const usableLevel =
+        Math.max(
+            0,
+            level - AUDIO_NOISE_FLOOR
+        );
+
+
+    /*
+       Transformamos o áudio em uma escala
+       visual de 0 a 1.
+    */
+
+    const targetIntensity =
         Math.min(
             1,
-            level * 8
+            usableLevel /
+            AUDIO_VOICE_LEVEL
         );
+
+
+    /*
+       Suavização.
+
+       Evita que a Máquina fique tremendo
+       de forma artificial a cada pequena
+       variação do microfone.
+    */
+
+    visualIntensity +=
+        (
+            targetIntensity -
+            visualIntensity
+        ) * 0.22;
 
 
     if (machine) {
 
         machine.style.setProperty(
             "--voice-intensity",
-            intensity.toFixed(3)
+            visualIntensity.toFixed(3)
         );
     }
+
+
+    /*
+       A intensidade visual NÃO liga
+       nem desliga o microfone.
+
+       Ela apenas controla a presença
+       visual da Máquina.
+    */
 
 
     animationFrame =
@@ -800,17 +848,10 @@ function enterWaitingMode() {
     );
 
 
-    setState(
+    setMachineState(
         STATE.WAITING
     );
 
-
-    /*
-       O microfone físico é liberado.
-
-       Não fica ouvindo enquanto o Homem
-       pediu privacidade.
-    */
 
     stopRecognition();
 
@@ -841,7 +882,7 @@ async function resumeConversation() {
     );
 
 
-    setState(
+    setMachineState(
         STATE.LISTENING
     );
 
@@ -873,7 +914,7 @@ function closeConversation() {
     resetTurn();
 
 
-    setState(
+    setMachineState(
         STATE.IDLE
     );
 }
@@ -887,6 +928,10 @@ function cleanupMicrophoneOnly() {
 
     microphoneActive =
         false;
+
+
+    visualIntensity =
+        0;
 
 
     if (animationFrame) {
@@ -968,7 +1013,7 @@ function cleanupMicrophone() {
 
     resetTurn();
 
-    setState(
+    setMachineState(
         STATE.IDLE
     );
 }
