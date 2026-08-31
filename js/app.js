@@ -1,25 +1,20 @@
 /* =====================================================
    HOMEM E A MÁQUINA
-   TESTE 03 — RECONHECIMENTO DE FALA POR TURNOS
+   VOZ V4 — SESSÃO CONTÍNUA / TURNOS / ESPERA
 
-   OBJETIVOS:
-   - Um toque desperta a conversa
-   - Microfone permanece aberto durante a sessão
-   - Cada fala é tratada como um turno
-   - Pausas não encerram a sessão
-   - Novo turno não é misturado ao anterior
-   - Comandos de encerramento são reconhecidos
-   - Estrutura preparada para a futura inteligência
+   PRINCÍPIOS:
+   - Um toque inicia a sessão.
+   - A sessão não é uma gravação contínua.
+   - Cada intervenção é um turno separado.
+   - Pausas curtas não encerram o turno.
+   - O microfone não é desligado entre turnos.
+   - "Espera" pausa a escuta.
+   - "Voltei" retoma.
+   - Comandos de encerramento terminam a sessão.
 ===================================================== */
-
 
 const machine = document.querySelector(".machine");
 const voiceButton = document.querySelector(".test-voice");
-
-
-/* =====================================================
-   RECONHECIMENTO DE VOZ
-===================================================== */
 
 const SpeechRecognition =
     window.SpeechRecognition ||
@@ -27,20 +22,28 @@ const SpeechRecognition =
 
 
 /* =====================================================
-   ESTADO
+   ESTADOS
 ===================================================== */
+
+const STATE = {
+    IDLE: "idle",
+    LISTENING: "listening",
+    THINKING: "thinking",
+    SPEAKING: "speaking",
+    WAITING: "waiting"
+};
+
+let state = STATE.IDLE;
 
 let recognition = null;
 
 let conversationActive = false;
 
-let machineSpeaking = false;
-
-let currentTranscript = "";
-
-let finalTranscript = "";
+let recognitionRunning = false;
 
 let turnActive = false;
+
+let finalTranscript = "";
 
 let restartRecognition = true;
 
@@ -51,415 +54,44 @@ let restartRecognition = true;
 
 const LANGUAGE = "pt-MZ";
 
-const MAX_INTERIM_LENGTH = 1000;
+const RESTART_DELAY = 300;
 
 
 /* =====================================================
-   ESTADO VISUAL
+   ALTERAR ESTADO
 ===================================================== */
 
-function setMachineState(state) {
+function setState(newState) {
 
-    if (!machine) {
-        return;
+    state = newState;
+
+    if (machine) {
+        machine.dataset.state = newState;
     }
 
-    machine.dataset.state = state;
+    console.log(
+        "Estado da Máquina:",
+        newState
+    );
 }
 
 
 /* =====================================================
-   VERIFICAR SUPORTE
+   SUPORTE
 ===================================================== */
 
-function speechSupported() {
+function supported() {
 
     if (!SpeechRecognition) {
 
         console.error(
-            "O navegador não disponibiliza reconhecimento de fala."
+            "Este navegador não suporta reconhecimento de fala."
         );
 
         return false;
     }
 
     return true;
-}
-
-
-/* =====================================================
-   CRIAR RECONHECEDOR
-===================================================== */
-
-function createRecognition() {
-
-    if (!speechSupported()) {
-        return null;
-    }
-
-
-    const recognizer =
-        new SpeechRecognition();
-
-
-    /*
-       Não queremos que uma pequena pausa
-       termine a sessão inteira.
-    */
-
-    recognizer.continuous = true;
-
-
-    /*
-       Precisamos de resultados provisórios
-       para acompanhar a fala enquanto ela acontece.
-    */
-
-    recognizer.interimResults = true;
-
-
-    /*
-       Idioma principal.
-    */
-
-    recognizer.lang = LANGUAGE;
-
-
-    /*
-       Uma alternativa é suficiente neste teste.
-    */
-
-    recognizer.maxAlternatives = 1;
-
-
-    /* =================================================
-       RESULTADO
-    ================================================= */
-
-    recognizer.onresult = function(event) {
-
-        let interim = "";
-        let newFinal = "";
-
-
-        for (
-            let i = event.resultIndex;
-            i < event.results.length;
-            i++
-        ) {
-
-            const result =
-                event.results[i];
-
-
-            const text =
-                result[0].transcript.trim();
-
-
-            if (!text) {
-                continue;
-            }
-
-
-            if (result.isFinal) {
-
-                newFinal +=
-                    text + " ";
-
-            } else {
-
-                interim +=
-                    text + " ";
-            }
-        }
-
-
-        /*
-           Resultado final pertence ao turno atual.
-        */
-
-        if (newFinal.trim()) {
-
-            finalTranscript +=
-                newFinal.trim() + " ";
-
-            turnActive = true;
-
-            setMachineState("listening");
-
-        }
-
-
-        /*
-           Resultado provisório.
-        */
-
-        currentTranscript =
-            (
-                finalTranscript +
-                interim
-            ).trim();
-
-
-        /*
-           Limite apenas para impedir
-           crescimento exagerado durante o teste.
-        */
-
-        if (
-            currentTranscript.length >
-            MAX_INTERIM_LENGTH
-        ) {
-
-            currentTranscript =
-                currentTranscript.slice(
-                    -MAX_INTERIM_LENGTH
-                );
-
-        }
-
-
-        console.log(
-            "Fala atual:",
-            currentTranscript
-        );
-    };
-
-
-    /* =================================================
-       INÍCIO DA FALA
-    ================================================= */
-
-    recognizer.onspeechstart = function() {
-
-        turnActive = true;
-
-        setMachineState("listening");
-
-        console.log(
-            "Homem começou a falar."
-        );
-    };
-
-
-    /* =================================================
-       FIM DA FALA
-    ================================================= */
-
-    recognizer.onspeechend = function() {
-
-        /*
-           Isto significa apenas que o navegador
-           detectou o fim deste momento de fala.
-
-           NÃO encerramos a conversa.
-        */
-
-        console.log(
-            "Pausa/fim deste momento de fala."
-        );
-
-
-        if (turnActive) {
-
-            finishTurn();
-        }
-    };
-
-
-    /* =================================================
-       ERRO
-    ================================================= */
-
-    recognizer.onerror = function(event) {
-
-        console.error(
-            "Reconhecimento de fala:",
-            event.error
-        );
-
-
-        /*
-           Erros transitórios não encerram
-           automaticamente a sessão.
-        */
-
-        if (
-            event.error === "no-speech" ||
-            event.error === "audio-capture" ||
-            event.error === "network"
-        ) {
-
-            return;
-        }
-    };
-
-
-    /* =================================================
-       RECONHECIMENTO TERMINOU
-    ================================================= */
-
-    recognizer.onend = function() {
-
-        console.log(
-            "Reconhecimento terminou."
-        );
-
-
-        /*
-           O navegador pode encerrar internamente
-           o reconhecimento mesmo com a sessão ativa.
-
-           Se a conversa continuar ativa,
-           iniciamos novamente.
-        */
-
-        if (
-            conversationActive &&
-            restartRecognition
-        ) {
-
-            setTimeout(() => {
-
-                try {
-
-                    recognizer.start();
-
-                } catch (error) {
-
-                    /*
-                       Evita erro caso o navegador
-                       ainda esteja encerrando a sessão.
-                    */
-
-                    console.log(
-                        "Reconhecimento aguardando reinício."
-                    );
-                }
-
-            }, 250);
-        }
-    };
-
-
-    return recognizer;
-}
-
-
-/* =====================================================
-   TERMINAR UM TURNO
-===================================================== */
-
-function finishTurn() {
-
-    const text =
-        finalTranscript.trim();
-
-
-    if (!text) {
-
-        turnActive = false;
-
-        return;
-    }
-
-
-    console.log(
-        "================================"
-    );
-
-    console.log(
-        "NOVO TURNO DO HOMEM:"
-    );
-
-    console.log(text);
-
-    console.log(
-        "================================"
-    );
-
-
-    /*
-       =================================================
-       COMANDOS DE CONTROLE
-       =================================================
-    */
-
-    const normalized =
-        normalizeText(text);
-
-
-    /*
-       Encerramento da sessão.
-    */
-
-    if (
-        isCloseCommand(normalized)
-    ) {
-
-        handleCloseCommand();
-
-        return;
-    }
-
-
-    /*
-       Interrupção.
-    */
-
-    if (
-        isStopCommand(normalized)
-    ) {
-
-        handleStopCommand();
-
-        return;
-    }
-
-
-    /*
-       =================================================
-       FUTURO:
-       AQUI ENTRARÁ A INTELIGÊNCIA DA MÁQUINA.
-
-       Por enquanto apenas mostramos no console.
-       Não estamos fingindo que a Máquina
-       já compreendeu o significado.
-       =================================================
-    */
-
-    setMachineState("thinking");
-
-
-    console.log(
-        "Turno separado e pronto para processamento."
-    );
-
-
-    /*
-       Depois do processamento,
-       a Máquina volta a escutar.
-    */
-
-    setTimeout(() => {
-
-        if (conversationActive) {
-
-            setMachineState("listening");
-        }
-
-    }, 700);
-
-
-    /*
-       Limpar o turno.
-    */
-
-    finalTranscript = "";
-
-    currentTranscript = "";
-
-    turnActive = false;
 }
 
 
@@ -478,14 +110,86 @@ function normalizeText(text) {
         )
         .replace(
             /[.,!?;:]/g,
-            ""
+            " "
+        )
+        .replace(
+            /\s+/g,
+            " "
         )
         .trim();
 }
 
 
 /* =====================================================
-   COMANDOS DE ENCERRAMENTO
+   INTENÇÃO: ESPERA
+===================================================== */
+
+function isWaitingCommand(text) {
+
+    const commands = [
+
+        "espera",
+
+        "espera maquina",
+
+        "maquina espera",
+
+        "espera um pouco",
+
+        "espera um bocadinho",
+
+        "volto ja",
+
+        "fica em espera",
+
+        "fica ai",
+
+        "aguarda um pouco"
+
+    ];
+
+    return commands.some(
+        command =>
+            text === command ||
+            text.includes(command)
+    );
+}
+
+
+/* =====================================================
+   INTENÇÃO: RETOMAR
+===================================================== */
+
+function isResumeCommand(text) {
+
+    const commands = [
+
+        "voltei",
+
+        "maquina voltei",
+
+        "ja voltei",
+
+        "podemos continuar",
+
+        "vamos continuar",
+
+        "continua",
+
+        "maquina continua"
+
+    ];
+
+    return commands.some(
+        command =>
+            text === command ||
+            text.includes(command)
+    );
+}
+
+
+/* =====================================================
+   INTENÇÃO: ENCERRAR
 ===================================================== */
 
 function isCloseCommand(text) {
@@ -504,49 +208,45 @@ function isCloseCommand(text) {
 
         "fechar a conversa",
 
-        "fecha a sessao",
-
-        "fechar a sessao",
-
         "encerra a sessao",
 
         "encerrar a sessao",
 
+        "fecha a sessao",
+
+        "fechar a sessao",
+
         "vamos parar por aqui",
 
-        "ate logo maquina"
+        "ate logo maquina",
+
+        "ate logo"
 
     ];
 
-
     return commands.some(
         command =>
+            text === command ||
             text.includes(command)
     );
 }
 
 
 /* =====================================================
-   COMANDOS PARA PARAR A MÁQUINA DE FALAR
+   INTENÇÃO: PARAR A FALA
 ===================================================== */
 
-function isStopCommand(text) {
+function isStopSpeakingCommand(text) {
 
     const commands = [
-
-        "para",
-
-        "pare",
-
-        "podes parar",
-
-        "pode parar",
 
         "para de falar",
 
         "pare de falar",
 
-        "espera",
+        "podes parar de falar",
+
+        "pode parar de falar",
 
         "espera maquina",
 
@@ -554,99 +254,457 @@ function isStopCommand(text) {
 
     ];
 
-
     return commands.some(
         command =>
+            text === command ||
             text.includes(command)
     );
 }
 
 
 /* =====================================================
-   ENCERRAR SESSÃO
+   PROCESSAR TURNO
 ===================================================== */
 
-function handleCloseCommand() {
+function processTurn() {
 
-    console.log(
-        "Comando de encerramento reconhecido."
-    );
+    const text =
+        finalTranscript.trim();
 
+    if (!text) {
 
-    /*
-       Primeiro impedimos o reinício automático.
-    */
+        resetTurn();
 
-    restartRecognition = false;
+        setState(
+            STATE.LISTENING
+        );
 
-    conversationActive = false;
-
-
-    if (recognition) {
-
-        try {
-
-            recognition.stop();
-
-        } catch (error) {
-
-            console.log(
-                "Reconhecimento já estava parado."
-            );
-        }
+        return;
     }
 
 
-    setMachineState("pause");
-
-
-    finalTranscript = "";
-
-    currentTranscript = "";
-
-    turnActive = false;
-}
-
-
-/* =====================================================
-   PARAR FALA DA MÁQUINA
-===================================================== */
-
-function handleStopCommand() {
+    console.log(
+        "--------------------------------"
+    );
 
     console.log(
-        "Comando de interrupção reconhecido."
+        "TURNO DO HOMEM:"
+    );
+
+    console.log(text);
+
+    console.log(
+        "--------------------------------"
+    );
+
+
+    const normalized =
+        normalizeText(text);
+
+
+    /* ---------------------------------------------
+       ENCERRAMENTO
+    --------------------------------------------- */
+
+    if (
+        isCloseCommand(normalized)
+    ) {
+
+        resetTurn();
+
+        closeConversation();
+
+        return;
+    }
+
+
+    /* ---------------------------------------------
+       ESPERA
+    --------------------------------------------- */
+
+    if (
+        isWaitingCommand(normalized)
+    ) {
+
+        resetTurn();
+
+        enterWaitingMode();
+
+        return;
+    }
+
+
+    /* ---------------------------------------------
+       PARAR A FALA DA MÁQUINA
+    --------------------------------------------- */
+
+    if (
+        isStopSpeakingCommand(normalized)
+    ) {
+
+        resetTurn();
+
+        stopMachineSpeaking();
+
+        return;
+    }
+
+
+    /* ---------------------------------------------
+       RETOMAR
+    --------------------------------------------- */
+
+    if (
+        isResumeCommand(normalized)
+    ) {
+
+        resetTurn();
+
+        resumeConversation();
+
+        return;
+    }
+
+
+    /* ---------------------------------------------
+       TURNO NORMAL
+    --------------------------------------------- */
+
+    setState(
+        STATE.THINKING
     );
 
 
     /*
-       Neste momento ainda não temos
-       síntese de voz real.
+       IMPORTANTE:
 
-       Quando tivermos, esta função irá
-       interromper imediatamente a fala.
+       Ainda não existe IA nesta etapa.
+
+       O texto abaixo representa o ponto
+       exato onde futuramente entraremos com
+       o processamento inteligente da Máquina.
     */
 
-    machineSpeaking = false;
+    console.log(
+        "Turno separado para processamento."
+    );
 
-    setMachineState("listening");
+
+    /*
+       Apenas para testar a transição
+       de estados.
+    */
+
+    setTimeout(() => {
+
+        if (
+            conversationActive &&
+            state === STATE.THINKING
+        ) {
+
+            setState(
+                STATE.LISTENING
+            );
+        }
+
+    }, 800);
 
 
-    finalTranscript = "";
-
-    currentTranscript = "";
-
-    turnActive = false;
+    resetTurn();
 }
 
 
 /* =====================================================
-   INICIAR CONVERSA
+   RESETAR TURNO
+===================================================== */
+
+function resetTurn() {
+
+    turnActive = false;
+
+    finalTranscript = "";
+}
+
+
+/* =====================================================
+   CRIAR RECONHECIMENTO
+===================================================== */
+
+function createRecognition() {
+
+    const recognizer =
+        new SpeechRecognition();
+
+
+    recognizer.lang =
+        LANGUAGE;
+
+
+    recognizer.continuous =
+        true;
+
+
+    recognizer.interimResults =
+        true;
+
+
+    recognizer.maxAlternatives =
+        1;
+
+
+    /* =================================================
+       RESULTADO
+    ================================================= */
+
+    recognizer.onresult =
+        function(event) {
+
+            let newFinal = "";
+
+
+            for (
+                let i = event.resultIndex;
+                i < event.results.length;
+                i++
+            ) {
+
+                const result =
+                    event.results[i];
+
+
+                const transcript =
+                    result[0]
+                        .transcript
+                        .trim();
+
+
+                if (!transcript) {
+                    continue;
+                }
+
+
+                if (
+                    result.isFinal
+                ) {
+
+                    newFinal +=
+                        transcript + " ";
+
+                    turnActive = true;
+                }
+            }
+
+
+            if (
+                newFinal.trim()
+            ) {
+
+                finalTranscript +=
+                    newFinal;
+            }
+
+
+            console.log(
+                "Turno atual:",
+                finalTranscript.trim()
+            );
+        };
+
+
+    /* =================================================
+       FALA COMEÇOU
+    ================================================= */
+
+    recognizer.onspeechstart =
+        function() {
+
+            if (
+                !conversationActive ||
+                state === STATE.WAITING
+            ) {
+                return;
+            }
+
+
+            turnActive = true;
+
+            setState(
+                STATE.LISTENING
+            );
+
+            console.log(
+                "Fala detectada."
+            );
+        };
+
+
+    /* =================================================
+       FALA TERMINOU
+    ================================================= */
+
+    recognizer.onspeechend =
+        function() {
+
+            /*
+               ATENÇÃO:
+
+               Este evento NÃO encerra a sessão.
+
+               Ele apenas informa que o navegador
+               deixou de detectar fala naquele momento.
+
+               O turno é processado apenas se
+               realmente houver texto.
+            */
+
+            if (
+                !conversationActive ||
+                state === STATE.WAITING
+            ) {
+                return;
+            }
+
+
+            if (turnActive) {
+
+                processTurn();
+            }
+        };
+
+
+    /* =================================================
+       ERRO
+    ================================================= */
+
+    recognizer.onerror =
+        function(event) {
+
+            console.log(
+                "Reconhecimento:",
+                event.error
+            );
+
+
+            /*
+               Erros transitórios não encerram
+               a sessão automaticamente.
+            */
+
+            if (
+                event.error ===
+                "aborted"
+            ) {
+                return;
+            }
+        };
+
+
+    /* =================================================
+       FIM INTERNO DO RECONHECIMENTO
+    ================================================= */
+
+    recognizer.onend =
+        function() {
+
+            recognitionRunning =
+                false;
+
+
+            console.log(
+                "Reconhecimento terminou internamente."
+            );
+
+
+            /*
+               Se a sessão continua ativa,
+               tentamos reabrir somente o
+               reconhecimento.
+
+               NÃO estamos regravando a conversa.
+            */
+
+            if (
+                conversationActive &&
+                restartRecognition &&
+                state !== STATE.WAITING
+            ) {
+
+                setTimeout(
+                    startRecognition,
+                    RESTART_DELAY
+                );
+            }
+        };
+
+
+    return recognizer;
+}
+
+
+/* =====================================================
+   INICIAR RECONHECIMENTO
+===================================================== */
+
+function startRecognition() {
+
+    if (
+        !conversationActive ||
+        state === STATE.WAITING
+    ) {
+        return;
+    }
+
+
+    if (
+        recognitionRunning
+    ) {
+        return;
+    }
+
+
+    if (!recognition) {
+
+        recognition =
+            createRecognition();
+    }
+
+
+    try {
+
+        recognition.start();
+
+        recognitionRunning =
+            true;
+
+        setState(
+            STATE.LISTENING
+        );
+
+        console.log(
+            "Reconhecimento ativo."
+        );
+
+    } catch (error) {
+
+        console.log(
+            "Reconhecimento ainda não pode iniciar:",
+            error
+        );
+
+
+        recognitionRunning =
+            false;
+    }
+}
+
+
+/* =====================================================
+   DESPERTAR CONVERSA
 ===================================================== */
 
 function startConversation() {
 
-    if (!speechSupported()) {
+    if (!supported()) {
         return;
     }
 
@@ -656,59 +714,145 @@ function startConversation() {
     }
 
 
-    conversationActive = true;
+    conversationActive =
+        true;
 
-    restartRecognition = true;
 
-    finalTranscript = "";
+    restartRecognition =
+        true;
 
-    currentTranscript = "";
 
-    turnActive = false;
+    resetTurn();
 
 
     recognition =
         createRecognition();
 
 
-    if (!recognition) {
-        return;
-    }
+    setState(
+        STATE.LISTENING
+    );
 
 
-    setMachineState("listening");
-
-
-    try {
-
-        recognition.start();
-
-        console.log(
-            "Sessão de conversa iniciada."
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Não foi possível iniciar o reconhecimento:",
-            error
-        );
-
-    }
+    startRecognition();
 }
 
 
 /* =====================================================
-   ENCERRAR MANUALMENTE
+   MODO ESPERA
 ===================================================== */
 
-function stopConversation() {
+function enterWaitingMode() {
 
-    conversationActive = false;
+    console.log(
+        "Máquina entrou em ESPERA."
+    );
 
-    restartRecognition = false;
 
-    turnActive = false;
+    setState(
+        STATE.WAITING
+    );
+
+
+    /*
+       O reconhecimento é parado.
+
+       O microfone não fica sendo utilizado
+       enquanto a pessoa pediu para esperar.
+    */
+
+    if (recognition) {
+
+        try {
+
+            recognition.stop();
+
+        } catch (error) {
+
+            console.log(
+                "Reconhecimento já estava parado."
+            );
+        }
+    }
+
+
+    recognitionRunning =
+        false;
+}
+
+
+/* =====================================================
+   RETOMAR
+===================================================== */
+
+function resumeConversation() {
+
+    if (
+        !conversationActive
+    ) {
+        return;
+    }
+
+
+    setState(
+        STATE.LISTENING
+    );
+
+
+    restartRecognition =
+        true;
+
+
+    startRecognition();
+}
+
+
+/* =====================================================
+   PARAR FALA DA MÁQUINA
+===================================================== */
+
+function stopMachineSpeaking() {
+
+    /*
+       Nesta etapa a Máquina ainda não possui
+       síntese de voz.
+
+       Quando adicionarmos a voz real,
+       esta função chamará speechSynthesis.cancel()
+       ou o sistema de voz escolhido.
+    */
+
+    console.log(
+        "Comando para interromper a fala recebido."
+    );
+
+
+    setState(
+        STATE.LISTENING
+    );
+}
+
+
+/* =====================================================
+   ENCERRAR CONVERSA
+===================================================== */
+
+function closeConversation() {
+
+    console.log(
+        "Encerrando sessão."
+    );
+
+
+    conversationActive =
+        false;
+
+
+    restartRecognition =
+        false;
+
+
+    resetTurn();
 
 
     if (recognition) {
@@ -726,39 +870,39 @@ function stopConversation() {
     }
 
 
-    recognition = null;
-
-    finalTranscript = "";
-
-    currentTranscript = "";
+    recognition =
+        null;
 
 
-    setMachineState("idle");
+    recognitionRunning =
+        false;
 
 
-    console.log(
-        "Sessão encerrada manualmente."
+    setState(
+        STATE.IDLE
     );
 }
 
 
 /* =====================================================
-   BOTÃO 🎙️
+   BOTÃO
 ===================================================== */
 
 if (voiceButton) {
 
     voiceButton.addEventListener(
         "click",
-        () => {
+        function() {
 
-            if (conversationActive) {
+            if (
+                !conversationActive
+            ) {
 
-                stopConversation();
+                startConversation();
 
             } else {
 
-                startConversation();
+                closeConversation();
 
             }
 
@@ -768,7 +912,9 @@ if (voiceButton) {
 
 
 /* =====================================================
-   INICIALIZAÇÃO
+   ESTADO INICIAL
 ===================================================== */
 
-setMachineState("idle");
+setState(
+    STATE.IDLE
+);
