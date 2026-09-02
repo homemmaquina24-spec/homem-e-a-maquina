@@ -2651,3 +2651,762 @@
 
             </div>
                     </section>
+        
+        
+<!-- ECRÃ: PRIVACIDADE -->
+        <section class="screen screen-settings-detail"
+                 id="screen-privacy"
+                 data-screen="privacy"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button" type="button"
+                        data-back="settings" aria-label="Voltar">←</button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">DEFINIÇÕES</span>
+                    <h1>Privacidade</h1>
+                </div>
+            </header>
+
+            <div class="screen-content settings-content">
+
+                <div class="privacy-intro">
+                    <div class="privacy-icon">◈</div>
+                    <h2>Os teus dados pertencem a ti.</h2>
+                    <p>
+                        A Máquina deve usar apenas os dados necessários
+                        para prestar o serviço autorizado por ti.
+                    </p>
+                </div>
+
+                <div class="settings-group">
+
+                    <button class="setting-option"
+                            type="button"
+                            data-privacy-action="data">
+                        <span class="setting-option-icon">◉</span>
+                        <span class="setting-option-text">
+                            <strong>Os meus dados</strong>
+                            <small>Ver informações associadas à conta.</small>
+                        </span>
+                        <span class="setting-arrow">›</span>
+                    </button>
+
+                    <button class="setting-option"
+                            type="button"
+                            data-privacy-action="permissions">
+                        <span class="setting-option-icon">✓</span>
+                        <span class="setting-option-text">
+                            <strong>Autorizações</strong>
+                            <small>Gerir permissões dadas à Máquina.</small>
+                        </span>
+                        <span class="setting-arrow">›</span>
+                    </button>
+
+                    <button class="setting-option"
+                            type="button"
+                            data-privacy-action="connections">
+                        <span class="setting-option-icon">↗</span>
+                        <span class="setting-option-text">
+                            <strong>Contas conectadas</strong>
+                            <small>Gerir ligações com plataformas externas.</small>
+                        </span>
+                        <span class="setting-arrow">›</span>
+                    </button>
+
+                </div>
+
+                <div class="privacy-notice">
+                    <strong>Importante</strong>
+                    <p>
+                        As integrações devem utilizar autorizações oficiais
+                        das respetivas plataformas.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ECRÃ: APARÊNCIA -->
+        <section class="screen screen-settings-detail"
+                 id="screen-appearance"
+                 data-screen="appearance"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button" type="button"
+                        data-back="settings" aria-label="Voltar">←</button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">DEFINIÇÕES</span>
+                    <h1>Aparência</h1>
+                </div>
+            </header>
+
+            <div class="screen-content settings-content">
+
+                <div class="settings-group">
+                    <h2>Tema</h2>
+
+                    <button class="setting-option selected"
+                            type="button"
+                            data-theme="dark">
+                        <span class="setting-option-icon">☾</span>
+                        <span class="setting-option-text">
+                            <strong>Escuro</strong>
+                            <small>A aparência principal da Máquina.</small>
+                        </span>
+                        <span class="setting-check">✓</span>
+                    </button>
+
+                    <button class="setting-option"
+                            type="button"
+                            data-theme="light">
+                        <span class="setting-option-icon">☀</span>
+                        <span class="setting-option-text">
+                            <strong>Claro</strong>
+                            <small>Uma aparência mais luminosa.</small>
+                        </span>
+                        <span class="setting-check">✓</span>
+                    </button>
+
+                    <button class="setting-option"
+                            type="button"
+                            data-theme="system">
+                        <span class="setting-option-icon">◐</span>
+                        <span class="setting-option-text">
+                            <strong>Automático</strong>
+                            <small>Segue o dispositivo.</small>
+                        </span>
+                        <span class="setting-check">✓</span>
+                    </button>
+                </div>
+
+                <div class="settings-group">
+                    <h2>Movimento</h2>
+
+                    <label class="toggle-option">
+                        <span class="setting-option-text">
+                            <strong>Animações da Máquina</strong>
+                            <small>Mostra os movimentos da Máquina.</small>
+                        </span>
+                        <input type="checkbox"
+                               id="machineAnimationToggle" checked>
+                        <span class="toggle-ui"></span>
+                    </label>
+
+                    <label class="toggle-option">
+                        <span class="setting-option-text">
+                            <strong>Movimento reduzido</strong>
+                            <small>Reduz as animações.</small>
+                        </span>
+                        <input type="checkbox"
+                               id="reducedMotionToggle">
+                        <span class="toggle-ui"></span>
+                    </label>
+                </div>
+
+            </div>
+    </section>
+    <!-- ECRÃ: TERMOS -->
+        <section class="screen screen-settings-detail"
+                 id="screen-terms"
+                 data-screen="terms"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button" type="button"
+                        data-back="settings" aria-label="Voltar">←</button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">DOCUMENTOS</span>
+                    <h1>Termos</h1>
+                </div>
+            </header>
+
+            <div class="screen-content document-content">
+
+                <div class="document-card">
+                    <div class="document-card-icon">§</div>
+
+                    <div>
+                        <h2>Termos de Utilização</h2>
+                        <p>
+                            Regras de utilização da Homem e a Máquina,
+                            responsabilidades e limitações do serviço.
+                        </p>
+                    </div>
+
+                    <button class="document-open-button"
+                            type="button"
+                            data-document="terms">
+                        Abrir
+                    </button>
+                </div>
+
+                <div class="document-card">
+                    <div class="document-card-icon">◇</div>
+
+                    <div>
+                        <h2>Política de Privacidade</h2>
+                        <p>
+                            Informações sobre tratamento, proteção e utilização
+                            dos dados dentro da plataforma.
+                        </p>
+                    </div>
+
+                    <button class="document-open-button"
+                            type="button"
+                            data-document="privacy">
+                        Abrir
+                    </button>
+                </div>
+
+                <div class="document-version">
+                    <span>Versão</span>
+                    <strong>1.0</strong>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ECRÃ: PLANO -->
+        <section class="screen screen-settings-detail"
+                 id="screen-plan"
+                 data-screen="plan"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button" type="button"
+                        data-back="settings" aria-label="Voltar">←</button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">CONTA</span>
+                    <h1>Plano</h1>
+                </div>
+            </header>
+
+            <div class="screen-content plan-content">
+
+                <div class="current-plan-card">
+                    <span class="plan-label">PLANO ATUAL</span>
+                    <h2 id="currentPlanName">Gratuito</h2>
+                    <p id="currentPlanDescription">
+                        Acesso inicial à Máquina e às funcionalidades
+                        disponíveis no plano gratuito.
+                    </p>
+                </div>
+
+                <div class="plans-list">
+
+                    <article class="plan-card" data-plan="free">
+                        <div class="plan-card-top">
+                            <div>
+                                <span class="plan-label">INÍCIO</span>
+                                <h3>Gratuito</h3>
+                            </div>
+                            <span class="plan-status">Atual</span>
+                        </div>
+
+                        <ul>
+                            <li>Conversação com a Máquina</li>
+                            <li>Funcionalidades básicas</li>
+                            <li>Análises iniciais limitadas</li>
+                        </ul>
+
+                        <button class="secondary-button"
+                                type="button"
+                                data-plan-action="free"
+                                disabled>
+                            Plano atual
+                        </button>
+                    </article>
+
+                    <article class="plan-card" data-plan="creator">
+                        <div class="plan-card-top">
+                            <div>
+                                <span class="plan-label">CRIADOR</span>
+                                <h3>Creator</h3>
+                            </div>
+                        </div>
+
+                        <ul>
+                            <li>Análises profundas</li>
+                            <li>Estratégia personalizada</li>
+                            <li>Planeamento de conteúdo</li>
+                            <li>Roteiros e ideias</li>
+                        </ul>
+
+                        <button class="primary-button"
+                                type="button"
+                                data-plan-action="creator">
+                            Conhecer plano
+                        </button>
+                    </article>
+
+                </div>
+
+            </div>
+                    </section>
+                    <!-- ECRÃ: PLANO PRO -->
+        <section class="screen screen-settings-detail"
+                 id="screen-plan-pro"
+                 data-screen="plan-pro"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button" type="button"
+                        data-back="plan" aria-label="Voltar">←</button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">PLANO</span>
+                    <h1>Pro</h1>
+                </div>
+            </header>
+
+            <div class="screen-content plan-content">
+
+                <div class="plan-detail-card">
+                    <span class="plan-label">PRO</span>
+
+                    <h2>Mais capacidade para criar.</h2>
+
+                    <p>
+                        Ferramentas avançadas para quem trabalha
+                        continuamente com conteúdo e várias plataformas.
+                    </p>
+
+                    <ul class="feature-list">
+                        <li>Maior volume de criação</li>
+                        <li>Múltiplas plataformas</li>
+                        <li>Automação</li>
+                        <li>Métricas e otimização</li>
+                    </ul>
+
+                    <button class="primary-button"
+                            type="button"
+                            data-plan-action="pro">
+                        Continuar
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ECRÃ: MÁQUINA AUTÓNOMA -->
+        <section class="screen screen-settings-detail"
+                 id="screen-plan-autonomous"
+                 data-screen="plan-autonomous"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button" type="button"
+                        data-back="plan" aria-label="Voltar">←</button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">PLANO AVANÇADO</span>
+                    <h1>Máquina Autónoma</h1>
+                </div>
+            </header>
+
+            <div class="screen-content plan-content">
+
+                <div class="plan-detail-card">
+                    <span class="plan-label">AUTÓNOMA</span>
+
+                    <h2>A Máquina trabalha contigo.</h2>
+
+                    <p>
+                        Com as autorizações necessárias, a Máquina pode
+                        acompanhar o trabalho, analisar, planear, criar
+                        e executar tarefas autorizadas.
+                    </p>
+
+                    <ul class="feature-list">
+                        <li>Análise contínua</li>
+                        <li>Planeamento</li>
+                        <li>Criação de conteúdo</li>
+                        <li>Publicação autorizada</li>
+                        <li>Acompanhamento e ajustes</li>
+                    </ul>
+
+                    <button class="primary-button"
+                            type="button"
+                            data-plan-action="autonomous">
+                        Continuar
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ECRÃ: LOGIN -->
+        <section class="screen screen-auth"
+                 id="screen-login"
+                 data-screen="login"
+                 aria-hidden="true">
+
+            <div class="auth-container">
+
+                <button class="auth-back"
+                        type="button"
+                        data-back="machine"
+                        aria-label="Voltar">
+                    ←
+                </button>
+
+                <div class="auth-machine-mark">
+                    <div class="auth-core"></div>
+                </div>
+
+                <span class="screen-kicker">HOMEM E A MÁQUINA</span>
+
+                <h1>Entrar</h1>
+
+                <p class="auth-description">
+                    Entra na tua conta para continuar a tua relação
+                    com a Máquina.
+                </p>
+
+                <form id="loginForm" class="auth-form">
+
+                    <label for="loginEmail">Email</label>
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        name="email"
+                        autocomplete="email"
+                        required
+                    >
+
+                    <label for="loginPassword">Palavra-passe</label>
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        name="password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button class="primary-button"
+                            type="submit"
+                            id="loginButton">
+                        Entrar
+                    </button>
+
+                    <button class="auth-link"
+                            type="button"
+                            id="forgotPasswordButton">
+                        Esqueci-me da palavra-passe
+                    </button>
+
+                </form>
+
+                <div class="auth-divider">
+                    <span>ou</span>
+                </div>
+
+                <button class="google-button"
+                        type="button"
+                        id="googleLoginButton">
+                    <span>G</span>
+                    Entrar com Google
+                </button>
+
+                <button class="auth-link"
+                        type="button"
+                        id="openRegisterButton">
+                    Criar uma conta
+                </button>
+
+                <p class="auth-message"
+                   id="loginMessage"
+                   aria-live="polite"></p>
+
+            </div>
+    </section>
+    <!-- ECRÃ: CRIAR CONTA -->
+        <section class="screen screen-auth"
+                 id="screen-register"
+                 data-screen="register"
+                 aria-hidden="true">
+
+            <div class="auth-container">
+
+                <button class="auth-back"
+                        type="button"
+                        data-back="login"
+                        aria-label="Voltar">
+                    ←
+                </button>
+
+                <div class="auth-machine-mark">
+                    <div class="auth-core"></div>
+                </div>
+
+                <span class="screen-kicker">HOMEM E A MÁQUINA</span>
+
+                <h1>Criar conta</h1>
+
+                <p class="auth-description">
+                    Cria a tua conta para começar a tua relação
+                    com a Máquina.
+                </p>
+
+                <form id="registerForm" class="auth-form">
+
+                    <label for="registerName">Nome</label>
+                    <input
+                        type="text"
+                        id="registerName"
+                        name="name"
+                        autocomplete="name"
+                        required
+                    >
+
+                    <label for="registerEmail">Email</label>
+                    <input
+                        type="email"
+                        id="registerEmail"
+                        name="email"
+                        autocomplete="email"
+                        required
+                    >
+
+                    <label for="registerPassword">Palavra-passe</label>
+                    <input
+                        type="password"
+                        id="registerPassword"
+                        name="password"
+                        autocomplete="new-password"
+                        minlength="6"
+                        required
+                    >
+
+                    <label class="terms-check">
+                        <input
+                            type="checkbox"
+                            id="registerTerms"
+                            required
+                        >
+
+                        <span>
+                            Aceito os Termos de Utilização e a
+                            Política de Privacidade.
+                        </span>
+                    </label>
+
+                    <button class="primary-button"
+                            type="submit"
+                            id="registerButton">
+                        Criar conta
+                    </button>
+
+                </form>
+
+                <button class="auth-link"
+                        type="button"
+                        id="openLoginButton">
+                    Já tenho uma conta
+                </button>
+
+                <p class="auth-message"
+                   id="registerMessage"
+                   aria-live="polite"></p>
+
+            </div>
+        </section>
+
+
+        <!-- ECRÃ: RECUPERAR PALAVRA-PASSE -->
+        <section class="screen screen-auth"
+                 id="screen-forgot-password"
+                 data-screen="forgot-password"
+                 aria-hidden="true">
+
+            <div class="auth-container">
+
+                <button class="auth-back"
+                        type="button"
+                        data-back="login"
+                        aria-label="Voltar">
+                    ←
+                </button>
+
+                <div class="auth-machine-mark">
+                    <div class="auth-core"></div>
+                </div>
+
+                <span class="screen-kicker">CONTA</span>
+
+                <h1>Recuperar acesso</h1>
+
+                <p class="auth-description">
+                    Introduz o teu email e enviaremos as instruções
+                    para recuperar o acesso.
+                </p>
+
+                <form id="forgotPasswordForm" class="auth-form">
+
+                    <label for="forgotEmail">Email</label>
+
+                    <input
+                        type="email"
+                        id="forgotEmail"
+                        name="email"
+                        autocomplete="email"
+                        required
+                    >
+
+                    <button class="primary-button"
+                            type="submit"
+                            id="forgotPasswordSubmit">
+                        Enviar instruções
+                    </button>
+
+                </form>
+
+                <p class="auth-message"
+                   id="forgotPasswordMessage"
+                   aria-live="polite"></p>
+
+            </div>
+                        </section>
+                        <!-- ECRÃ: ACEITAÇÃO DOS TERMOS -->
+        <section class="screen screen-auth"
+                 id="screen-terms-acceptance"
+                 data-screen="terms-acceptance"
+                 aria-hidden="true">
+
+            <div class="auth-container">
+
+                <div class="auth-machine-mark">
+                    <div class="auth-core"></div>
+                </div>
+
+                <span class="screen-kicker">ANTES DE CONTINUAR</span>
+
+                <h1>Bem-vindo.</h1>
+
+                <p class="auth-description">
+                    Para utilizar a Máquina, precisas aceitar os
+                    Termos de Utilização e a Política de Privacidade.
+                </p>
+
+                <div class="terms-preview">
+                    <button type="button"
+                            class="document-card compact"
+                            data-document="terms">
+                        <strong>Termos de Utilização</strong>
+                        <span>Consultar documento</span>
+                        <span>›</span>
+                    </button>
+
+                    <button type="button"
+                            class="document-card compact"
+                            data-document="privacy">
+                        <strong>Política de Privacidade</strong>
+                        <span>Consultar documento</span>
+                        <span>›</span>
+                    </button>
+                </div>
+
+                <label class="terms-check acceptance-check">
+                    <input type="checkbox"
+                           id="acceptTermsCheckbox">
+
+                    <span>
+                        Li e aceito os Termos de Utilização e a
+                        Política de Privacidade.
+                    </span>
+                </label>
+
+                <button class="primary-button"
+                        type="button"
+                        id="acceptTermsButton"
+                        disabled>
+                    Continuar
+                </button>
+
+                <p class="auth-message"
+                   id="termsAcceptanceMessage"
+                   aria-live="polite"></p>
+
+            </div>
+        </section>
+
+
+        <!-- ECRÃ: TECLADO / ESCRITA -->
+        <section class="screen screen-keyboard"
+                 id="screen-keyboard"
+                 data-screen="keyboard"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button"
+                        type="button"
+                        data-back="machine"
+                        aria-label="Voltar">
+                    ←
+                </button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">MÁQUINA</span>
+                    <h1>Escrever</h1>
+                </div>
+            </header>
+
+            <div class="keyboard-content">
+
+                <div class="keyboard-machine-state">
+                    <div class="small-machine"
+                         id="keyboardMachine"
+                         data-state="idle">
+                        <div class="small-machine-aura"></div>
+                        <div class="small-machine-core"></div>
+                    </div>
+                </div>
+
+                <form id="keyboardForm" class="keyboard-form">
+
+                    <label for="keyboardInput">
+                        Fala com a Máquina por escrito
+                    </label>
+
+                    <textarea
+                        id="keyboardInput"
+                        name="message"
+                        rows="4"
+                        maxlength="4000"
+                        placeholder="Escreve aqui..."
+                        autocomplete="off"
+                    ></textarea>
+
+                    <div class="keyboard-actions">
+
+                        <span class="keyboard-counter"
+                              id="keyboardCounter">
+                            0 / 4000
+                        </span>
+
+                        <button class="primary-button"
+                                type="submit"
+                                id="keyboardSendButton">
+                            Enviar
+                        </button>
+
+                    </div>
+
+                </form>
+
+                <p class="keyboard-message"
+                   id="keyboardMessage"
+                   aria-live="polite"></p>
+
+            </div>
+                    </section>
