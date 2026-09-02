@@ -3410,3 +3410,542 @@
 
             </div>
                     </section>
+        <!-- ECRÃ: DETALHES DE RESULTADO -->
+        <section class="screen screen-result-view"
+                 id="screen-result-view"
+                 data-screen="result-view"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button"
+                        type="button"
+                        data-back="results"
+                        aria-label="Voltar">
+                    ←
+                </button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">MÁQUINA</span>
+                    <h1 id="resultViewTitle">Resultado</h1>
+                </div>
+            </header>
+
+            <div class="screen-content">
+
+                <div class="result-view-card">
+
+                    <div class="result-view-status"
+                         id="resultViewStatus">
+                        CONCLUÍDO
+                    </div>
+
+                    <h2 id="resultViewHeading">
+                        O resultado está pronto.
+                    </h2>
+
+                    <div class="result-view-content"
+                         id="resultViewContent">
+                    </div>
+
+                </div>
+
+                <button class="primary-button"
+                        type="button"
+                        id="resultViewAction">
+                    Continuar
+                </button>
+
+            </div>
+        </section>
+
+
+        <!-- ECRÃ: LIGAÇÃO DE CONTA EXTERNA -->
+        <section class="screen screen-connection"
+                 id="screen-connection"
+                 data-screen="connection"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button"
+                        type="button"
+                        data-back="accounts"
+                        aria-label="Voltar">
+                    ←
+                </button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">CONTAS</span>
+                    <h1>Conectar conta</h1>
+                </div>
+            </header>
+
+            <div class="screen-content">
+
+                <div class="connection-card">
+
+                    <div class="connection-icon"
+                         id="connectionIcon">
+                        ◉
+                    </div>
+
+                    <h2 id="connectionTitle">
+                        Conectar plataforma
+                    </h2>
+
+                    <p id="connectionDescription">
+                        Autoriza a Máquina a utilizar as funcionalidades
+                        disponíveis através da integração oficial.
+                    </p>
+
+                    <div class="connection-permissions"
+                         id="connectionPermissions">
+
+                        <div>
+                            <span>✓</span>
+                            <span>Analisar dados autorizados</span>
+                        </div>
+
+                        <div>
+                            <span>✓</span>
+                            <span>Utilizar métricas disponíveis</span>
+                        </div>
+
+                        <div>
+                            <span>✓</span>
+                            <span>Executar ações autorizadas</span>
+                        </div>
+
+                    </div>
+
+                    <button class="primary-button"
+                            type="button"
+                            id="authorizeConnectionButton">
+                        Autorizar conexão
+                    </button>
+
+                    <button class="secondary-button"
+                            type="button"
+                            data-back="accounts">
+                        Cancelar
+                    </button>
+
+                    <p class="connection-message"
+                       id="connectionMessage"
+                       aria-live="polite"></p>
+
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ECRÃ: CONFIRMAÇÃO DE AÇÃO -->
+        <section class="screen screen-confirmation"
+                 id="screen-confirmation"
+                 data-screen="confirmation"
+                 aria-hidden="true">
+
+            <div class="confirmation-content">
+
+                <div class="confirmation-icon"
+                     id="confirmationIcon">
+                    ✓
+                </div>
+
+                <span class="screen-kicker"
+                      id="confirmationKicker">
+                    MÁQUINA
+                </span>
+
+                <h1 id="confirmationTitle">
+                    Tudo pronto.
+                </h1>
+
+                <p id="confirmationMessage">
+                    A ação foi concluída.
+                </p>
+
+                <button class="primary-button"
+                        type="button"
+                        id="confirmationButton">
+                    Continuar
+                </button>
+
+            </div>
+                    </section>
+        <!-- ECRÃ: CRIAR CONTA DE RAIZ -->
+        <section class="screen screen-creator-flow"
+                 id="screen-create-account"
+                 data-screen="create-account"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button"
+                        type="button"
+                        data-back="creator"
+                        aria-label="Voltar">
+                    ←
+                </button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">CRIADOR</span>
+                    <h1>Criar do zero</h1>
+                </div>
+            </header>
+
+            <div class="screen-content creator-flow-content">
+
+                <div class="creator-flow-intro">
+                    <div class="flow-machine">
+                        <div class="flow-machine-core"></div>
+                    </div>
+
+                    <h2>Não tens um nicho?</h2>
+
+                    <p>
+                        Conta à Máquina o que procuras e ela pode
+                        ajudar a construir a direção inicial da conta.
+                    </p>
+                </div>
+
+                <form id="createAccountForm"
+                      class="creator-flow-form">
+
+                    <label for="createAccountGoal">
+                        O que queres alcançar?
+                    </label>
+
+                    <textarea
+                        id="createAccountGoal"
+                        rows="3"
+                        maxlength="2000"
+                        placeholder="Ex.: Quero criar uma conta e encontrar uma direção com potencial."
+                        required
+                    ></textarea>
+
+                    <label for="createAccountPlatform">
+                        Plataforma principal
+                    </label>
+
+                    <select id="createAccountPlatform">
+                        <option value="tiktok">TikTok</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="other">Outra</option>
+                    </select>
+
+                    <button class="primary-button"
+                            type="submit"
+                            id="startAccountCreationButton">
+                        Começar
+                    </button>
+
+                </form>
+
+                <p class="flow-message"
+                   id="createAccountMessage"
+                   aria-live="polite"></p>
+
+            </div>
+        </section>
+
+
+        <!-- ECRÃ: TRABALHO DA MÁQUINA -->
+        <section class="screen screen-machine-work"
+                 id="screen-machine-work"
+                 data-screen="machine-work"
+                 aria-hidden="true">
+
+            <div class="machine-work-content">
+
+                <div class="work-machine"
+                     id="workMachine"
+                     data-state="thinking">
+
+                    <div class="work-aura"></div>
+                    <div class="work-orbit work-orbit-one"></div>
+                    <div class="work-orbit work-orbit-two"></div>
+
+                    <div class="work-core">
+                        <div class="work-core-inner"></div>
+                    </div>
+
+                </div>
+
+                <span class="screen-kicker"
+                      id="workKicker">
+                    MÁQUINA A TRABALHAR
+                </span>
+
+                <h1 id="workTitle">
+                    Estou a preparar.
+                </h1>
+
+                <p id="workDescription">
+                    A Máquina está a processar o pedido.
+                </p>
+
+                <div class="work-progress">
+                    <div class="work-progress-bar"
+                         id="workProgressBar"></div>
+                </div>
+
+                <span class="work-progress-text"
+                      id="workProgressText">
+                    A preparar...
+                </span>
+
+                <button class="secondary-button"
+                        type="button"
+                        id="workCancelButton">
+                    Parar
+                </button>
+
+            </div>
+                    </section>
+        <!-- ECRÃ: DOCUMENTO -->
+        <section class="screen screen-document"
+                 id="screen-document"
+                 data-screen="document"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button"
+                        type="button"
+                        data-back="terms"
+                        aria-label="Voltar">
+                    ←
+                </button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">DOCUMENTO</span>
+                    <h1 id="documentTitle">Documento</h1>
+                </div>
+            </header>
+
+            <div class="screen-content document-reader">
+
+                <article class="document-reader-card"
+                         id="documentContent">
+                </article>
+
+                <button class="primary-button"
+                        type="button"
+                        data-back="terms">
+                    Voltar
+                </button>
+
+            </div>
+        </section>
+
+
+        <!-- ECRÃ: PERFIL DA MÁQUINA / EVOLUÇÃO -->
+        <section class="screen screen-machine-profile"
+                 id="screen-machine-profile"
+                 data-screen="machine-profile"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button"
+                        type="button"
+                        data-back="evolution"
+                        aria-label="Voltar">
+                    ←
+                </button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">EVOLUÇÃO</span>
+                    <h1>Máquina</h1>
+                </div>
+            </header>
+
+            <div class="screen-content">
+
+                <div class="machine-evolution-display">
+
+                    <div class="evolution-machine"
+                         id="evolutionMachine"
+                         data-stage="1">
+
+                        <div class="evolution-aura"></div>
+                        <div class="evolution-orbit"></div>
+
+                        <div class="evolution-core">
+                            <div class="evolution-core-inner"></div>
+                        </div>
+
+                    </div>
+
+                    <span class="evolution-stage-label"
+                          id="evolutionStageLabel">
+                        ESTÁGIO 1
+                    </span>
+
+                    <h2 id="evolutionStageName">
+                        Presença
+                    </h2>
+
+                    <p id="evolutionStageDescription">
+                        A Máquina começa a conhecer a tua forma
+                        de trabalhar e a construir a sua presença.
+                    </p>
+
+                </div>
+
+                <div class="evolution-progress-card">
+
+                    <div class="evolution-progress-top">
+                        <span>Progresso</span>
+                        <strong id="evolutionProgressValue">
+                            0%
+                        </strong>
+                    </div>
+
+                    <div class="evolution-progress">
+                        <div id="evolutionProgressBar"></div>
+                    </div>
+
+                </div>
+
+                <div class="evolution-message"
+                     id="evolutionMessage">
+                    A evolução acontece com a utilização e a relação
+                    construída com a Máquina.
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ECRÃ: NOTIFICAÇÃO DA MÁQUINA -->
+        <section class="machine-notification"
+                 id="machineNotification"
+                 aria-hidden="true">
+
+            <div class="notification-machine"></div>
+
+            <div class="notification-content">
+                <strong id="notificationTitle">
+                    Máquina
+                </strong>
+
+                <p id="notificationMessage"></p>
+            </div>
+
+            <button type="button"
+                    id="notificationClose"
+                    aria-label="Fechar">
+                ×
+            </button>
+
+                    </section>
+<!-- MODAL: CONFIRMAÇÃO -->
+        <div class="modal"
+             id="confirmationModal"
+             aria-hidden="true">
+
+            <div class="modal-overlay"
+                 data-modal-close="confirmationModal"></div>
+
+            <div class="modal-card"
+                 role="dialog"
+                 aria-modal="true">
+
+                <button class="modal-close"
+                        type="button"
+                        data-modal-close="confirmationModal"
+                        aria-label="Fechar">
+                    ×
+                </button>
+
+                <div class="modal-icon"
+                     id="modalIcon">
+                    ?
+                </div>
+
+                <h2 id="modalTitle">
+                    Confirmar ação
+                </h2>
+
+                <p id="modalMessage">
+                    Tens a certeza que queres continuar?
+                </p>
+
+                <div class="modal-actions">
+
+                    <button class="secondary-button"
+                            type="button"
+                            data-modal-close="confirmationModal">
+                        Cancelar
+                    </button>
+
+                    <button class="primary-button"
+                            type="button"
+                            id="modalConfirmButton">
+                        Confirmar
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- MODAL: MENSAGEM DA MÁQUINA -->
+        <div class="modal"
+             id="machineMessageModal"
+             aria-hidden="true">
+
+            <div class="modal-overlay"
+                 data-modal-close="machineMessageModal"></div>
+
+            <div class="modal-card machine-message-card"
+                 role="dialog"
+                 aria-modal="true">
+
+                <button class="modal-close"
+                        type="button"
+                        data-modal-close="machineMessageModal"
+                        aria-label="Fechar">
+                    ×
+                </button>
+
+                <div class="modal-machine">
+                    <div class="modal-machine-core"></div>
+                </div>
+
+                <span class="screen-kicker">MÁQUINA</span>
+
+                <h2 id="machineMessageTitle">
+                    Estou contigo.
+                </h2>
+
+                <p id="machineMessageText"></p>
+
+                <button class="primary-button"
+                        type="button"
+                        data-modal-close="machineMessageModal">
+                    Continuar
+                </button>
+
+            </div>
+        </div>
+
+
+        <!-- AVISO GLOBAL -->
+        <div class="toast"
+             id="globalToast"
+             aria-hidden="true"
+             role="status">
+
+            <span class="toast-icon"
+                  id="toastIcon">
+                ✓
+            </span>
+
+            <span class="toast-message"
+                  id="toastMessage">
+            </span>
+
+    </div>
