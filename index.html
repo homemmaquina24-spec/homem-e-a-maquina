@@ -6662,3 +6662,1053 @@
   >
 
     </div>
+<!-- =========================================================
+     PARTE 37 — CONTROLADOR DE INTENÇÃO E CONTEXTO
+     ========================================================= -->
+
+<div
+  id="intentController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="detectedIntent"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="detectedSubject"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="detectedAction"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="detectedPlatform"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="detectedNiche"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="intentConfidence"
+    value="0"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTEXTO ATUAL DA CONVERSA
+     ========================================================= -->
+
+<div
+  id="activeConversationContext"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="contextSubject"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="contextPreviousSubject"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="contextIntent"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="contextPreviousIntent"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="contextLastQuestion"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="contextLastAnswer"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="contextFollowUp"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="contextRequiresDetails"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     MEMÓRIA TEMPORÁRIA DA CONVERSA
+     ========================================================= -->
+
+<div
+  id="conversationMemory"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="memoryTurnCount"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="memoryCurrentTopic"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="memoryPreviousTopic"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="memoryPendingQuestion"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="memoryPendingAction"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE INTERPRETAÇÃO
+     ========================================================= -->
+
+<div
+  id="interpretationController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="interpretationStatus"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="interpretationInput"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="interpretationResult"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="interpretationRequiresTool"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="interpretationRequiresExternalAI"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE RESPOSTA
+     ========================================================= -->
+
+<div
+  id="responseController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="responseStatus"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="responseText"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="responseType"
+    value="spoken"
+  >
+
+  <input
+    type="hidden"
+    id="responseRequiresScreen"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="responseTargetScreen"
+    value=""
+  >
+
+      </div>
+      <!-- =========================================================
+     PARTE 38 — CONTROLADOR DE AÇÕES DA MÁQUINA
+     ========================================================= -->
+
+<div
+  id="machineActionController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="machineActionType"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="machineActionTarget"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="machineActionStatus"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="machineActionRequiresConfirmation"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="machineActionRequiresAuthorization"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     AÇÕES DISPONÍVEIS
+     ========================================================= -->
+
+<div
+  id="machineActions"
+  hidden
+>
+
+  <input type="hidden" id="actionOpenScreen" value="open-screen">
+  <input type="hidden" id="actionStartConversation" value="start-conversation">
+  <input type="hidden" id="actionPauseConversation" value="pause-conversation">
+  <input type="hidden" id="actionResumeConversation" value="resume-conversation">
+  <input type="hidden" id="actionStopConversation" value="stop-conversation">
+
+  <input type="hidden" id="actionAnalyzeAccount" value="analyze-account">
+  <input type="hidden" id="actionAnalyzeContent" value="analyze-content">
+  <input type="hidden" id="actionAnalyzeAudience" value="analyze-audience">
+  <input type="hidden" id="actionAnalyzeTrends" value="analyze-trends">
+
+  <input type="hidden" id="actionCreateStrategy" value="create-strategy">
+  <input type="hidden" id="actionCreateIdeas" value="create-ideas">
+  <input type="hidden" id="actionCreateScripts" value="create-scripts">
+  <input type="hidden" id="actionCreateImages" value="create-images">
+  <input type="hidden" id="actionCreateVideos" value="create-videos">
+  <input type="hidden" id="actionCreatePlanning" value="create-planning">
+
+  <input type="hidden" id="actionConnectAccount" value="connect-account">
+  <input type="hidden" id="actionAuthorizeAccount" value="authorize-account">
+  <input type="hidden" id="actionPublishContent" value="publish-content">
+
+  <input type="hidden" id="actionStartAutonomous" value="start-autonomous">
+  <input type="hidden" id="actionStopAutonomous" value="stop-autonomous">
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE FERRAMENTAS
+     ========================================================= -->
+
+<div
+  id="toolsController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="activeTool"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="toolStatus"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="toolInput"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="toolOutput"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="toolError"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE IA EXTERNA
+     ========================================================= -->
+
+<div
+  id="externalAIController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="externalAIEnabled"
+    value="true"
+  >
+
+  <input
+    type="hidden"
+    id="externalAIProvider"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="externalAIStatus"
+    value="available"
+  >
+
+  <input
+    type="hidden"
+    id="externalAIRequest"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="externalAIResponse"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE INTELIGÊNCIA PRÓPRIA
+     ========================================================= -->
+
+<div
+  id="internalIntelligenceController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="internalIntelligenceStatus"
+    value="active"
+  >
+
+  <input
+    type="hidden"
+    id="internalContextEngine"
+    value="active"
+  >
+
+  <input
+    type="hidden"
+    id="internalMemoryEngine"
+    value="active"
+  >
+
+  <input
+    type="hidden"
+    id="internalOrchestrator"
+    value="active"
+  >
+
+  <input
+    type="hidden"
+    id="internalKnowledge"
+    value="active"
+  >
+
+    </div>
+    <!-- =========================================================
+     PARTE 39 — CONTROLADOR DE ESTADO DA APLICAÇÃO
+     ========================================================= -->
+
+<div
+  id="appRuntimeController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="runtimeStatus"
+    value="initializing"
+  >
+
+  <input
+    type="hidden"
+    id="runtimeReady"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="runtimeVersion"
+    value="1.0.0"
+  >
+
+  <input
+    type="hidden"
+    id="runtimeStartedAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="runtimeLastUpdate"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE DISPOSITIVO
+     ========================================================= -->
+
+<div
+  id="deviceController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="deviceType"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="deviceWidth"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="deviceHeight"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="deviceOnline"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="deviceMicrophone"
+    value="unknown"
+  >
+
+  <input
+    type="hidden"
+    id="deviceAudio"
+    value="unknown"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE ACESSIBILIDADE
+     ========================================================= -->
+
+<div
+  id="accessibilityController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="accessibilityReducedMotion"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="accessibilityLargeText"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="accessibilityScreenReader"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE ARMAZENAMENTO
+     ========================================================= -->
+
+<div
+  id="storageController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="storageAvailable"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="storageUserPreferences"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="storageConversation"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="storageMachineState"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE SINCRONIZAÇÃO
+     ========================================================= -->
+
+<div
+  id="syncController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="syncStatus"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="syncLastUpdate"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="syncPending"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="syncError"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE INICIALIZAÇÃO
+     ========================================================= -->
+
+<div
+  id="initializationController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="initDOM"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="initMachine"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="initNavigation"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="initAuth"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="initPreferences"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="initComplete"
+    value="false"
+  >
+
+      </div>
+      <!-- =========================================================
+     PARTE 40 — CONTROLADOR DE EVENTOS GLOBAIS
+     ========================================================= -->
+
+<div
+  id="eventController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="lastEvent"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="lastEventTarget"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="lastEventTime"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     EVENTOS DA MÁQUINA
+     ========================================================= -->
+
+<div
+  id="machineEventController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="machineEventListening"
+    value="machine:listening"
+  >
+
+  <input
+    type="hidden"
+    id="machineEventThinking"
+    value="machine:thinking"
+  >
+
+  <input
+    type="hidden"
+    id="machineEventSpeaking"
+    value="machine:speaking"
+  >
+
+  <input
+    type="hidden"
+    id="machineEventWaiting"
+    value="machine:waiting"
+  >
+
+  <input
+    type="hidden"
+    id="machineEventWorking"
+    value="machine:working"
+  >
+
+  <input
+    type="hidden"
+    id="machineEventPaused"
+    value="machine:paused"
+  >
+
+  <input
+    type="hidden"
+    id="machineEventStopped"
+    value="machine:stopped"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     EVENTOS DE CONVERSAÇÃO
+     ========================================================= -->
+
+<div
+  id="conversationEventController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="conversationEventStarted"
+    value="conversation:started"
+  >
+
+  <input
+    type="hidden"
+    id="conversationEventUserSpeech"
+    value="conversation:user-speech"
+  >
+
+  <input
+    type="hidden"
+    id="conversationEventUserPause"
+    value="conversation:user-pause"
+  >
+
+  <input
+    type="hidden"
+    id="conversationEventResponse"
+    value="conversation:response"
+  >
+
+  <input
+    type="hidden"
+    id="conversationEventEnded"
+    value="conversation:ended"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     EVENTOS DE NAVEGAÇÃO
+     ========================================================= -->
+
+<div
+  id="navigationEventController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="navigationEventOpen"
+    value="navigation:open"
+  >
+
+  <input
+    type="hidden"
+    id="navigationEventBack"
+    value="navigation:back"
+  >
+
+  <input
+    type="hidden"
+    id="navigationEventForward"
+    value="navigation:forward"
+  >
+
+  <input
+    type="hidden"
+    id="navigationEventChange"
+    value="navigation:change"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     EVENTOS DE AUTENTICAÇÃO
+     ========================================================= -->
+
+<div
+  id="authEventController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="authEventLogin"
+    value="auth:login"
+  >
+
+  <input
+    type="hidden"
+    id="authEventLogout"
+    value="auth:logout"
+  >
+
+  <input
+    type="hidden"
+    id="authEventRegister"
+    value="auth:register"
+  >
+
+  <input
+    type="hidden"
+    id="authEventPasswordReset"
+    value="auth:password-reset"
+  >
+
+  <input
+    type="hidden"
+    id="authEventGoogleLogin"
+    value="auth:google-login"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     EVENTOS DE TAREFA
+     ========================================================= -->
+
+<div
+  id="taskEventController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="taskEventStarted"
+    value="task:started"
+  >
+
+  <input
+    type="hidden"
+    id="taskEventProgress"
+    value="task:progress"
+  >
+
+  <input
+    type="hidden"
+    id="taskEventCompleted"
+    value="task:completed"
+  >
+
+  <input
+    type="hidden"
+    id="taskEventFailed"
+    value="task:failed"
+  >
+
+      </div>
+      <!-- =========================================================
+     PARTE 41 — CONTROLADOR DE ELEMENTOS DINÂMICOS
+     ========================================================= -->
+
+<div
+  id="dynamicContentLayer"
+  class="dynamic-content-layer"
+  aria-live="polite"
+>
+
+  <!-- Conteúdo criado pela Máquina -->
+  <div
+    id="dynamicMachineContent"
+    class="dynamic-machine-content"
+  ></div>
+
+  <!-- Resultados criados pela Máquina -->
+  <div
+    id="dynamicResultsContent"
+    class="dynamic-results-content"
+  ></div>
+
+  <!-- Ações criadas pela Máquina -->
+  <div
+    id="dynamicActionsContent"
+    class="dynamic-actions-content"
+  ></div>
+
+</div>
+
+
+<!-- =========================================================
+     LISTA DE RESULTADOS
+     ========================================================= -->
+
+<div
+  id="resultsList"
+  class="results-list"
+  aria-live="polite"
+></div>
+
+
+<!-- =========================================================
+     LISTA DE CONTAS
+     ========================================================= -->
+
+<div
+  id="accountsList"
+  class="accounts-list"
+  aria-live="polite"
+></div>
+
+
+<!-- =========================================================
+     LISTA DE AUTORIZAÇÕES
+     ========================================================= -->
+
+<div
+  id="authorizationsList"
+  class="authorizations-list"
+  aria-live="polite"
+></div>
+
+
+<!-- =========================================================
+     LISTA DE MÉTRICAS
+     ========================================================= -->
+
+<div
+  id="metricsList"
+  class="metrics-list"
+  aria-live="polite"
+></div>
+
+
+<!-- =========================================================
+     LISTA DE IDEIAS
+     ========================================================= -->
+
+<div
+  id="ideasList"
+  class="ideas-list"
+  aria-live="polite"
+></div>
+
+
+<!-- =========================================================
+     LISTA DE ROTEIROS
+     ========================================================= -->
+
+<div
+  id="scriptsList"
+  class="scripts-list"
+  aria-live="polite"
+></div>
+
+
+<!-- =========================================================
+     LISTA DE PLANEAMENTO
+     ========================================================= -->
+
+<div
+  id="planningList"
+  class="planning-list"
+  aria-live="polite"
+></div>
+
+
+<!-- =========================================================
+     LISTA DE TENDÊNCIAS
+     ========================================================= -->
+
+<div
+  id="trendsList"
+  class="trends-list"
+  aria-live="polite"
+></div>
+
+
+<!-- =========================================================
+     LISTA DE CAPACIDADES
+     ========================================================= -->
+
+<div
+  id="capabilitiesList"
+  class="capabilities-list"
+  aria-live="polite"
+></div>
+
+
+<!-- =========================================================
+     ÁREA DE CONTEÚDO GERADO
+     ========================================================= -->
+
+<div
+  id="generatedContentList"
+  class="generated-content-list"
+  aria-live="polite"
+></div>
