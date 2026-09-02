@@ -7712,3 +7712,414 @@
   class="generated-content-list"
   aria-live="polite"
 ></div>
+<!-- =========================================================
+     PARTE 42 — CONTROLADOR DE ELEMENTOS VAZIOS E ESTADOS
+     ========================================================= -->
+
+<div
+  id="emptyStateLayer"
+  class="empty-state-layer"
+  aria-hidden="true"
+>
+
+  <div
+    id="emptyState"
+    class="empty-state"
+  >
+
+    <div
+      id="emptyStateIcon"
+      class="empty-state-icon"
+      aria-hidden="true"
+    ></div>
+
+    <h3
+      id="emptyStateTitle"
+      class="empty-state-title"
+    >
+      Ainda não há resultados.
+    </h3>
+
+    <p
+      id="emptyStateText"
+      class="empty-state-text"
+    >
+      Quando a Máquina realizar uma tarefa, o resultado aparecerá aqui.
+    </p>
+
+    <button
+      type="button"
+      id="emptyStateAction"
+      class="primary-button"
+    >
+      Falar com a Máquina
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     ESTADO DE CARREGAMENTO DE ECRÃ
+     ========================================================= -->
+
+<div
+  id="screenLoadingLayer"
+  class="screen-loading-layer"
+  aria-hidden="true"
+>
+
+  <div
+    class="screen-loading-machine"
+    aria-hidden="true"
+  ></div>
+
+  <p
+    id="screenLoadingText"
+    class="screen-loading-text"
+  >
+    A Máquina está a preparar...
+  </p>
+
+</div>
+
+
+<!-- =========================================================
+     ESTADO DE ECRÃ INDISPONÍVEL
+     ========================================================= -->
+
+<div
+  id="screenUnavailableLayer"
+  class="screen-unavailable-layer"
+  aria-hidden="true"
+>
+
+  <div class="screen-unavailable-content">
+
+    <div
+      class="screen-unavailable-icon"
+      aria-hidden="true"
+    >
+      !
+    </div>
+
+    <h3
+      id="screenUnavailableTitle"
+      class="screen-unavailable-title"
+    >
+      Esta capacidade ainda não está disponível.
+    </h3>
+
+    <p
+      id="screenUnavailableText"
+      class="screen-unavailable-text"
+    >
+      A estrutura já está preparada. A integração será ativada posteriormente.
+    </p>
+
+    <button
+      type="button"
+      id="screenUnavailableBack"
+      class="secondary-button"
+    >
+      Voltar
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     ESTADO DE AUTORIZAÇÃO NECESSÁRIA
+     ========================================================= -->
+
+<div
+  id="authorizationRequiredLayer"
+  class="authorization-required-layer"
+  aria-hidden="true"
+>
+
+  <div class="authorization-required-content">
+
+    <h3
+      id="authorizationRequiredTitle"
+    >
+      Autorização necessária
+    </h3>
+
+    <p
+      id="authorizationRequiredText"
+    >
+      Para executar esta ação, precisas autorizar a Máquina a aceder à conta correspondente.
+    </p>
+
+    <div class="authorization-required-actions">
+
+      <button
+        type="button"
+        id="authorizationRequiredButton"
+        class="primary-button"
+      >
+        Autorizar
+      </button>
+
+      <button
+        type="button"
+        id="authorizationRequiredCancel"
+        class="secondary-button"
+      >
+        Cancelar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     ESTADO DE LOGIN NECESSÁRIO
+     ========================================================= -->
+
+<div
+  id="loginRequiredLayer"
+  class="login-required-layer"
+  aria-hidden="true"
+>
+
+  <div class="login-required-content">
+
+    <h3
+      id="loginRequiredTitle"
+    >
+      Entra na tua conta
+    </h3>
+
+    <p
+      id="loginRequiredText"
+    >
+      Esta função precisa de uma conta autenticada.
+    </p>
+
+    <button
+      type="button"
+      id="loginRequiredButton"
+      class="primary-button"
+    >
+      Entrar
+    </button>
+
+  </div>
+
+    </div>
+    <!-- =========================================================
+     PARTE 43 — CONTROLADOR DE PERFIL E DADOS DA PESSOA
+     ========================================================= -->
+
+<div
+  id="profileController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="profileId"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="profileNameValue"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="profileEmailValue"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="profilePhotoValue"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="profileLanguageValue"
+    value="pt-MZ"
+  >
+
+  <input
+    type="hidden"
+    id="profileCreatedAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="profileUpdatedAt"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE PREFERÊNCIAS DO CRIADOR
+     ========================================================= -->
+
+<div
+  id="creatorPreferencesController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="creatorNiche"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creatorAudience"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creatorMainGoal"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creatorPlatforms"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creatorContentStyle"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE OBJETIVOS
+     ========================================================= -->
+
+<div
+  id="goalsController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="activeGoal"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="goalStatus"
+    value="inactive"
+  >
+
+  <input
+    type="hidden"
+    id="goalCreatedAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="goalUpdatedAt"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE PROGRESSO DO UTILIZADOR
+     ========================================================= -->
+
+<div
+  id="userProgressController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="progressLevel"
+    value="1"
+  >
+
+  <input
+    type="hidden"
+    id="progressPoints"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="progressNextLevel"
+    value="100"
+  >
+
+  <input
+    type="hidden"
+    id="progressUpdatedAt"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE CONCESSÕES DA MÁQUINA
+     ========================================================= -->
+
+<div
+  id="concessionsController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="activeConcessions"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="permanentConcessions"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="temporaryConcessions"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="concessionStartDate"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="concessionExpirationDate"
+    value=""
+  >
+
+          </div>
