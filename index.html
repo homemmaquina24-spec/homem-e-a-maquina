@@ -2,125 +2,2652 @@
 <html lang="pt-MZ">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Homem e a Máquina</title>
 
-    <link
-        rel="stylesheet"
-        href="css/style.css"
+    <meta
+        name="description"
+        content="Homem e a Máquina — uma nova forma de trabalhar, criar e evoluir com uma Máquina inteligente."
     >
 
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
 
 <body>
 
-    <div class="test-screen">
+    <div class="app" id="app">
 
-        <!-- =========================
-             TOPO
-        ========================== -->
+        <!-- =====================================================
+             MÁQUINA PRINCIPAL
+             ===================================================== -->
 
-        <div class="test-top">
+        <main
+            class="screen screen-machine active"
+            id="screen-machine"
+        >
 
-            <div
-                class="test-logo"
-                aria-label="Homem e a Máquina"
-            >
-                <span class="logo-h">H</span>
-                <span class="logo-m">M</span>
-                <span class="logo-core"></span>
-            </div>
+            <header class="test-top">
+
+                <button
+                    class="test-logo"
+                    id="machineHomeButton"
+                    type="button"
+                    aria-label="Voltar para a Máquina"
+                >
+                    <span class="logo-h">H</span>
+                    <span class="logo-m">M</span>
+                    <span class="logo-core"></span>
+                </button>
+
+                <button
+                    class="test-settings"
+                    id="settingsButton"
+                    type="button"
+                    aria-label="Definições"
+                >
+                    ⚙️
+                </button>
+
+            </header>
 
 
-            <button
-                class="test-settings"
-                type="button"
-                aria-label="Definições"
-            >
-                ⚙️
-            </button>
+            <section class="test-center">
 
-        </div>
+                <div
+                    class="machine"
+                    id="machine"
+                    data-state="idle"
+                    aria-label="A Máquina"
+                >
 
+                    <div class="machine-aura"></div>
 
-        <!-- =========================
-             CENTRO — A MÁQUINA
-        ========================== -->
+                    <div class="machine-orbit machine-orbit-one"></div>
+                    <div class="machine-orbit machine-orbit-two"></div>
 
-        <div class="test-center">
+                    <div class="machine-field">
 
-            <div
-                class="machine"
-                data-state="idle"
-                aria-label="A Máquina"
-            >
+                        <div class="machine-particle particle-one"></div>
+                        <div class="machine-particle particle-two"></div>
+                        <div class="machine-particle particle-three"></div>
+                        <div class="machine-particle particle-four"></div>
+                        <div class="machine-particle particle-five"></div>
+                        <div class="machine-particle particle-six"></div>
 
-                <div class="machine-aura"></div>
+                    </div>
 
-                <div class="machine-orbit machine-orbit-one"></div>
-
-                <div class="machine-orbit machine-orbit-two"></div>
-
-                <div class="machine-field">
-
-                    <div class="machine-particle particle-one"></div>
-                    <div class="machine-particle particle-two"></div>
-                    <div class="machine-particle particle-three"></div>
-                    <div class="machine-particle particle-four"></div>
-                    <div class="machine-particle particle-five"></div>
-                    <div class="machine-particle particle-six"></div>
+                    <div class="machine-core">
+                        <div class="core-inner"></div>
+                    </div>
 
                 </div>
 
-                <div class="machine-core">
+            </section>
 
-                    <div class="core-inner"></div>
+
+            <footer class="test-bottom">
+
+                <button
+                    class="test-voice"
+                    id="voiceButton"
+                    type="button"
+                    aria-label="Falar com a Máquina"
+                >
+                    🎙️
+                </button>
+
+                <button
+                    class="test-keyboard"
+                    id="keyboardButton"
+                    type="button"
+                    aria-label="Escrever para a Máquina"
+                >
+                    ⌨️
+                </button>
+
+            </footer>
+
+        </main>
+        <!-- =====================================================
+             CONVERSAÇÃO
+             ===================================================== -->
+
+        <section
+            class="screen screen-conversation"
+            id="screen-conversation"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="machine"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Conversação</h1>
+                    <p>A Máquina está contigo.</p>
+                </div>
+
+            </header>
+
+
+            <div class="conversation-content">
+
+                <div
+                    class="conversation-machine"
+                    id="conversationMachine"
+                    data-state="idle"
+                >
+
+                    <div class="machine-aura"></div>
+
+                    <div class="machine-orbit machine-orbit-one"></div>
+                    <div class="machine-orbit machine-orbit-two"></div>
+
+                    <div class="machine-field">
+
+                        <div class="machine-particle particle-one"></div>
+                        <div class="machine-particle particle-two"></div>
+                        <div class="machine-particle particle-three"></div>
+                        <div class="machine-particle particle-four"></div>
+
+                    </div>
+
+                    <div class="machine-core">
+                        <div class="core-inner"></div>
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="conversation-status"
+                    id="conversationStatus"
+                >
+                    A Máquina está pronta.
+                </div>
+
+            </div>
+
+
+            <footer class="conversation-controls">
+
+                <button
+                    class="conversation-voice-button"
+                    id="conversationVoiceButton"
+                    type="button"
+                    aria-label="Falar"
+                >
+                    🎙️
+                </button>
+
+                <button
+                    class="conversation-keyboard-button"
+                    id="conversationKeyboardButton"
+                    type="button"
+                    aria-label="Escrever"
+                >
+                    ⌨️
+                </button>
+
+            </footer>
+
+                                                                       </section>
+                                                                       <!-- =====================================================
+             CRIADOR
+             ===================================================== -->
+
+        <section
+            class="screen screen-creator"
+            id="screen-creator"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="machine"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Criador</h1>
+                    <p>A Máquina trabalha contigo.</p>
+                </div>
+
+            </header>
+
+
+            <div
+                class="feature-grid"
+                id="creatorFeatureGrid"
+            >
+
+                <button
+                    class="feature-card"
+                    type="button"
+                    data-screen="account-analysis"
+                >
+                    <span class="feature-icon">📊</span>
+                    <span class="feature-title">Analisar conta</span>
+                    <span class="feature-description">
+                        Compreender a conta e encontrar oportunidades.
+                    </span>
+                </button>
+
+
+                <button
+                    class="feature-card"
+                    type="button"
+                    data-screen="content-analysis"
+                >
+                    <span class="feature-icon">🔎</span>
+                    <span class="feature-title">Analisar conteúdo</span>
+                    <span class="feature-description">
+                        Descobrir o que funciona e o que melhorar.
+                    </span>
+                </button>
+
+
+                <button
+                    class="feature-card"
+                    type="button"
+                    data-screen="audience"
+                >
+                    <span class="feature-icon">👥</span>
+                    <span class="feature-title">Público</span>
+                    <span class="feature-description">
+                        Conhecer melhor o público da conta.
+                    </span>
+                </button>
+
+
+                <button
+                    class="feature-card"
+                    type="button"
+                    data-screen="trends"
+                >
+                    <span class="feature-icon">📈</span>
+                    <span class="feature-title">Tendências</span>
+                    <span class="feature-description">
+                        Encontrar tendências relevantes.
+                    </span>
+                </button>
+
+            </div>
+
+    </section>
+    <!-- =====================================================
+             CRIADOR — CONTINUAÇÃO
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-account-analysis"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="creator"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Analisar conta</h1>
+                    <p>Compreender a conta e encontrar oportunidades.</p>
+                </div>
+
+            </header>
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+                    <span class="detail-icon">📊</span>
+
+                    <h2>Análise da conta</h2>
+
+                    <p>
+                        A Máquina poderá analisar uma conta autorizada,
+                        identificar padrões, pontos fortes, problemas
+                        e oportunidades.
+                    </p>
+                </div>
+
+                <div
+                    class="result-container"
+                    id="accountAnalysisResult"
+                >
+
+                    <div class="result-placeholder">
+                        <span>🤖</span>
+                        <p>
+                            O resultado da Máquina aparecerá aqui.
+                        </p>
+                    </div>
+
+                </div>
+
+                <button
+                    class="primary-action"
+                    id="startAccountAnalysisButton"
+                    type="button"
+                >
+                    Analisar conta
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             ANÁLISE DE CONTEÚDO
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-content-analysis"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="creator"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Analisar conteúdo</h1>
+                    <p>Descobrir o que funciona.</p>
+                </div>
+
+            </header>
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+                    <span class="detail-icon">🔎</span>
+
+                    <h2>Análise de conteúdo</h2>
+
+                    <p>
+                        A Máquina poderá analisar vídeos, publicações,
+                        formatos, temas, títulos e padrões de desempenho.
+                    </p>
+                </div>
+
+                <div
+                    class="result-container"
+                    id="contentAnalysisResult"
+                >
+
+                    <div class="result-placeholder">
+                        <span>🤖</span>
+                        <p>
+                            O resultado da análise aparecerá aqui.
+                        </p>
+                    </div>
+
+                </div>
+
+                <button
+                    class="primary-action"
+                    id="startContentAnalysisButton"
+                    type="button"
+                >
+                    Analisar conteúdo
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             PÚBLICO
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-audience"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="creator"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Público</h1>
+                    <p>Compreender para quem estás a criar.</p>
+                </div>
+
+            </header>
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+                    <span class="detail-icon">👥</span>
+
+                    <h2>Análise do público</h2>
+
+                    <p>
+                        A Máquina poderá identificar características,
+                        interesses, comportamentos e necessidades
+                        do público.
+                    </p>
+                </div>
+
+                <div
+                    class="result-container"
+                    id="audienceResult"
+                >
+
+                    <div class="result-placeholder">
+                        <span>🤖</span>
+                        <p>
+                            A análise do público aparecerá aqui.
+                        </p>
+                    </div>
+
+                </div>
+
+                <button
+                    class="primary-action"
+                    id="startAudienceAnalysisButton"
+                    type="button"
+                >
+                    Analisar público
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             TENDÊNCIAS
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-trends"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="creator"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Tendências</h1>
+                    <p>Tendências relevantes para o teu conteúdo.</p>
+                </div>
+
+            </header>
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+                    <span class="detail-icon">📈</span>
+
+                    <h2>Tendências</h2>
+
+                    <p>
+                        A Máquina poderá procurar tendências e relacioná-las
+                        com o nicho, público e posicionamento da conta.
+                    </p>
+                </div>
+
+                <div
+                    class="result-container"
+                    id="trendsResult"
+                >
+
+                    <div class="result-placeholder">
+                        <span>🤖</span>
+                        <p>
+                            As tendências encontradas aparecerão aqui.
+                        </p>
+                    </div>
+
+                </div>
+
+                <button
+                    class="primary-action"
+                    id="searchTrendsButton"
+                    type="button"
+                >
+                    Procurar tendências
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             ESTRATÉGIA
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-strategy"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="creator"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Estratégia</h1>
+                    <p>Transformar informação em direção.</p>
+                </div>
+
+            </header>
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+                    <span class="detail-icon">🧭</span>
+
+                    <h2>Estratégia</h2>
+
+                    <p>
+                        A Máquina poderá transformar análises, público,
+                        tendências e objetivos numa estratégia personalizada.
+                    </p>
+                </div>
+
+                <div
+                    class="result-container"
+                    id="strategyResult"
+                >
+
+                    <div class="result-placeholder">
+                        <span>🤖</span>
+                        <p>
+                            A estratégia criada pela Máquina aparecerá aqui.
+                        </p>
+                    </div>
+
+                </div>
+
+                <button
+                    class="primary-action"
+                    id="createStrategyButton"
+                    type="button"
+                >
+                    Criar estratégia
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             IDEIAS
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-ideas"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="creator"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Ideias</h1>
+                    <p>Ideias adaptadas ao teu objetivo.</p>
+                </div>
+
+            </header>
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+                    <span class="detail-icon">💡</span>
+
+                    <h2>Ideias de conteúdo</h2>
+
+                    <p>
+                        A Máquina poderá criar ideias relacionadas
+                        com o nicho, público, tendências e estratégia.
+                    </p>
+                </div>
+
+                <div
+                    class="result-container"
+                    id="ideasResult"
+                >
+
+                    <div class="result-placeholder">
+                        <span>🤖</span>
+                        <p>
+                            As ideias criadas pela Máquina aparecerão aqui.
+                        </p>
+                    </div>
+
+                </div>
+
+                <button
+                    class="primary-action"
+                    id="generateIdeasButton"
+                    type="button"
+                >
+                    Criar ideias
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             ROTEIROS
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-scripts"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="creator"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Roteiros</h1>
+                    <p>Transformar ideias em conteúdo.</p>
+                </div>
+
+            </header>
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+                    <span class="detail-icon">📝</span>
+
+                    <h2>Roteiros</h2>
+
+                    <p>
+                        A Máquina poderá transformar ideias em roteiros
+                        completos, adaptados ao formato e à plataforma.
+                    </p>
+                </div>
+
+                <div
+                    class="result-container"
+                    id="scriptsResult"
+                >
+
+                    <div class="result-placeholder">
+                        <span>🤖</span>
+                        <p>
+                            Os roteiros criados pela Máquina aparecerão aqui.
+                        </p>
+                    </div>
+
+                </div>
+
+                <button
+                    class="primary-action"
+                    id="generateScriptButton"
+                    type="button"
+                >
+                    Criar roteiro
+                </button>
+
+            </div>
+
+    </section>
+    <!-- =====================================================
+             IMAGENS
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-images"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="creator"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Imagens</h1>
+                    <p>Imagens preparadas para o teu conteúdo.</p>
+                </div>
+
+            </header>
+
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+
+                    <span class="detail-icon">🖼️</span>
+
+                    <h2>Criação de imagens</h2>
+
+                    <p>
+                        A Máquina poderá preparar imagens, capas,
+                        miniaturas e outros elementos visuais.
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="result-container"
+                    id="imagesResult"
+                >
+
+                    <div class="result-placeholder">
+
+                        <span>🤖</span>
+
+                        <p>
+                            As imagens criadas aparecerão aqui.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="primary-action"
+                    id="generateImageButton"
+                    type="button"
+                >
+                    Criar imagem
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             VÍDEOS
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-videos"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="creator"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Vídeos</h1>
+                    <p>Transformar conteúdo em vídeo.</p>
+                </div>
+
+            </header>
+
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+
+                    <span class="detail-icon">🎬</span>
+
+                    <h2>Criação de vídeos</h2>
+
+                    <p>
+                        A Máquina poderá preparar vídeos a partir
+                        de ideias, roteiros e materiais autorizados.
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="result-container"
+                    id="videosResult"
+                >
+
+                    <div class="result-placeholder">
+
+                        <span>🤖</span>
+
+                        <p>
+                            Os vídeos preparados pela Máquina
+                            aparecerão aqui.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="primary-action"
+                    id="generateVideoButton"
+                    type="button"
+                >
+                    Criar vídeo
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             PLANEAMENTO
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-planning"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="creator"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Planeamento</h1>
+                    <p>Organizar o que vem a seguir.</p>
+                </div>
+
+            </header>
+
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+
+                    <span class="detail-icon">🗓️</span>
+
+                    <h2>Planeamento de conteúdo</h2>
+
+                    <p>
+                        A Máquina poderá organizar ideias, roteiros,
+                        publicações e objetivos num plano de conteúdo.
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="result-container"
+                    id="planningResult"
+                >
+
+                    <div class="result-placeholder">
+
+                        <span>🤖</span>
+
+                        <p>
+                            O planeamento criado aparecerá aqui.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="primary-action"
+                    id="createPlanningButton"
+                    type="button"
+                >
+                    Criar planeamento
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             CONTAS
+             ===================================================== -->
+
+        <section
+            class="screen screen-accounts"
+            id="screen-accounts"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="machine"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Contas</h1>
+                    <p>
+                        Contas que a Máquina está autorizada a utilizar.
+                    </p>
+                </div>
+
+            </header>
+
+
+            <div class="settings-list">
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="my-accounts"
+                >
+
+                    <span class="settings-item-icon">📱</span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Minhas contas</strong>
+
+                        <small>
+                            Ver e gerir contas ligadas.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">›</span>
+
+                </button>
+
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="authorizations"
+                >
+
+                    <span class="settings-item-icon">🔐</span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Autorizações</strong>
+
+                        <small>
+                            Controlar o que a Máquina pode fazer.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">›</span>
+
+                </button>
+
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="metrics"
+                >
+
+                    <span class="settings-item-icon">📊</span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Métricas</strong>
+
+                        <small>
+                            Acompanhar dados e desempenho.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">›</span>
+
+                </button>
+
+            </div>
+
+    </section>
+    <!-- =====================================================
+             MINHAS CONTAS
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-my-accounts"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="accounts"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Minhas contas</h1>
+                    <p>Contas ligadas à Máquina.</p>
+                </div>
+
+            </header>
+
+
+            <div class="detail-content">
+
+                <div
+                    class="account-list"
+                    id="linkedAccountsList"
+                >
+
+                    <div class="empty-state">
+
+                        <span class="empty-state-icon">📱</span>
+
+                        <h2>Nenhuma conta ligada</h2>
+
+                        <p>
+                            Quando uma conta for autorizada,
+                            ela aparecerá aqui.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="primary-action"
+                    id="connectAccountButton"
+                    type="button"
+                >
+                    Ligar uma conta
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             AUTORIZAÇÕES
+             ===================================================== -->
+
+        <section
+            class="screen screen-detail"
+            id="screen-authorizations"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="accounts"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Autorizações</h1>
+                    <p>Tu decides o que a Máquina pode fazer.</p>
+                </div>
+
+            </header>
+
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+
+                    <span class="detail-icon">🔐</span>
+
+                    <h2>Permissões da Máquina</h2>
+
+                    <p>
+                        As ações externas dependerão das autorizações
+                        concedidas pelo utilizador e pelas plataformas.
+                    </p>
+
+                </div>
+
+
+                <div class="permission-list">
+
+                    <div class="permission-item">
+
+                        <div class="permission-content">
+                            <strong>Ver dados da conta</strong>
+
+                            <small>
+                                Permitir que a Máquina consulte
+                                dados autorizados.
+                            </small>
+                        </div>
+
+                        <span
+                            class="permission-status"
+                            data-permission="account-read"
+                        >
+                            Desativado
+                        </span>
+
+                    </div>
+
+
+                    <div class="permission-item">
+
+                        <div class="permission-content">
+                            <strong>Analisar conteúdo</strong>
+
+                            <small>
+                                Permitir análise do conteúdo autorizado.
+                            </small>
+                        </div>
+
+                        <span
+                            class="permission-status"
+                            data-permission="content-analysis"
+                        >
+                            Desativado
+                        </span>
+
+                    </div>
+
+
+                    <div class="permission-item">
+
+                        <div class="permission-content">
+                            <strong>Criar conteúdo</strong>
+
+                            <small>
+                                Permitir criação de conteúdo pela Máquina.
+                            </small>
+                        </div>
+
+                        <span
+                            class="permission-status"
+                            data-permission="content-create"
+                        >
+                            Desativado
+                        </span>
+
+                    </div>
+
+
+                    <div class="permission-item">
+
+                        <div class="permission-content">
+                            <strong>Publicar conteúdo</strong>
+
+                            <small>
+                                Publicação somente mediante autorização
+                                compatível com a plataforma.
+                            </small>
+                        </div>
+
+                        <span
+                            class="permission-status"
+                            data-permission="content-publish"
+                        >
+                            Desativado
+                        </span>
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
+        </section>
 
 
-        <!-- =========================
-             FUNDO
-        ========================== -->
+        <!-- =====================================================
+             MÉTRICAS
+             ===================================================== -->
 
-        <div class="test-bottom">
+        <section
+            class="screen screen-detail"
+            id="screen-metrics"
+            aria-hidden="true"
+        >
 
-            <button
-                class="test-voice"
-                type="button"
-                aria-label="Falar com a Máquina"
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="accounts"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Métricas</h1>
+                    <p>Acompanhar o desempenho.</p>
+                </div>
+
+            </header>
+
+
+            <div class="detail-content">
+
+                <div class="detail-intro">
+
+                    <span class="detail-icon">📊</span>
+
+                    <h2>Métricas da conta</h2>
+
+                    <p>
+                        Os dados autorizados pelas plataformas poderão
+                        ser apresentados e analisados pela Máquina.
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="metrics-container"
+                    id="metricsContainer"
+                >
+
+                    <div class="empty-state">
+
+                        <span class="empty-state-icon">📈</span>
+
+                        <h2>Sem dados disponíveis</h2>
+
+                        <p>
+                            As métricas aparecerão quando existir
+                            uma conta autorizada.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             RESULTADOS
+             ===================================================== -->
+
+        <section
+            class="screen screen-results"
+            id="screen-results"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="machine"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Resultados</h1>
+                    <p>O que a Máquina encontrou.</p>
+                </div>
+
+            </header>
+
+
+            <div class="results-content">
+
+                <div
+                    class="main-result"
+                    id="mainResult"
+                >
+
+                    <div class="result-placeholder">
+
+                        <span>🤖</span>
+
+                        <h2>Resultado da Máquina</h2>
+
+                        <p>
+                            Quando a Máquina concluir um trabalho,
+                            o resultado principal aparecerá aqui.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="secondary-action"
+                    id="showResultDetailsButton"
+                    type="button"
+                >
+                    Ver detalhes
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             DETALHES DO RESULTADO
+             ===================================================== -->
+
+        <section
+            class="screen screen-result-details"
+            id="screen-result-details"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="results"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Detalhes</h1>
+                    <p>Explicação do resultado.</p>
+                </div>
+
+            </header>
+
+
+            <div
+                class="result-details-content"
+                id="resultDetailsContent"
             >
-                🎙️
-            </button>
+
+                <div class="empty-state">
+
+                    <span class="empty-state-icon">🤖</span>
+
+                    <p>
+                        Os detalhes do resultado aparecerão aqui.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
 
 
-            <button
-                class="test-keyboard"
-                type="button"
-                aria-label="Escrever para a Máquina"
-            >
-                ⌨️
-            </button>
+        <!-- =====================================================
+             MODO AUTÓNOMO
+             ===================================================== -->
 
-        </div>
+        <section
+            class="screen screen-autonomous"
+            id="screen-autonomous"
+            aria-hidden="true"
+        >
 
-    </div>
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="machine"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Modo Autónomo</h1>
+                    <p>A Máquina trabalha continuamente com autorização.</p>
+                </div>
+
+            </header>
 
 
-    <script src="js/app.js"></script>
+            <div class="autonomous-content">
 
-</body>
+                <div class="autonomous-machine">
 
-    </html>
+                    <div class="machine-core">
+                        <div class="core-inner"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="autonomous-status">
+
+                    <span
+                        class="status-indicator"
+                        id="autonomousStatusIndicator"
+                    ></span>
+
+                    <strong id="autonomousStatusText">
+                        Desativado
+                    </strong>
+
+                </div>
+
+
+                <p class="autonomous-description">
+                    O Modo Autónomo permitirá à Máquina executar
+                    tarefas autorizadas de forma contínua, acompanhar
+                    resultados e voltar a agir quando necessário.
+                </p>
+
+
+                <button
+                    class="primary-action"
+                    id="autonomousToggleButton"
+                    type="button"
+                >
+                    Ativar Modo Autónomo
+                </button>
+
+            </div>
+
+    </section>
+    <!-- =====================================================
+             EVOLUÇÃO DA MÁQUINA
+             ===================================================== -->
+
+        <section
+            class="screen screen-evolution"
+            id="screen-evolution"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="machine"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Evolução da Máquina</h1>
+                    <p>A relação entre a pessoa e a Máquina evolui.</p>
+                </div>
+
+            </header>
+
+
+            <div class="evolution-content">
+
+                <!-- ESTADO ATUAL -->
+
+                <div class="evolution-machine">
+
+                    <div
+                        class="evolution-core"
+                        id="evolutionMachineCore"
+                    >
+                        <div class="evolution-core-inner"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="evolution-stage">
+
+                    <span class="evolution-label">
+                        ESTADO ATUAL
+                    </span>
+
+                    <h2 id="machineEvolutionStage">
+                        Primeira presença
+                    </h2>
+
+                    <p id="machineEvolutionDescription">
+                        A Máquina está a começar a construir
+                        a sua relação contigo.
+                    </p>
+
+                </div>
+
+
+                <!-- PROGRESSO -->
+
+                <div class="evolution-progress">
+
+                    <div class="evolution-progress-header">
+
+                        <span>Progresso da evolução</span>
+
+                        <strong id="evolutionProgressValue">
+                            0%
+                        </strong>
+
+                    </div>
+
+                    <div class="evolution-progress-bar">
+
+                        <div
+                            class="evolution-progress-fill"
+                            id="evolutionProgressFill"
+                            style="width: 0%;"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PRÓXIMA EVOLUÇÃO -->
+
+                <div class="evolution-next">
+
+                    <span class="evolution-label">
+                        PRÓXIMA EVOLUÇÃO
+                    </span>
+
+                    <h3 id="nextEvolutionStage">
+                        Em construção
+                    </h3>
+
+                    <p id="nextEvolutionDescription">
+                        Continua a utilizar a Máquina e a construir
+                        esta relação para descobrir o próximo estado.
+                    </p>
+
+                </div>
+
+
+                <!-- CAPACIDADES PERMANENTES -->
+
+                <div class="evolution-section">
+
+                    <div class="evolution-section-header">
+
+                        <span class="evolution-section-icon">
+                            ♾️
+                        </span>
+
+                        <div>
+                            <h3>Capacidades permanentes</h3>
+
+                            <p>
+                                Capacidades que podem permanecer
+                                desbloqueadas depois de conquistadas.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="evolution-capabilities"
+                        id="permanentCapabilities"
+                    >
+
+                        <div class="capability-item locked">
+
+                            <span class="capability-icon">
+                                🔒
+                            </span>
+
+                            <div class="capability-content">
+
+                                <strong>
+                                    Próxima capacidade
+                                </strong>
+
+                                <small>
+                                    Ainda não desbloqueada.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CONCESSÕES TEMPORÁRIAS -->
+
+                <div class="evolution-section">
+
+                    <div class="evolution-section-header">
+
+                        <span class="evolution-section-icon">
+                            ⏳
+                        </span>
+
+                        <div>
+                            <h3>Concessões temporárias</h3>
+
+                            <p>
+                                Acessos especiais concedidos por
+                                um período determinado.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="evolution-concessions"
+                        id="temporaryConcessions"
+                    >
+
+                        <div class="concession-item empty">
+
+                            <span class="concession-icon">
+                                ✨
+                            </span>
+
+                            <div class="concession-content">
+
+                                <strong>
+                                    Nenhuma concessão ativa
+                                </strong>
+
+                                <small>
+                                    Quando receberes uma concessão,
+                                    ela aparecerá aqui.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- MENSAGEM DA MÁQUINA -->
+
+                <div
+                    class="evolution-message"
+                    id="evolutionMessage"
+                >
+
+                    <span>🤖</span>
+
+                    <p>
+                        A evolução da Máquina não é apenas
+                        uma questão de plano. Algumas coisas
+                        precisam ser conquistadas.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             CONFIGURAÇÕES PRINCIPAIS
+             ===================================================== -->
+
+        <section
+            class="screen screen-settings"
+            id="screen-settings"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="machine"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Configurações</h1>
+                    <p>Define como a Máquina trabalha contigo.</p>
+                </div>
+
+            </header>
+
+
+            <div class="settings-list">
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="account"
+                >
+
+                    <span class="settings-item-icon">
+                        👤
+                    </span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Conta</strong>
+
+                        <small>
+                            Acesso, perfil e dados da tua conta.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="voice"
+                >
+
+                    <span class="settings-item-icon">
+                        🔊
+                    </span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Voz</strong>
+
+                        <small>
+                            Escolher como a Máquina fala contigo.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="language"
+                >
+
+                    <span class="settings-item-icon">
+                        🌐
+                    </span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Idioma</strong>
+
+                        <small>
+                            Idioma da Máquina e da conversação.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="conversation-settings"
+                >
+
+                    <span class="settings-item-icon">
+                        💬
+                    </span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Conversação</strong>
+
+                        <small>
+                            Controlar o comportamento da conversa.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="privacy"
+                >
+
+                    <span class="settings-item-icon">
+                        🛡️
+                    </span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Privacidade</strong>
+
+                        <small>
+                            Dados, permissões e privacidade.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="appearance"
+                >
+
+                    <span class="settings-item-icon">
+                        🎨
+                    </span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Aparência</strong>
+
+                        <small>
+                            Personalizar a aparência da Máquina.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="terms"
+                >
+
+                    <span class="settings-item-icon">
+                        📄
+                    </span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Termos</strong>
+
+                        <small>
+                            Termos de utilização e privacidade.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="plan"
+                >
+
+                    <span class="settings-item-icon">
+                        ⭐
+                    </span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Plano</strong>
+
+                        <small>
+                            Ver o plano e as capacidades disponíveis.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+            </div>
+
+                        </section>
+                        <!-- =====================================================
+             CONTA
+             ===================================================== -->
+
+        <section
+            class="screen screen-account"
+            id="screen-account"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="settings"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Conta</h1>
+                    <p>Gerir a tua conta na Máquina.</p>
+                </div>
+
+            </header>
+
+
+            <div class="settings-list">
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    data-screen="profile"
+                >
+
+                    <span class="settings-item-icon">
+                        👤
+                    </span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Perfil</strong>
+
+                        <small>
+                            Nome, email e informações do perfil.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-item"
+                    type="button"
+                    id="logoutButton"
+                >
+
+                    <span class="settings-item-icon">
+                        🚪
+                    </span>
+
+                    <span class="settings-item-content">
+
+                        <strong>Terminar sessão</strong>
+
+                        <small>
+                            Sair da tua conta neste dispositivo.
+                        </small>
+
+                    </span>
+
+                    <span class="settings-item-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             PERFIL
+             ===================================================== -->
+
+        <section
+            class="screen screen-profile"
+            id="screen-profile"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="account"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Perfil</h1>
+                    <p>As informações que a Máquina utiliza para te conhecer.</p>
+                </div>
+
+            </header>
+
+
+            <div class="profile-content">
+
+                <div class="profile-avatar-area">
+
+                    <div
+                        class="profile-avatar"
+                        id="profileAvatar"
+                        aria-label="Foto do perfil"
+                    >
+                        👤
+                    </div>
+
+                    <button
+                        class="secondary-action"
+                        id="changeProfilePhotoButton"
+                        type="button"
+                    >
+                        Alterar foto
+                    </button>
+
+                </div>
+
+
+                <form
+                    class="profile-form"
+                    id="profileForm"
+                    novalidate
+                >
+
+                    <div class="form-field">
+
+                        <label for="profileName">
+                            Nome
+                        </label>
+
+                        <input
+                            id="profileName"
+                            name="profileName"
+                            type="text"
+                            autocomplete="name"
+                            placeholder="O teu nome"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="profileEmail">
+                            Email
+                        </label>
+
+                        <input
+                            id="profileEmail"
+                            name="profileEmail"
+                            type="email"
+                            autocomplete="email"
+                            placeholder="O teu email"
+                        >
+
+                        <small class="field-note">
+                            A alteração do email será feita através
+                            do sistema de autenticação.
+                        </small>
+
+                    </div>
+
+
+                    <div
+                        class="form-message"
+                        id="profileFormMessage"
+                        role="status"
+                        aria-live="polite"
+                    ></div>
+
+
+                    <button
+                        class="primary-action"
+                        id="saveProfileButton"
+                        type="submit"
+                    >
+                        Guardar alterações
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             VOZ
+             ===================================================== -->
+
+        <section
+            class="screen screen-voice"
+            id="screen-voice"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="settings"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Voz</h1>
+                    <p>Escolhe como a Máquina fala contigo.</p>
+                </div>
+
+            </header>
+
+
+            <div class="voice-settings-content">
+
+                <div class="voice-preview">
+
+                    <div
+                        class="voice-preview-machine"
+                        id="voicePreviewMachine"
+                        data-state="idle"
+                    >
+
+                        <div class="machine-aura"></div>
+
+                        <div class="machine-orbit machine-orbit-one"></div>
+                        <div class="machine-orbit machine-orbit-two"></div>
+
+                        <div class="machine-core">
+                            <div class="core-inner"></div>
+                        </div>
+
+                    </div>
+
+                    <p id="selectedVoiceDescription">
+                        Escolhe a voz que melhor representa
+                        a tua Máquina.
+                    </p>
+
+                </div>
+
+
+                <div class="voice-list">
+
+                    <button
+                        class="voice-option active"
+                        type="button"
+                        data-voice="duarte"
+                    >
+
+                        <span class="voice-option-icon">
+                            ◉
+                        </span>
+
+                        <span class="voice-option-content">
+
+                            <strong>Voz 1</strong>
+
+                            <small>
+                                Masculina
+                            </small>
+
+                        </span>
+
+                        <span class="voice-option-check">
+                            ✓
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        class="voice-option"
+                        type="button"
+                        data-voice="antonio"
+                    >
+
+                        <span class="voice-option-icon">
+                            ◉
+                        </span>
+
+                        <span class="voice-option-content">
+
+                            <strong>Voz 2</strong>
+
+                            <small>
+                                Masculina
+                            </small>
+
+                        </span>
+
+                        <span class="voice-option-check">
+                            ✓
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        class="voice-option"
+                        type="button"
+                        data-voice="female-1"
+                    >
+
+                        <span class="voice-option-icon">
+                            ◉
+                        </span>
+
+                        <span class="voice-option-content">
+
+                            <strong>Voz 3</strong>
+
+                            <small>
+                                Feminina
+                            </small>
+
+                        </span>
+
+                        <span class="voice-option-check">
+                            ✓
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        class="voice-option"
+                        type="button"
+                        data-voice="female-2"
+                    >
+
+                        <span class="voice-option-icon">
+                            ◉
+                        </span>
+
+                        <span class="voice-option-content">
+
+                            <strong>Voz 4</strong>
+
+                            <small>
+                                Feminina
+                            </small>
+
+                        </span>
+
+                        <span class="voice-option-check">
+                            ✓
+                        </span>
+
+                    </button>
+
+                </div>
+
+
+                <button
+                    class="secondary-action"
+                    id="testVoiceButton"
+                    type="button"
+                >
+                    Ouvir voz
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             IDIOMA
+             ===================================================== -->
+
+        <section
+            class="screen screen-language"
+            id="screen-language"
+            aria-hidden="true"
+        >
+
+            <header class="screen-header">
+
+                <button
+                    class="back-button"
+                    type="button"
+                    data-back="settings"
+                    aria-label="Voltar"
+                >
+                    ←
+                </button>
+
+                <div class="screen-title-group">
+                    <h1>Idioma</h1>
+                    <p>Escolhe o idioma da Máquina.</p>
+                </div>
+
+            </header>
+
+
+            <div class="language-list">
+
+                <button
+                    class="language-option active"
+                    type="button"
+                    data-language="pt-MZ"
+                >
+
+                    <span class="language-flag">
+                        🇲🇿
+                    </span>
+
+                    <span class="language-content">
+
+                        <strong>Português</strong>
+
+                        <small>
+                            Português
+                        </small>
+
+                    </span>
+
+                    <span class="language-check">
+                        ✓
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="language-option"
+                    type="button"
+                    data-language="en-US"
+                >
+
+                    <span class="language-flag">
+                        🇺🇸
+                    </span>
+
+                    <span class="language-content">
+
+                        <strong>English</strong>
+
+                        <small>
+                            English
+                        </small>
+
+                    </span>
+
+                    <span class="language-check">
+                        ✓
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="language-option"
+                    type="button"
+                    data-language="es-ES"
+                >
+
+                    <span class="language-flag">
+                        🇪🇸
+                    </span>
+
+                    <span class="language-content">
+
+                        <strong>Español</strong>
+
+                        <small>
+                            Español
+                        </small>
+
+                    </span>
+
+                    <span class="language-check">
+                        ✓
+                    </span>
+
+                </button>
+
+            </div>
+
+    </section>
+    <!-- ECRÃ: DEFINIÇÕES DE CONVERSAÇÃO -->
+        <section class="screen screen-settings-detail"
+                 id="screen-conversation-settings"
+                 data-screen="conversation-settings"
+                 aria-hidden="true">
+
+            <header class="screen-header">
+                <button class="back-button" type="button"
+                        data-back="settings" aria-label="Voltar">←</button>
+
+                <div class="screen-header-title">
+                    <span class="screen-kicker">DEFINIÇÕES</span>
+                    <h1>Conversação</h1>
+                </div>
+            </header>
+
+            <div class="screen-content settings-content">
+
+                <div class="settings-group">
+                    <h2>Forma de conversar</h2>
+
+                    <button class="setting-option selected"
+                            type="button"
+                            data-conversation-mode="natural">
+                        <span class="setting-option-icon">◉</span>
+                        <span class="setting-option-text">
+                            <strong>Natural</strong>
+                            <small>A Máquina adapta o ritmo da conversa.</small>
+                        </span>
+                        <span class="setting-check">✓</span>
+                    </button>
+
+                    <button class="setting-option"
+                            type="button"
+                            data-conversation-mode="direct">
+                        <span class="setting-option-icon">→</span>
+                        <span class="setting-option-text">
+                            <strong>Direta</strong>
+                            <small>Respostas mais rápidas e objetivas.</small>
+                        </span>
+                        <span class="setting-check">✓</span>
+                    </button>
+
+                    <button class="setting-option"
+                            type="button"
+                            data-conversation-mode="detailed">
+                        <span class="setting-option-icon">≡</span>
+                        <span class="setting-option-text">
+                            <strong>Detalhada</strong>
+                            <small>Explicações mais desenvolvidas.</small>
+                        </span>
+                        <span class="setting-check">✓</span>
+                    </button>
+                </div>
+
+                <div class="settings-group">
+                    <h2>Continuidade</h2>
+
+                    <label class="toggle-option">
+                        <span class="setting-option-text">
+                            <strong>Manter conversa ativa</strong>
+                            <small>Continua a conversa sem reiniciar.</small>
+                        </span>
+                        <input type="checkbox"
+                               id="continuousConversationToggle" checked>
+                        <span class="toggle-ui"></span>
+                    </label>
+
+                    <label class="toggle-option">
+                        <span class="setting-option-text">
+                            <strong>Respeitar pausas</strong>
+                            <small>Pequenas pausas não encerram a conversa.</small>
+                        </span>
+                        <input type="checkbox"
+                               id="pauseRecognitionToggle" checked>
+                        <span class="toggle-ui"></span>
+                    </label>
+                </div>
+
+                <div class="settings-group">
+                    <h2>Interação</h2>
+
+                    <label class="toggle-option">
+                        <span class="setting-option-text">
+                            <strong>Interrupção natural</strong>
+                            <small>Permite interromper a Máquina.</small>
+                        </span>
+                        <input type="checkbox"
+                               id="voiceInterruptionToggle" checked>
+                        <span class="toggle-ui"></span>
+                    </label>
+
+                    <label class="toggle-option">
+                        <span class="setting-option-text">
+                            <strong>Responder por voz</strong>
+                            <small>A Máquina responde usando a voz.</small>
+                        </span>
+                        <input type="checkbox"
+                               id="voiceResponseToggle" checked>
+                        <span class="toggle-ui"></span>
+                    </label>
+                </div>
+
+            </div>
+                    </section>
