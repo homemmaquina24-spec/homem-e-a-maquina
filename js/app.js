@@ -1252,3 +1252,2340 @@ if (
   HM.initialize();
 
      }
+/* =========================================================
+   HOMEM E A MÁQUINA
+   APP.JS — PARTE 2
+   CONTROLO DE NAVEGAÇÃO E INTERFACE
+   ========================================================= */
+
+
+/* =========================================================
+   NAVEGAÇÃO ENTRE ECRÃS
+   ========================================================= */
+
+function navigateTo(screen, options = {}) {
+
+  if (!window.HM) {
+    return false;
+  }
+
+  return HM.showScreen(screen, options);
+}
+
+
+function navigateBack() {
+
+  if (!window.HM) {
+    return false;
+  }
+
+  return HM.goBack();
+}
+
+
+function navigateHome() {
+
+  if (!window.HM) {
+    return false;
+  }
+
+  return HM.goHome();
+}
+
+
+/* =========================================================
+   ABRIR ECRÃ ATRAVÉS DE DATA-ACTION
+   ========================================================= */
+
+function handleNavigationAction(element) {
+
+  if (!element) {
+    return;
+  }
+
+  const screen =
+    element.dataset.screen ||
+    element.dataset.navigate ||
+    element.dataset.target;
+
+  if (!screen) {
+    return;
+  }
+
+  navigateTo(screen);
+}
+
+
+/* =========================================================
+   EVENTOS GLOBAIS DE NAVEGAÇÃO
+   ========================================================= */
+
+document.addEventListener("click", event => {
+
+  const navigationElement =
+    event.target.closest(
+      "[data-screen], [data-navigate], [data-target]"
+    );
+
+  if (!navigationElement) {
+    return;
+  }
+
+  if (
+    navigationElement.classList.contains(
+      "back-button"
+    )
+  ) {
+    return;
+  }
+
+  handleNavigationAction(
+    navigationElement
+  );
+
+});
+
+
+/* =========================================================
+   BOTÕES DE VOLTAR
+   ========================================================= */
+
+document.addEventListener("click", event => {
+
+  const button =
+    event.target.closest(
+      ".back-button"
+    );
+
+  if (!button) {
+    return;
+  }
+
+  const explicitBack =
+    button.dataset.back;
+
+  if (explicitBack) {
+
+    navigateTo(
+      explicitBack,
+      {
+        skipHistory: true
+      }
+    );
+
+    return;
+  }
+
+  navigateBack();
+
+});
+
+
+/* =========================================================
+   ATUALIZAÇÃO DO TÍTULO DO DOCUMENTO
+   ========================================================= */
+
+const screenTitles = {
+
+  machine:
+    "Homem e a Máquina",
+
+  conversation:
+    "Conversação",
+
+  creator:
+    "Criador",
+
+  accountAnalysis:
+    "Análise da Conta",
+
+  contentAnalysis:
+    "Análise de Conteúdo",
+
+  audience:
+    "Público",
+
+  trends:
+    "Tendências",
+
+  strategy:
+    "Estratégia",
+
+  ideas:
+    "Ideias",
+
+  scripts:
+    "Roteiros",
+
+  images:
+    "Imagens",
+
+  videos:
+    "Vídeos",
+
+  planning:
+    "Planeamento",
+
+  accounts:
+    "Contas",
+
+  myAccounts:
+    "Minhas Contas",
+
+  authorizations:
+    "Autorizações",
+
+  metrics:
+    "Métricas",
+
+  results:
+    "Resultados",
+
+  resultDetails:
+    "Detalhes do Resultado",
+
+  autonomous:
+    "Modo Autónomo",
+
+  evolution:
+    "Evolução da Máquina",
+
+  settings:
+    "Configurações",
+
+  account:
+    "Conta",
+
+  profile:
+    "Perfil",
+
+  voice:
+    "Voz",
+
+  language:
+    "Idioma",
+
+  conversationSettings:
+    "Conversação",
+
+  privacy:
+    "Privacidade",
+
+  appearance:
+    "Aparência",
+
+  terms:
+    "Termos",
+
+  plan:
+    "Plano",
+
+  planPro:
+    "Plano Pro",
+
+  planAutonomous:
+    "Máquina Autónoma",
+
+  login:
+    "Entrar",
+
+  register:
+    "Criar Conta",
+
+  forgotPassword:
+    "Recuperar Palavra-passe",
+
+  keyboard:
+    "Escrever",
+
+  resultView:
+    "Resultado",
+
+  connection:
+    "Ligação",
+
+  createAccount:
+    "Criar Conta",
+
+  machineWork:
+    "A Máquina está a trabalhar",
+
+  document:
+    "Documento",
+
+  machineProfile:
+    "Perfil da Máquina"
+};
+
+
+function updateDocumentTitle() {
+
+  if (!window.HM) {
+    return;
+  }
+
+  const title =
+    screenTitles[HM.state.screen] ||
+    "Homem e a Máquina";
+
+  document.title =
+    `${title} — Homem e a Máquina`;
+}
+
+
+/* =========================================================
+   OBSERVADOR DE NAVEGAÇÃO
+   ========================================================= */
+
+function watchNavigation() {
+
+  if (!window.HM) {
+    return;
+  }
+
+  let lastScreen =
+    HM.state.screen;
+
+  setInterval(() => {
+
+    if (
+      HM.state.screen !== lastScreen
+    ) {
+
+      lastScreen =
+        HM.state.screen;
+
+      updateDocumentTitle();
+
+    }
+
+  }, 100);
+
+}
+
+
+/* =========================================================
+   ABRIR CONVERSAÇÃO
+   ========================================================= */
+
+function openConversation() {
+
+  navigateTo("conversation");
+
+  if (
+    HM.state.conversation &&
+    !HM.state.conversation.active
+  ) {
+    HM.startConversation();
+  }
+}
+
+
+/* =========================================================
+   ABRIR TECLADO
+   ========================================================= */
+
+function openKeyboard() {
+
+  navigateTo("keyboard");
+
+  const input =
+    document.getElementById(
+      "keyboardInput"
+    );
+
+  if (input) {
+
+    setTimeout(() => {
+      input.focus();
+    }, 100);
+
+  }
+}
+
+
+/* =========================================================
+   CONFIGURAÇÕES
+   ========================================================= */
+
+function openSettings() {
+  navigateTo("settings");
+}
+
+
+function openProfile() {
+  navigateTo("profile");
+}
+
+
+function openVoiceSettings() {
+  navigateTo("voice");
+}
+
+
+function openLanguageSettings() {
+  navigateTo("language");
+}
+
+
+function openConversationSettings() {
+  navigateTo("conversationSettings");
+}
+
+
+function openPrivacySettings() {
+  navigateTo("privacy");
+}
+
+
+function openAppearanceSettings() {
+  navigateTo("appearance");
+}
+
+
+function openPlan() {
+  navigateTo("plan");
+}
+
+
+/* =========================================================
+   ÁREA DO CRIADOR
+   ========================================================= */
+
+function openCreator() {
+  navigateTo("creator");
+}
+
+
+function openAccountAnalysis() {
+  navigateTo("accountAnalysis");
+}
+
+
+function openContentAnalysis() {
+  navigateTo("contentAnalysis");
+}
+
+
+function openAudience() {
+  navigateTo("audience");
+}
+
+
+function openTrends() {
+  navigateTo("trends");
+}
+
+
+function openStrategy() {
+  navigateTo("strategy");
+}
+
+
+function openIdeas() {
+  navigateTo("ideas");
+}
+
+
+function openScripts() {
+  navigateTo("scripts");
+}
+
+
+function openImages() {
+  navigateTo("images");
+}
+
+
+function openVideos() {
+  navigateTo("videos");
+}
+
+
+function openPlanning() {
+  navigateTo("planning");
+}
+
+
+/* =========================================================
+   ÁREA DE CONTAS
+   ========================================================= */
+
+function openAccounts() {
+  navigateTo("accounts");
+}
+
+
+function openMyAccounts() {
+  navigateTo("myAccounts");
+}
+
+
+function openAuthorizations() {
+  navigateTo("authorizations");
+}
+
+
+function openMetrics() {
+  navigateTo("metrics");
+}
+
+
+/* =========================================================
+   RESULTADOS
+   ========================================================= */
+
+function openResults() {
+  navigateTo("results");
+}
+
+
+function openResultDetails() {
+  navigateTo("resultDetails");
+}
+
+
+function openResultView() {
+  navigateTo("resultView");
+}
+
+
+/* =========================================================
+   EVOLUÇÃO
+   ========================================================= */
+
+function openEvolution() {
+  navigateTo("evolution");
+}
+
+
+function openAutonomousMode() {
+  navigateTo("autonomous");
+}
+
+
+/* =========================================================
+   INICIALIZAÇÃO DESTE MÓDULO
+   ========================================================= */
+
+updateDocumentTitle();
+
+watchNavigation();
+
+
+/* =========================================================
+   FIM DA PARTE 2
+   ========================================================= */
+/* =========================================================
+   HOMEM E A MÁQUINA
+   APP.JS — PARTE 3
+   PERFIL + PREFERÊNCIAS + CONFIGURAÇÕES
+   ========================================================= */
+
+
+/* =========================================================
+   PERFIL DO UTILIZADOR
+   ========================================================= */
+
+function loadProfile() {
+
+  const profile =
+    HM.state.profile;
+
+  const nameInput =
+    document.getElementById(
+      "profileName"
+    );
+
+  const emailInput =
+    document.getElementById(
+      "profileEmail"
+    );
+
+  if (nameInput) {
+    nameInput.value =
+      profile.name || "";
+  }
+
+  if (emailInput) {
+    emailInput.value =
+      profile.email || "";
+  }
+}
+
+
+function saveProfile() {
+
+  const nameInput =
+    document.getElementById(
+      "profileName"
+    );
+
+  const message =
+    document.getElementById(
+      "profileFormMessage"
+    );
+
+  if (!nameInput) {
+    return;
+  }
+
+  const name =
+    nameInput.value.trim();
+
+  if (!name) {
+
+    if (message) {
+      message.textContent =
+        "Introduz o teu nome.";
+    }
+
+    return;
+  }
+
+  HM.state.profile.name =
+    name;
+
+  if (message) {
+    message.textContent =
+      "Perfil atualizado.";
+  }
+
+  HM.toast(
+    "O teu perfil foi atualizado.",
+    "success"
+  );
+}
+
+
+/* =========================================================
+   EVENTO DO PERFIL
+   ========================================================= */
+
+document.addEventListener(
+  "submit",
+  event => {
+
+    if (
+      event.target.id !==
+      "profileForm"
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+
+    saveProfile();
+
+  }
+);
+
+
+/* =========================================================
+   PREFERÊNCIA DE VOZ
+   ========================================================= */
+
+const voiceOptions =
+  document.querySelectorAll(
+    "[data-voice]"
+  );
+
+
+voiceOptions.forEach(option => {
+
+  option.addEventListener(
+    "click",
+    () => {
+
+      const voice =
+        option.dataset.voice;
+
+      if (!voice) {
+        return;
+      }
+
+      HM.state.voice =
+        voice;
+
+      voiceOptions.forEach(item => {
+        item.classList.remove(
+          "active"
+        );
+      });
+
+      option.classList.add(
+        "active"
+      );
+
+      HM.toast(
+        "Voz selecionada.",
+        "success"
+      );
+    }
+  );
+
+});
+
+
+/* =========================================================
+   PREFERÊNCIA DE IDIOMA
+   ========================================================= */
+
+const languageOptions =
+  document.querySelectorAll(
+    "[data-language]"
+  );
+
+
+languageOptions.forEach(option => {
+
+  option.addEventListener(
+    "click",
+    () => {
+
+      const language =
+        option.dataset.language;
+
+      if (!language) {
+        return;
+      }
+
+      HM.state.language =
+        language;
+
+      languageOptions.forEach(item => {
+        item.classList.remove(
+          "active"
+        );
+      });
+
+      option.classList.add(
+        "active"
+      );
+
+      HM.toast(
+        "Idioma atualizado.",
+        "success"
+      );
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   MODO DE CONVERSAÇÃO
+   ========================================================= */
+
+const conversationModes =
+  document.querySelectorAll(
+    "[data-conversation-mode]"
+  );
+
+
+conversationModes.forEach(option => {
+
+  option.addEventListener(
+    "click",
+    () => {
+
+      const mode =
+        option.dataset.conversationMode;
+
+      if (!mode) {
+        return;
+      }
+
+      HM.state.preferences
+        .conversationMode = mode;
+
+      conversationModes.forEach(item => {
+        item.classList.remove(
+          "active"
+        );
+      });
+
+      option.classList.add(
+        "active"
+      );
+
+      HM.toast(
+        "Modo de conversação atualizado.",
+        "success"
+      );
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   TEMA
+   ========================================================= */
+
+function applyTheme(theme) {
+
+  document.body.classList.remove(
+    "light-theme"
+  );
+
+  if (theme === "light") {
+    document.body.classList.add(
+      "light-theme"
+    );
+  }
+
+  if (theme === "system") {
+
+    const prefersLight =
+      window.matchMedia &&
+      window.matchMedia(
+        "(prefers-color-scheme: light)"
+      ).matches;
+
+    if (prefersLight) {
+      document.body.classList.add(
+        "light-theme"
+      );
+    }
+  }
+
+  HM.state.preferences.theme =
+    theme;
+}
+
+
+const appearanceOptions =
+  document.querySelectorAll(
+    "[data-theme]"
+  );
+
+
+appearanceOptions.forEach(option => {
+
+  option.addEventListener(
+    "click",
+    () => {
+
+      const theme =
+        option.dataset.theme;
+
+      if (!theme) {
+        return;
+      }
+
+      appearanceOptions.forEach(item => {
+        item.classList.remove(
+          "active"
+        );
+      });
+
+      option.classList.add(
+        "active"
+      );
+
+      applyTheme(theme);
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   TOGGLES DE CONFIGURAÇÃO
+   ========================================================= */
+
+function bindToggle(
+  selector,
+  stateKey
+) {
+
+  const elements =
+    document.querySelectorAll(
+      selector
+    );
+
+  elements.forEach(element => {
+
+    element.addEventListener(
+      "change",
+      () => {
+
+        HM.state.preferences[
+          stateKey
+        ] = element.checked;
+
+      }
+    );
+
+  });
+}
+
+
+bindToggle(
+  "[data-setting='continuousConversation']",
+  "continuousConversation"
+);
+
+bindToggle(
+  "[data-setting='pauseRecognition']",
+  "pauseRecognition"
+);
+
+bindToggle(
+  "[data-setting='voiceInterruption']",
+  "voiceInterruption"
+);
+
+bindToggle(
+  "[data-setting='voiceResponse']",
+  "voiceResponse"
+);
+
+bindToggle(
+  "[data-setting='animations']",
+  "animations"
+);
+
+bindToggle(
+  "[data-setting='reducedMotion']",
+  "reducedMotion"
+);
+
+
+/* =========================================================
+   CARREGAR PERFIL QUANDO ABRIR O ECRÃ
+   ========================================================= */
+
+document.addEventListener(
+  "click",
+  event => {
+
+    const button =
+      event.target.closest(
+        "[data-screen='profile']"
+      );
+
+    if (!button) {
+      return;
+    }
+
+    setTimeout(
+      loadProfile,
+      50
+    );
+
+  }
+);
+
+
+/* =========================================================
+   FIM DA PARTE 3
+   ========================================================= */
+/* =========================================================
+   HOMEM E A MÁQUINA
+   APP.JS — PARTE 4
+   VOZ + SÍNTESE + RECONHECIMENTO DE FALA
+   ========================================================= */
+
+
+/* =========================================================
+   CONFIGURAÇÃO DAS VOZES
+   ========================================================= */
+
+const MACHINE_VOICES = {
+
+  duarte: {
+    name: "Duarte",
+    pitch: -10,
+    rate: 0.90,
+    volume: 1
+  },
+
+  antonio: {
+    name: "António",
+    pitch: -5,
+    rate: 0.92,
+    volume: 1
+  },
+
+  "female-1": {
+    name: "Voz 3",
+    pitch: 0,
+    rate: 0.95,
+    volume: 1
+  },
+
+  "female-2": {
+    name: "Voz 4",
+    pitch: 2,
+    rate: 0.95,
+    volume: 1
+  }
+
+};
+
+
+/* =========================================================
+   SÍNTESE DE VOZ
+   ========================================================= */
+
+const speechSynthesisController = {
+
+  supported:
+    "speechSynthesis" in window,
+
+  speaking: false,
+
+  voices: [],
+
+  loadVoices() {
+
+    if (!this.supported) {
+      return;
+    }
+
+    this.voices =
+      window.speechSynthesis
+        .getVoices();
+
+  },
+
+  findVoice() {
+
+    const language =
+      HM.state.language || "pt-MZ";
+
+    const voices =
+      this.voices.length
+        ? this.voices
+        : window.speechSynthesis.getVoices();
+
+    return (
+      voices.find(
+        voice =>
+          voice.lang === language
+      ) ||
+      voices.find(
+        voice =>
+          voice.lang.startsWith(
+            language.split("-")[0]
+          )
+      ) ||
+      voices.find(
+        voice =>
+          voice.lang.startsWith("pt")
+      ) ||
+      voices[0] ||
+      null
+    );
+  },
+
+  stop() {
+
+    if (!this.supported) {
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    this.speaking = false;
+
+    if (
+      HM.state.machineState ===
+      HM.MACHINE_STATES.SPEAKING
+    ) {
+      HM.setMachineState(
+        HM.MACHINE_STATES.IDLE
+      );
+    }
+  },
+
+  speak(text) {
+
+    if (!this.supported) {
+      return Promise.resolve();
+    }
+
+    const message =
+      String(text || "").trim();
+
+    if (!message) {
+      return Promise.resolve();
+    }
+
+    this.stop();
+
+    const selected =
+      MACHINE_VOICES[
+        HM.state.voice
+      ] ||
+      MACHINE_VOICES.duarte;
+
+    const utterance =
+      new SpeechSynthesisUtterance(
+        message
+      );
+
+    const voice =
+      this.findVoice();
+
+    if (voice) {
+      utterance.voice = voice;
+    }
+
+    utterance.lang =
+      HM.state.language;
+
+    utterance.pitch =
+      selected.pitch;
+
+    utterance.rate =
+      selected.rate;
+
+    utterance.volume =
+      selected.volume;
+
+    this.speaking = true;
+
+    HM.setMachineState(
+      HM.MACHINE_STATES.SPEAKING
+    );
+
+    return new Promise(resolve => {
+
+      utterance.onend = () => {
+
+        this.speaking = false;
+
+        resolve();
+
+        if (
+          HM.state.conversation.active &&
+          !HM.state.isPaused
+        ) {
+          HM.setMachineState(
+            HM.MACHINE_STATES.LISTENING
+          );
+        } else {
+          HM.setMachineState(
+            HM.MACHINE_STATES.IDLE
+          );
+        }
+
+      };
+
+      utterance.onerror = error => {
+
+        console.warn(
+          "[HM] Erro na voz:",
+          error
+        );
+
+        this.speaking = false;
+
+        resolve();
+
+        HM.setMachineState(
+          HM.MACHINE_STATES.IDLE
+        );
+
+      };
+
+      window.speechSynthesis
+        .speak(utterance);
+
+    });
+  }
+};
+
+
+/* =========================================================
+   CARREGAR VOZES DISPONÍVEIS
+   ========================================================= */
+
+if (
+  "speechSynthesis" in window
+) {
+
+  speechSynthesisController
+    .loadVoices();
+
+  window.speechSynthesis
+    .onvoiceschanged = () => {
+
+      speechSynthesisController
+        .loadVoices();
+
+    };
+}
+
+
+/* =========================================================
+   RECONHECIMENTO DE FALA
+   ========================================================= */
+
+const SpeechRecognition =
+  window.SpeechRecognition ||
+  window.webkitSpeechRecognition;
+
+
+const speechRecognitionController = {
+
+  supported:
+    Boolean(SpeechRecognition),
+
+  recognition: null,
+
+  active: false,
+
+  restarting: false,
+
+  init() {
+
+    if (!this.supported) {
+      return false;
+    }
+
+    this.recognition =
+      new SpeechRecognition();
+
+    this.recognition.lang =
+      HM.state.language;
+
+    this.recognition.continuous =
+      true;
+
+    this.recognition.interimResults =
+      true;
+
+    this.recognition.maxAlternatives =
+      1;
+
+    this.bindEvents();
+
+    return true;
+  },
+
+  bindEvents() {
+
+    if (!this.recognition) {
+      return;
+    }
+
+    this.recognition.onstart = () => {
+
+      this.active = true;
+
+      HM.state.isListening = true;
+
+      HM.setMachineState(
+        HM.MACHINE_STATES.LISTENING
+      );
+
+    };
+
+
+    this.recognition.onresult =
+      event => {
+
+        let finalText = "";
+
+        for (
+          let i = event.resultIndex;
+          i < event.results.length;
+          i++
+        ) {
+
+          const result =
+            event.results[i];
+
+          if (
+            result.isFinal
+          ) {
+
+            finalText +=
+              result[0].transcript;
+
+          }
+
+        }
+
+        finalText =
+          finalText.trim();
+
+        if (finalText) {
+
+          HM.processMessage(
+            finalText
+          );
+
+        }
+
+      };
+
+
+    this.recognition.onerror =
+      event => {
+
+        console.warn(
+          "[HM] Reconhecimento:",
+          event.error
+        );
+
+        if (
+          event.error ===
+          "not-allowed"
+        ) {
+
+          HM.toast(
+            "O acesso ao microfone foi bloqueado.",
+            "error"
+          );
+
+          this.active = false;
+
+          HM.setMachineState(
+            HM.MACHINE_STATES.ERROR
+          );
+        }
+
+      };
+
+
+    this.recognition.onend = () => {
+
+      this.active = false;
+
+      if (
+        HM.state.conversation.active &&
+        !HM.state.isPaused &&
+        HM.state.preferences
+          .continuousConversation
+      ) {
+
+        this.restart();
+
+      } else {
+
+        HM.setMachineState(
+          HM.MACHINE_STATES.IDLE
+        );
+
+      }
+
+    };
+  },
+
+  start() {
+
+    if (!this.supported) {
+
+      HM.toast(
+        "O reconhecimento de voz não é suportado neste navegador.",
+        "error"
+      );
+
+      return false;
+    }
+
+    if (!this.recognition) {
+      this.init();
+    }
+
+    if (this.active) {
+      return true;
+    }
+
+    this.recognition.lang =
+      HM.state.language;
+
+    try {
+
+      this.recognition.start();
+
+      return true;
+
+    } catch (error) {
+
+      console.warn(
+        "[HM] Não foi possível iniciar o microfone:",
+        error
+      );
+
+      return false;
+    }
+  },
+
+  stop() {
+
+    if (
+      !this.recognition ||
+      !this.active
+    ) {
+      return;
+    }
+
+    try {
+      this.recognition.stop();
+    } catch (error) {
+      console.warn(
+        "[HM] Erro ao parar reconhecimento:",
+        error
+      );
+    }
+
+    this.active = false;
+  },
+
+  restart() {
+
+    if (this.restarting) {
+      return;
+    }
+
+    this.restarting = true;
+
+    setTimeout(() => {
+
+      this.restarting = false;
+
+      if (
+        HM.state.conversation.active &&
+        !HM.state.isPaused
+      ) {
+        this.start();
+      }
+
+    }, 350);
+  }
+};
+
+
+/* =========================================================
+   CONECTAR VOZ À CONVERSAÇÃO
+   ========================================================= */
+
+function startMachineVoice() {
+
+  if (
+    !HM.state.conversation.active
+  ) {
+    HM.startConversation();
+  }
+
+  speechRecognitionController.start();
+}
+
+
+function pauseMachineVoice() {
+
+  speechRecognitionController.stop();
+
+  HM.pauseConversation();
+}
+
+
+function stopMachineVoice() {
+
+  speechRecognitionController.stop();
+
+  speechSynthesisController.stop();
+
+  HM.stopConversation();
+}
+
+
+/* =========================================================
+   BOTÃO PRINCIPAL DE VOZ
+   ========================================================= */
+
+if (HM.DOM.voiceButton) {
+
+  HM.DOM.voiceButton
+    .addEventListener(
+      "click",
+      () => {
+
+        if (
+          HM.state.isPaused
+        ) {
+
+          HM.resumeConversation();
+
+          speechRecognitionController
+            .start();
+
+          return;
+        }
+
+        if (
+          HM.state.conversation.active
+        ) {
+
+          pauseMachineVoice();
+
+        } else {
+
+          startMachineVoice();
+
+        }
+
+      }
+    );
+}
+
+
+/* =========================================================
+   FIM DA PARTE 4
+   ========================================================= */
+/* =========================================================
+   HOMEM E A MÁQUINA
+   app.js — PARTE 5
+   ORQUESTRAÇÃO • CONTEXTO • TAREFAS • RESULTADOS
+   ========================================================= */
+
+(function () {
+  "use strict";
+
+  const HM = window.HM;
+
+  if (!HM) {
+    console.error("HM não foi inicializado.");
+    return;
+  }
+
+  /* =========================================================
+     1. CONTEXTO DA CONVERSA
+     ========================================================= */
+
+  HM.context = {
+    currentSubject: null,
+    currentIntent: null,
+    lastQuestion: null,
+    lastAnswer: null,
+    lastResult: null,
+    lastScreen: null,
+    entities: {},
+    pendingAction: null,
+
+    set(subject, intent, message) {
+      this.currentSubject = subject || this.currentSubject;
+      this.currentIntent = intent || this.currentIntent;
+      this.lastQuestion = message || this.lastQuestion;
+
+      if (HM.state && HM.state.conversation) {
+        HM.state.conversation.subject = this.currentSubject;
+        HM.state.conversation.intent = this.currentIntent;
+      }
+    },
+
+    setAnswer(answer) {
+      this.lastAnswer = answer || null;
+    },
+
+    setResult(result) {
+      this.lastResult = result || null;
+
+      if (HM.state) {
+        HM.state.lastResult = result || null;
+      }
+    },
+
+    clearPending() {
+      this.pendingAction = null;
+    }
+  };
+
+
+  /* =========================================================
+     2. MEMÓRIA DE CONVERSAÇÃO
+     ========================================================= */
+
+  HM.memory = {
+    addUserMessage(message) {
+      if (!message) return;
+
+      if (!HM.state.conversation.history) {
+        HM.state.conversation.history = [];
+      }
+
+      HM.state.conversation.history.push({
+        role: "user",
+        content: message,
+        timestamp: Date.now()
+      });
+
+      this.limit();
+    },
+
+    addMachineMessage(message) {
+      if (!message) return;
+
+      if (!HM.state.conversation.history) {
+        HM.state.conversation.history = [];
+      }
+
+      HM.state.conversation.history.push({
+        role: "machine",
+        content: message,
+        timestamp: Date.now()
+      });
+
+      this.limit();
+    },
+
+    limit() {
+      const history = HM.state.conversation.history;
+
+      if (history.length > 50) {
+        HM.state.conversation.history = history.slice(-50);
+      }
+    },
+
+    lastUserMessage() {
+      const history = HM.state.conversation.history || [];
+
+      for (let i = history.length - 1; i >= 0; i--) {
+        if (history[i].role === "user") {
+          return history[i].content;
+        }
+      }
+
+      return null;
+    },
+
+    lastMachineMessage() {
+      const history = HM.state.conversation.history || [];
+
+      for (let i = history.length - 1; i >= 0; i--) {
+        if (history[i].role === "machine") {
+          return history[i].content;
+        }
+      }
+
+      return null;
+    },
+
+    clear() {
+      HM.state.conversation.history = [];
+      HM.context.currentSubject = null;
+      HM.context.currentIntent = null;
+      HM.context.lastQuestion = null;
+      HM.context.lastAnswer = null;
+      HM.context.lastResult = null;
+    }
+  };
+
+
+  /* =========================================================
+     3. GERENCIADOR DE TAREFAS
+     ========================================================= */
+
+  HM.taskManager = {
+    create(type, label) {
+      const id = "task_" + Date.now();
+
+      const task = {
+        id,
+        type: type || "general",
+        label: label || "A Máquina está a trabalhar",
+        status: "pending",
+        progress: 0,
+        startedAt: null,
+        finishedAt: null,
+        result: null,
+        error: null
+      };
+
+      HM.state.task = task;
+
+      return task;
+    },
+
+    start(task) {
+      if (!task) return;
+
+      task.status = "working";
+      task.progress = 5;
+      task.startedAt = Date.now();
+
+      HM.setMachineState("WORKING");
+      this.updateUI(task);
+    },
+
+    progress(value, message) {
+      const task = HM.state.task;
+
+      if (!task) return;
+
+      task.progress = Math.max(
+        0,
+        Math.min(100, Number(value) || 0)
+      );
+
+      if (message) {
+        task.label = message;
+      }
+
+      this.updateUI(task);
+    },
+
+    finish(result) {
+      const task = HM.state.task;
+
+      if (!task) return;
+
+      task.status = "completed";
+      task.progress = 100;
+      task.finishedAt = Date.now();
+      task.result = result || null;
+
+      this.updateUI(task);
+
+      HM.context.setResult(result);
+    },
+
+    fail(error) {
+      const task = HM.state.task;
+
+      if (!task) return;
+
+      task.status = "error";
+      task.error = error || "Erro desconhecido";
+      task.finishedAt = Date.now();
+
+      HM.setMachineState("ERROR");
+      this.updateUI(task);
+    },
+
+    updateUI(task) {
+      if (!task) return;
+
+      const progress = document.querySelector(
+        "[data-task-progress]"
+      );
+
+      const status = document.querySelector(
+        "[data-task-status]"
+      );
+
+      const label = document.querySelector(
+        "[data-task-label]"
+      );
+
+      if (progress) {
+        progress.style.width = task.progress + "%";
+        progress.setAttribute(
+          "aria-valuenow",
+          String(task.progress)
+        );
+      }
+
+      if (status) {
+        status.textContent = task.status;
+      }
+
+      if (label) {
+        label.textContent = task.label;
+      }
+    },
+
+    clear() {
+      HM.state.task = null;
+    }
+  };
+
+
+  /* =========================================================
+     4. ORQUESTRADOR DA MÁQUINA
+     ========================================================= */
+
+  HM.orchestrator = {
+
+    async execute(intentData) {
+      const data = intentData || {};
+
+      const intent = data.intent || "general";
+      const message = data.message || "";
+
+      HM.context.set(
+        data.subject,
+        intent,
+        message
+      );
+
+      switch (intent) {
+        case "analyze_account":
+          return this.accountAnalysis(message);
+
+        case "analyze_content":
+          return this.contentAnalysis(message);
+
+        case "audience":
+          return this.audience(message);
+
+        case "trends":
+          return this.trends(message);
+
+        case "strategy":
+          return this.strategy(message);
+
+        case "ideas":
+          return this.ideas(message);
+
+        case "scripts":
+          return this.scripts(message);
+
+        case "planning":
+          return this.planning(message);
+
+        default:
+          return this.general(message);
+      }
+    },
+
+
+    async general(message) {
+      return {
+        type: "conversation",
+        title: "Resposta da Máquina",
+        text:
+          "Entendi. Estou a acompanhar o que estás a dizer. " +
+          "Podemos continuar esta conversa e, quando for necessário, " +
+          "a Máquina pode transformar o teu pedido numa tarefa.",
+        source: "machine"
+      };
+    },
+
+
+    async accountAnalysis(message) {
+      return this.runTask(
+        "account_analysis",
+        "A Máquina está a preparar a análise da conta.",
+        [
+          "A identificar a conta solicitada.",
+          "A preparar os dados necessários.",
+          "A organizar os pontos que precisam de análise."
+        ]
+      );
+    },
+
+
+    async contentAnalysis(message) {
+      return this.runTask(
+        "content_analysis",
+        "A Máquina está a preparar a análise do conteúdo.",
+        [
+          "A identificar o conteúdo.",
+          "A organizar os elementos relevantes.",
+          "A preparar a análise."
+        ]
+      );
+    },
+
+
+    async audience(message) {
+      return this.runTask(
+        "audience",
+        "A Máquina está a preparar a análise do público.",
+        [
+          "A identificar o contexto.",
+          "A organizar os sinais disponíveis.",
+          "A preparar o perfil do público."
+        ]
+      );
+    },
+
+
+    async trends(message) {
+      return this.runTask(
+        "trends",
+        "A Máquina está a preparar a análise de tendências.",
+        [
+          "A identificar o contexto da conta.",
+          "A separar tendências relevantes.",
+          "A preparar oportunidades relacionadas com o nicho."
+        ]
+      );
+    },
+
+
+    async strategy(message) {
+      return this.runTask(
+        "strategy",
+        "A Máquina está a preparar uma estratégia.",
+        [
+          "A compreender o objetivo.",
+          "A organizar os pontos estratégicos.",
+          "A preparar uma direção de ação."
+        ]
+      );
+    },
+
+
+    async ideas(message) {
+      return this.runTask(
+        "ideas",
+        "A Máquina está a preparar ideias.",
+        [
+          "A compreender o nicho.",
+          "A procurar ângulos possíveis.",
+          "A organizar ideias adequadas ao contexto."
+        ]
+      );
+    },
+
+
+    async scripts(message) {
+      return this.runTask(
+        "scripts",
+        "A Máquina está a preparar roteiros.",
+        [
+          "A definir o objetivo do conteúdo.",
+          "A organizar a estrutura.",
+          "A preparar os roteiros."
+        ]
+      );
+    },
+
+
+    async planning(message) {
+      return this.runTask(
+        "planning",
+        "A Máquina está a preparar o planeamento.",
+        [
+          "A organizar os objetivos.",
+          "A estruturar as ações.",
+          "A preparar o plano."
+        ]
+      );
+    },
+
+
+    async runTask(type, label, stages) {
+      const task = HM.taskManager.create(
+        type,
+        label
+      );
+
+      HM.taskManager.start(task);
+
+      for (let i = 0; i < stages.length; i++) {
+        HM.taskManager.progress(
+          Math.round(((i + 1) / (stages.length + 1)) * 100),
+          stages[i]
+        );
+
+        await new Promise(resolve =>
+          setTimeout(resolve, 180)
+        );
+      }
+
+      const result = {
+        type,
+        title: this.getResultTitle(type),
+        summary: this.getResultSummary(type),
+        data: {
+          status: "prepared",
+          source: "machine-orchestrator"
+        }
+      };
+
+      HM.taskManager.finish(result);
+
+      return result;
+    },
+
+
+    getResultTitle(type) {
+      const titles = {
+        account_analysis: "Análise da conta",
+        content_analysis: "Análise do conteúdo",
+        audience: "Análise do público",
+        trends: "Tendências",
+        strategy: "Estratégia",
+        ideas: "Ideias",
+        scripts: "Roteiros",
+        planning: "Planeamento"
+      };
+
+      return titles[type] || "Resultado da Máquina";
+    },
+
+
+    getResultSummary(type) {
+      const summaries = {
+        account_analysis:
+          "A análise da conta foi preparada.",
+
+        content_analysis:
+          "A análise do conteúdo foi preparada.",
+
+        audience:
+          "A análise do público foi preparada.",
+
+        trends:
+          "A análise de tendências foi preparada.",
+
+        strategy:
+          "A estratégia foi preparada.",
+
+        ideas:
+          "As ideias foram preparadas.",
+
+        scripts:
+          "Os roteiros foram preparados.",
+
+        planning:
+          "O planeamento foi preparado."
+      };
+
+      return summaries[type] ||
+        "O resultado foi preparado pela Máquina.";
+    }
+  };
+
+
+  /* =========================================================
+     5. RESULTADOS
+     ========================================================= */
+
+  HM.results = {
+
+    current: null,
+
+    show(result) {
+      if (!result) return;
+
+      this.current = result;
+      HM.context.setResult(result);
+
+      const title = document.querySelector(
+        "[data-result-title]"
+      );
+
+      const summary = document.querySelector(
+        "[data-result-summary]"
+      );
+
+      if (title) {
+        title.textContent =
+          result.title || "Resultado";
+      }
+
+      if (summary) {
+        summary.textContent =
+          result.summary || "";
+      }
+
+      const resultScreen =
+        HM.getScreenElement &&
+        HM.getScreenElement("results");
+
+      if (resultScreen) {
+        HM.showScreen("results");
+      }
+
+      HM.showMachineResponse(
+        result.summary || "Resultado preparado."
+      );
+    },
+
+    showDetails() {
+      if (!this.current) {
+        HM.showToast(
+          "Ainda não existe um resultado para mostrar."
+        );
+        return;
+      }
+
+      HM.showScreen("result-details");
+    },
+
+    clear() {
+      this.current = null;
+      HM.context.setResult(null);
+    }
+  };
+
+
+  /* =========================================================
+     6. CONVERSAÇÃO CONTÍNUA COM CONTEXTO
+     ========================================================= */
+
+  HM.conversation = {
+
+    rememberUser(message) {
+      HM.memory.addUserMessage(message);
+    },
+
+    rememberMachine(message) {
+      HM.memory.addMachineMessage(message);
+      HM.context.setAnswer(message);
+    },
+
+    getContext() {
+      return {
+        subject: HM.context.currentSubject,
+        intent: HM.context.currentIntent,
+        lastQuestion: HM.context.lastQuestion,
+        lastAnswer: HM.context.lastAnswer,
+        history: HM.state.conversation.history || []
+      };
+    },
+
+    hasContext() {
+      return Boolean(
+        HM.context.currentSubject ||
+        HM.context.currentIntent ||
+        HM.context.lastQuestion
+      );
+    },
+
+    continueFromContext(message) {
+      if (!message) return null;
+
+      const text = HM.normalizeText(message);
+
+      if (
+        /^(explica|explique|detalha|detalhe|como assim)/.test(text)
+      ) {
+        return {
+          intent: HM.context.currentIntent || "general",
+          subject: HM.context.currentSubject,
+          message,
+          continuation: true
+        };
+      }
+
+      return null;
+    }
+  };
+
+
+  /* =========================================================
+     7. RESULTADO → RESPOSTA NATURAL DA MÁQUINA
+     ========================================================= */
+
+  HM.responseController = {
+
+    present(result) {
+      if (!result) return;
+
+      const text =
+        result.summary ||
+        result.text ||
+        "Terminei esta tarefa.";
+
+      HM.conversation.rememberMachine(text);
+
+      HM.showMachineResponse(text);
+
+      if (HM.speechSynthesisController &&
+          HM.state.preferences &&
+          HM.state.preferences.voiceResponse !== false) {
+
+        HM.speechSynthesisController.speak(text);
+      } else {
+        HM.setMachineState("WAITING");
+      }
+    }
+  };
+
+
+  /* =========================================================
+     8. SUBSTITUIR O PROCESSAMENTO BÁSICO PELO ORQUESTRADOR
+     ========================================================= */
+
+  HM.processMessageAdvanced = async function (message) {
+    const text = String(message || "").trim();
+
+    if (!text) return null;
+
+    HM.conversation.rememberUser(text);
+
+    const continuation =
+      HM.conversation.continueFromContext(text);
+
+    let interpreted;
+
+    if (continuation) {
+      interpreted = continuation;
+    } else if (typeof HM.interpretMessage === "function") {
+      interpreted = HM.interpretMessage(text);
+    } else {
+      interpreted = {
+        intent: "general",
+        subject: null,
+        message: text
+      };
+    }
+
+    HM.context.set(
+      interpreted.subject,
+      interpreted.intent,
+      text
+    );
+
+    HM.setMachineState("THINKING");
+
+    try {
+      const result =
+        await HM.orchestrator.execute({
+          ...interpreted,
+          message: text
+        });
+
+      HM.responseController.present(result);
+
+      return result;
+
+    } catch (error) {
+      console.error(
+        "Erro no orquestrador:",
+        error
+      );
+
+      HM.taskManager.fail(
+        "Não foi possível concluir a tarefa."
+      );
+
+      HM.showToast(
+        "A Máquina encontrou um problema."
+      );
+
+      return null;
+    }
+  };
+
+
+  /* =========================================================
+     9. EXPOR FUNÇÕES ÚTEIS
+     ========================================================= */
+
+  HM.createTask = function (type, label) {
+    return HM.taskManager.create(type, label);
+  };
+
+  HM.startTask = function (task) {
+    return HM.taskManager.start(task);
+  };
+
+  HM.finishTask = function (result) {
+    return HM.taskManager.finish(result);
+  };
+
+  HM.showResult = function (result) {
+    return HM.results.show(result);
+  };
+
+  HM.showResultDetails = function () {
+    return HM.results.showDetails();
+  };
+
+
+  /* =========================================================
+     10. CORREÇÃO DO BOTÃO DE VOZ
+     Evita que múltiplos listeners anteriores provoquem
+     start + pause no mesmo toque.
+     ========================================================= */
+
+  if (HM.DOM && HM.DOM.voiceButton) {
+    const voiceButton = HM.DOM.voiceButton;
+
+    if (!voiceButton.dataset.hmVoiceController) {
+      voiceButton.dataset.hmVoiceController = "active";
+
+      voiceButton.addEventListener(
+        "click",
+        function (event) {
+          event.stopImmediatePropagation();
+        },
+        true
+      );
+
+      voiceButton.addEventListener(
+        "click",
+        function () {
+          if (!HM.speechRecognitionController ||
+              !HM.speechRecognitionController.supported) {
+
+            HM.showToast(
+              "O reconhecimento de voz não está disponível neste navegador."
+            );
+
+            return;
+          }
+
+          if (
+            HM.state.listening ||
+            HM.speechRecognitionController.active
+          ) {
+            HM.speechRecognitionController.stop();
+            HM.setMachineState("WAITING");
+            return;
+          }
+
+          HM.speechRecognitionController.start();
+        },
+        false
+      );
+    }
+  }
+
+
+  /* =========================================================
+     11. INDICADOR DE CONEXÃO
+     ========================================================= */
+
+  HM.connection = {
+
+    update() {
+      const online = navigator.onLine;
+
+      HM.state.online = online;
+
+      document.documentElement.classList.toggle(
+        "is-offline",
+        !online
+      );
+
+      document.documentElement.classList.toggle(
+        "is-online",
+        online
+      );
+
+      const indicator = document.querySelector(
+        "[data-connection-indicator]"
+      );
+
+      if (indicator) {
+        indicator.textContent =
+          online ? "Online" : "Offline";
+      }
+    }
+  };
+
+
+  window.addEventListener(
+    "online",
+    () => HM.connection.update()
+  );
+
+  window.addEventListener(
+    "offline",
+    () => HM.connection.update()
+  );
+
+  HM.connection.update();
+
+
+  /* =========================================================
+     FIM DA PARTE 5
+     ========================================================= */
+
+})();
