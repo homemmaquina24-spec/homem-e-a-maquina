@@ -1,1800 +1,1254 @@
-/* =====================================================
+/* =========================================================
    HOMEM E A MÁQUINA
-   V6.4 — ÁUDIO ESTÁVEL + REAÇÃO À VOZ + MACHINE VOICE
-===================================================== */
+   APP.JS
+   PARTE 1
+   NÚCLEO DA APLICAÇÃO + ESTADO + NAVEGAÇÃO
+   ========================================================= */
 
+const HM = (() => {
 
-/* =====================================================
-   ELEMENTOS
-===================================================== */
+  "use strict";
 
-const machine =
-    document.querySelector(".machine");
+  /* =======================================================
+     CONFIGURAÇÃO PRINCIPAL
+     ======================================================= */
 
-const voiceButton =
-    document.querySelector(".test-voice");
+  const CONFIG = {
+    appName: "Homem e a Máquina",
+    version: "1.0.0",
+    defaultLanguage: "pt-MZ",
+    defaultVoice: "duarte",
 
-
-const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
-
-
-/* =====================================================
-   ESTADOS
-===================================================== */
-
-const STATE = {
-
-    IDLE:
-        "idle",
-
-    LISTENING:
-        "listening",
-
-    THINKING:
-        "thinking",
-
-    SPEAKING:
-        "speaking",
-
-    WAITING:
-        "waiting"
-};
-
-
-let state =
-    STATE.IDLE;
-
-
-/* =====================================================
-   ÁUDIO
-===================================================== */
-
-let audioStream =
-    null;
-
-let audioContext =
-    null;
-
-let analyser =
-    null;
-
-let microphoneSource =
-    null;
-
-let animationFrame =
-    null;
-
-let microphoneActive =
-    false;
-
-
-/* =====================================================
-   RECONHECIMENTO
-===================================================== */
-
-let recognition =
-    null;
-
-let recognitionRunning =
-    false;
-
-let recognitionWanted =
-    false;
-
-let finalTranscript =
-    "";
-
-let turnActive =
-    false;
-
-
-/* =====================================================
-   CONFIGURAÇÃO
-===================================================== */
-
-const LANGUAGE =
-    "pt-MZ";
-
-const FFT_SIZE =
-    512;
-
-
-/* =====================================================
-   REAÇÃO VISUAL
-===================================================== */
-
-const AUDIO_NOISE_FLOOR =
-    0.008;
-
-const AUDIO_VOICE_LEVEL =
-    0.055;
-
-let visualIntensity =
-    0;
-
-
-/* =====================================================
-   ESTADO DA MÁQUINA
-===================================================== */
-
-function setMachineState(
-    newState
-) {
-
-    state =
-        newState;
-
-
-    if (machine) {
-
-        machine.dataset.state =
-            newState;
+    screens: {
+      machine: "screen-machine",
+      conversation: "screen-conversation",
+      creator: "screen-creator",
+      accountAnalysis: "screen-account-analysis",
+      contentAnalysis: "screen-content-analysis",
+      audience: "screen-audience",
+      trends: "screen-trends",
+      strategy: "screen-strategy",
+      ideas: "screen-ideas",
+      scripts: "screen-scripts",
+      images: "screen-images",
+      videos: "screen-videos",
+      planning: "screen-planning",
+      accounts: "screen-accounts",
+      myAccounts: "screen-my-accounts",
+      authorizations: "screen-authorizations",
+      metrics: "screen-metrics",
+      results: "screen-results",
+      resultDetails: "screen-result-details",
+      autonomous: "screen-autonomous",
+      evolution: "screen-evolution",
+      settings: "screen-settings",
+      account: "screen-account",
+      profile: "screen-profile",
+      voice: "screen-voice",
+      language: "screen-language",
+      conversationSettings: "screen-conversation-settings",
+      privacy: "screen-privacy",
+      appearance: "screen-appearance",
+      terms: "screen-terms",
+      plan: "screen-plan",
+      planPro: "screen-plan-pro",
+      planAutonomous: "screen-plan-autonomous",
+      login: "screen-login",
+      register: "screen-register",
+      forgotPassword: "screen-forgot-password",
+      termsAcceptance: "screen-terms-acceptance",
+      keyboard: "screen-keyboard",
+      resultView: "screen-result-view",
+      connection: "screen-connection",
+      confirmation: "screen-confirmation",
+      createAccount: "screen-create-account",
+      machineWork: "screen-machine-work",
+      document: "screen-document",
+      machineProfile: "screen-machine-profile"
     }
+  };
 
 
-    console.log(
-        "Estado:",
-        newState
-    );
-}
+  /* =======================================================
+     ESTADO GLOBAL
+     ======================================================= */
 
+  const state = {
 
-/* =====================================================
-   NORMALIZAÇÃO
-===================================================== */
+    initialized: false,
 
-function normalizeText(
-    text
-) {
+    screen: "machine",
 
-    return text
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(
-            /[\u0300-\u036f]/g,
-            ""
-        )
-        .replace(
-            /[.,!?;:]/g,
-            " "
-        )
-        .replace(
-            /\s+/g,
-            " "
-        )
-        .trim();
-}
+    previousScreen: null,
 
+    navigationHistory: [],
 
-/* =====================================================
-   COMANDO DE ESPERA
-===================================================== */
+    language: CONFIG.defaultLanguage,
 
-function isWaitingCommand(
-    text
-) {
+    voice: CONFIG.defaultVoice,
 
-    const commands = [
+    machineState: "idle",
 
-        "espera",
+    isListening: false,
 
-        "espera maquina",
+    isSpeaking: false,
 
-        "maquina espera",
+    isThinking: false,
 
-        "espera um pouco",
+    isWaiting: false,
 
-        "espera um bocadinho",
+    isWorking: false,
 
-        "fica em espera",
+    isPaused: false,
 
-        "aguarda um pouco",
+    isOnline: navigator.onLine,
 
-        "volto ja"
-    ];
+    isAuthenticated: false,
 
+    user: null,
 
-    return commands.some(
-        command =>
-            text === command ||
-            text.includes(command)
-    );
-}
+    session: null,
 
-
-/* =====================================================
-   COMANDO DE RETOMA
-===================================================== */
-
-function isResumeCommand(
-    text
-) {
-
-    const commands = [
-
-        "voltei",
-
-        "maquina voltei",
-
-        "ja voltei",
-
-        "podemos continuar",
-
-        "vamos continuar",
-
-        "continua",
-
-        "maquina continua"
-    ];
-
-
-    return commands.some(
-        command =>
-            text === command ||
-            text.includes(command)
-    );
-}
-
-
-/* =====================================================
-   COMANDO DE ENCERRAMENTO
-===================================================== */
-
-function isCloseCommand(
-    text
-) {
-
-    const commands = [
-
-        "encerra a conversa",
-
-        "encerrar a conversa",
-
-        "podes encerrar a conversa",
-
-        "pode encerrar a conversa",
-
-        "fecha a conversa",
-
-        "fechar a conversa",
-
-        "encerra a sessao",
-
-        "encerrar a sessao",
-
-        "fecha a sessao",
-
-        "fechar a sessao",
-
-        "vamos parar por aqui",
-
-        "ate logo maquina"
-    ];
-
-
-    return commands.some(
-        command =>
-            text === command ||
-            text.includes(command)
-    );
-}
-
-
-/* =====================================================
-   PROCESSAR TEXTO
-===================================================== */
-
-function processTranscript() {
-
-    const text =
-        finalTranscript.trim();
-
-
-    if (!text) {
-
-        resetTurn();
-
-        return;
-    }
-
-
-    console.log(
-        "TURNO:",
-        text
-    );
-
-
-    const normalized =
-        normalizeText(text);
-
-
-    /* ---------------------------------------------
-       ENCERRAR
-    --------------------------------------------- */
-
-    if (
-        isCloseCommand(
-            normalized
-        )
-    ) {
-
-        resetTurn();
-
-        closeConversation();
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       ESPERA
-    --------------------------------------------- */
-
-    if (
-        isWaitingCommand(
-            normalized
-        )
-    ) {
-
-        resetTurn();
-
-        enterWaitingMode();
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       RETOMAR
-    --------------------------------------------- */
-
-    if (
-        isResumeCommand(
-            normalized
-        )
-    ) {
-
-        resetTurn();
-
-        resumeConversation();
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       TURNO NORMAL
-    --------------------------------------------- */
-
-    console.log(
-        "Turno normal recebido."
-    );
-
-
-    setMachineState(
-        STATE.THINKING
-    );
-
-
-    /*
-       A inteligência da Máquina
-       será ligada posteriormente.
-    */
-
-
-    setTimeout(
-        () => {
-
-            if (
-                microphoneActive &&
-                state === STATE.THINKING
-            ) {
-
-                setMachineState(
-                    STATE.LISTENING
-                );
-            }
-
-        },
-        500
-    );
-
-
-    resetTurn();
-}
-
-
-/* =====================================================
-   RESETAR TURNO
-===================================================== */
-
-function resetTurn() {
-
-    finalTranscript =
-        "";
-
-    turnActive =
-        false;
-}
-
-
-/* =====================================================
-   CRIAR RECONHECIMENTO
-===================================================== */
-
-function createRecognition() {
-
-    if (!SpeechRecognition) {
-
-        console.error(
-            "SpeechRecognition não suportado."
-        );
-
-        return null;
-    }
-
-
-    const recognizer =
-        new SpeechRecognition();
-
-
-    recognizer.lang =
-        LANGUAGE;
-
-    recognizer.continuous =
-        true;
-
-    recognizer.interimResults =
-        true;
-
-    recognizer.maxAlternatives =
-        1;
-
-
-    /* =================================================
-       RESULTADO
-    ================================================= */
-
-    recognizer.onresult =
-        function(event) {
-
-            let transcript =
-                "";
-
-
-            for (
-                let i = event.resultIndex;
-
-                i < event.results.length;
-
-                i++
-            ) {
-
-                const result =
-                    event.results[i];
-
-
-                const text =
-                    result[0]
-                        .transcript
-                        .trim();
-
-
-                if (!text) {
-
-                    continue;
-                }
-
-
-                transcript +=
-                    text + " ";
-
-
-                if (
-                    result.isFinal
-                ) {
-
-                    turnActive =
-                        true;
-                }
-            }
-
-
-            if (
-                transcript.trim()
-            ) {
-
-                finalTranscript +=
-                    transcript;
-            }
-
-
-            console.log(
-                "Reconhecido:",
-                finalTranscript.trim()
-            );
-        };
-
-
-    /* =================================================
-       INÍCIO DA FALA
-    ================================================= */
-
-    recognizer.onspeechstart =
-        function() {
-
-            if (
-                !microphoneActive ||
-                state === STATE.WAITING
-            ) {
-
-                return;
-            }
-
-
-            turnActive =
-                true;
-
-
-            if (
-                state !== STATE.THINKING &&
-                state !== STATE.SPEAKING
-            ) {
-
-                setMachineState(
-                    STATE.LISTENING
-                );
-            }
-        };
-
-
-    /* =================================================
-       FIM DA FALA
-    ================================================= */
-
-    recognizer.onspeechend =
-        function() {
-
-            if (
-                !microphoneActive ||
-                state === STATE.WAITING
-            ) {
-
-                return;
-            }
-
-
-            if (
-                turnActive &&
-                finalTranscript.trim()
-            ) {
-
-                processTranscript();
-            }
-        };
-
-
-    /* =================================================
-       ERRO
-    ================================================= */
-
-    recognizer.onerror =
-        function(event) {
-
-            console.log(
-                "Reconhecimento:",
-                event.error
-            );
-        };
-
-
-    /* =================================================
-       FIM DO RECONHECIMENTO
-    ================================================= */
-
-    recognizer.onend =
-        function() {
-
-            recognitionRunning =
-                false;
-
-
-            console.log(
-                "Reconhecimento terminou."
-            );
-
-
-            /*
-               Não reiniciamos automaticamente.
-               Mantemos a estabilidade validada.
-            */
-        };
-
-
-    return recognizer;
-}
-
-
-/* =====================================================
-   INICIAR RECONHECIMENTO
-===================================================== */
-
-function startRecognition() {
-
-    if (
-        !recognitionWanted ||
-        !microphoneActive ||
-        state === STATE.WAITING
-    ) {
-
-        return;
-    }
-
-
-    if (
-        recognitionRunning
-    ) {
-
-        return;
-    }
-
-
-    if (!recognition) {
-
-        recognition =
-            createRecognition();
-    }
-
-
-    if (!recognition) {
-
-        return;
-    }
-
-
-    try {
-
-        recognition.start();
-
-        recognitionRunning =
-            true;
-
-
-        console.log(
-            "Reconhecimento iniciado."
-        );
-
-    } catch (error) {
-
-        console.log(
-            "Não foi possível iniciar reconhecimento:",
-            error
-        );
-
-
-        recognitionRunning =
-            false;
-    }
-}
-
-
-/* =====================================================
-   PARAR RECONHECIMENTO
-===================================================== */
-
-function stopRecognition() {
-
-    recognitionWanted =
-        false;
-
-
-    if (!recognition) {
-
-        return;
-    }
-
-
-    try {
-
-        recognition.stop();
-
-    } catch (error) {
-
-        console.log(
-            "Reconhecimento já estava parado."
-        );
-    }
-
-
-    recognitionRunning =
-        false;
-}
-
-
-/* =====================================================
-   INICIAR MICROFONE
-===================================================== */
-
-async function startMicrophone() {
-
-    if (
-        microphoneActive
-    ) {
-
-        return;
-    }
-
-
-    try {
-
-        audioStream =
-            await navigator.mediaDevices
-                .getUserMedia({
-
-                    audio: {
-
-                        echoCancellation:
-                            true,
-
-                        noiseSuppression:
-                            true,
-
-                        autoGainControl:
-                            true
-                    }
-                });
-
-
-        audioContext =
-            new (
-                window.AudioContext ||
-                window.webkitAudioContext
-            )();
-
-
-        if (
-            audioContext.state ===
-            "suspended"
-        ) {
-
-            await audioContext.resume();
-        }
-
-
-        analyser =
-            audioContext.createAnalyser();
-
-
-        analyser.fftSize =
-            FFT_SIZE;
-
-
-        analyser.smoothingTimeConstant =
-            0.75;
-
-
-        microphoneSource =
-            audioContext
-                .createMediaStreamSource(
-                    audioStream
-                );
-
-
-        microphoneSource.connect(
-            analyser
-        );
-
-
-        microphoneActive =
-            true;
-
-
-        visualIntensity =
-            0;
-
-
-        setMachineState(
-            STATE.LISTENING
-        );
-
-
-        monitorAudio();
-
-
-        recognitionWanted =
-            true;
-
-
-        startRecognition();
-
-
-        console.log(
-            "Sessão de áudio iniciada."
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Erro no microfone:",
-            error
-        );
-
-
-        cleanupMicrophone();
-    }
-}
-
-
-/* =====================================================
-   MONITORAR ÁUDIO
-===================================================== */
-
-function monitorAudio() {
-
-    if (
-        !microphoneActive ||
-        !analyser
-    ) {
-
-        return;
-    }
-
-
-    const data =
-        new Uint8Array(
-            analyser.fftSize
-        );
-
-
-    analyser.getByteTimeDomainData(
-        data
-    );
-
-
-    let total =
-        0;
-
-
-    for (
-        let i = 0;
-
-        i < data.length;
-
-        i++
-    ) {
-
-        const value =
-            (
-                data[i] -
-                128
-            ) / 128;
-
-
-        total +=
-            value * value;
-    }
-
-
-    const level =
-        Math.sqrt(
-            total /
-            data.length
-        );
-
-
-    const usableLevel =
-        Math.max(
-            0,
-            level -
-            AUDIO_NOISE_FLOOR
-        );
-
-
-    const targetIntensity =
-        Math.min(
-            1,
-            usableLevel /
-            AUDIO_VOICE_LEVEL
-        );
-
-
-    visualIntensity +=
-        (
-            targetIntensity -
-            visualIntensity
-        ) * 0.22;
-
-
-    if (machine) {
-
-        machine.style.setProperty(
-
-            "--voice-intensity",
-
-            visualIntensity.toFixed(3)
-        );
-    }
-
-
-    animationFrame =
-        requestAnimationFrame(
-            monitorAudio
-        );
-}
-
-
-/* =====================================================
-   ESPERA
-===================================================== */
-
-function enterWaitingMode() {
-
-    console.log(
-        "MÁQUINA → ESPERA"
-    );
-
-
-    setMachineState(
-        STATE.WAITING
-    );
-
-
-    stopRecognition();
-
-    cleanupMicrophoneOnly();
-
-
-    console.log(
-        "Escuta suspensa."
-    );
-}
-
-
-/* =====================================================
-   RETOMAR
-===================================================== */
-
-async function resumeConversation() {
-
-    if (
-        microphoneActive
-    ) {
-
-        return;
-    }
-
-
-    console.log(
-        "MÁQUINA → RETOMANDO"
-    );
-
-
-    setMachineState(
-        STATE.LISTENING
-    );
-
-
-    await startMicrophone();
-}
-/* =====================================================
-   ENCERRAR
-===================================================== */
-
-function closeConversation() {
-
-    console.log(
-        "MÁQUINA → ENCERRADA"
-    );
-
-
-    /*
-       Se a Máquina estiver falando,
-       a fala também será interrompida.
-    */
-
-    if (
-        typeof MachineVoice !==
-        "undefined"
-    ) {
-
-        MachineVoice.stopSpeaking();
-    }
-
-
-    stopRecognition();
-
-    cleanupMicrophoneOnly();
-
-
-    recognition =
-        null;
-
-
-    resetTurn();
-
-
-    setMachineState(
-        STATE.IDLE
-    );
-}
-
-
-/* =====================================================
-   LIMPAR MICROFONE
-===================================================== */
-
-function cleanupMicrophoneOnly() {
-
-    microphoneActive =
-        false;
-
-
-    visualIntensity =
-        0;
-
-
-    if (animationFrame) {
-
-        cancelAnimationFrame(
-            animationFrame
-        );
-
-        animationFrame =
-            null;
-    }
-
-
-    if (microphoneSource) {
-
-        try {
-
-            microphoneSource.disconnect();
-
-        } catch (error) {}
-
-
-        microphoneSource =
-            null;
-    }
-
-
-    analyser =
-        null;
-
-
-    if (audioStream) {
-
-        audioStream
-            .getTracks()
-            .forEach(
-                track =>
-                    track.stop()
-            );
-
-
-        audioStream =
-            null;
-    }
-
-
-    if (audioContext) {
-
-        try {
-
-            audioContext.close();
-
-        } catch (error) {}
-
-
-        audioContext =
-            null;
-    }
-
-
-    if (machine) {
-
-        machine.style.setProperty(
-
-            "--voice-intensity",
-
-            "0"
-        );
-    }
-}
-
-
-/* =====================================================
-   LIMPEZA COMPLETA
-===================================================== */
-
-function cleanupMicrophone() {
-
-    if (
-        typeof MachineVoice !==
-        "undefined"
-    ) {
-
-        MachineVoice.stopSpeaking();
-    }
-
-
-    stopRecognition();
-
-    cleanupMicrophoneOnly();
-
-
-    recognition =
-        null;
-
-
-    resetTurn();
-
-
-    setMachineState(
-        STATE.IDLE
-    );
-}
-
-
-/* =====================================================
-   BOTÃO
-===================================================== */
-
-if (voiceButton) {
-
-    voiceButton.addEventListener(
-
-        "click",
-
-        async function() {
-
-            /*
-               Um toque inicia.
-
-               Outro toque encerra.
-
-               Pequenas pausas na fala
-               não desligam o microfone.
-            */
-
-            if (
-                microphoneActive
-            ) {
-
-                closeConversation();
-
-            } else {
-
-                await startMicrophone();
-            }
-        }
-    );
-}
-
-
-/* =====================================================
-   MACHINE VOICE — V6.4
-   FALLBACK GRATUITO DO NAVEGADOR
-===================================================== */
-
-const MachineVoice = {
-
-    provider:
-        "browser",
-
-    voiceName:
-        "",
-
-    language:
-        "pt-PT",
-
-    gender:
-        "male",
-
-    speed:
-        0.95,
-
-    pitch:
-        0.80,
-
-    volume:
-        1.0,
-
-    speaking:
-        false,
-
-    currentUtterance:
-        null,
-
-
-    /* =================================================
-       LISTAR VOZES
-    ================================================= */
-
-    getVoices() {
-
-        if (
-            !("speechSynthesis" in window)
-        ) {
-
-            console.warn(
-                "Speech Synthesis não disponível."
-            );
-
-            return [];
-        }
-
-
-        return window
-            .speechSynthesis
-            .getVoices();
+    conversation: {
+      active: false,
+      continuous: true,
+      lastUserMessage: "",
+      lastMachineMessage: "",
+      history: [],
+      subject: null,
+      intent: null
     },
 
-
-    /* =================================================
-       CONFIGURAR
-    ================================================= */
-
-    configure(
-        options = {}
-    ) {
-
-        if (
-            typeof options.provider ===
-            "string"
-        ) {
-
-            this.provider =
-                options.provider;
-        }
-
-
-        if (
-            typeof options.voiceName ===
-            "string"
-        ) {
-
-            this.voiceName =
-                options.voiceName;
-        }
-
-
-        if (
-            typeof options.language ===
-            "string"
-        ) {
-
-            this.language =
-                options.language;
-        }
-
-
-        if (
-            typeof options.gender ===
-            "string"
-        ) {
-
-            this.gender =
-                options.gender;
-        }
-
-
-        if (
-            typeof options.speed ===
-            "number"
-        ) {
-
-            this.speed =
-                Math.max(
-                    0.1,
-                    Math.min(
-                        2,
-                        options.speed
-                    )
-                );
-        }
-
-
-        if (
-            typeof options.pitch ===
-            "number"
-        ) {
-
-            this.pitch =
-                Math.max(
-                    0,
-                    Math.min(
-                        2,
-                        options.pitch
-                    )
-                );
-        }
-
-
-        if (
-            typeof options.volume ===
-            "number"
-        ) {
-
-            this.volume =
-                Math.max(
-                    0,
-                    Math.min(
-                        1,
-                        options.volume
-                    )
-                );
-        }
-
-
-        console.log(
-            "MachineVoice configurada:",
-            {
-
-                provider:
-                    this.provider,
-
-                language:
-                    this.language,
-
-                gender:
-                    this.gender,
-
-                voiceName:
-                    this.voiceName,
-
-                speed:
-                    this.speed,
-
-                pitch:
-                    this.pitch
-            }
-        );
+    task: {
+      active: false,
+      type: null,
+      status: "idle",
+      progress: 0,
+      result: null
     },
 
-
-    /* =================================================
-       ESCOLHER VOZ
-    ================================================= */
-
-    selectVoice() {
-
-        const voices =
-            this.getVoices();
-
-
-        if (!voices.length) {
-
-            return null;
-        }
-
-
-        if (this.voiceName) {
-
-            const exact =
-                voices.find(
-                    voice =>
-                        voice.name ===
-                        this.voiceName
-                );
-
-
-            if (exact) {
-
-                return exact;
-            }
-        }
-
-
-        const language =
-            this.language
-                .toLowerCase();
-
-
-        const languageVoices =
-            voices.filter(
-                voice =>
-                    voice.lang
-                        .toLowerCase()
-                        .startsWith(
-                            language
-                                .split("-")[0]
-                        )
-            );
-
-
-        if (!languageVoices.length) {
-
-            return null;
-        }
-
-
-        /*
-           Se o navegador fornecer
-           indicação de género no nome,
-           tentamos respeitar a escolha.
-        */
-
-        if (
-            this.gender
-        ) {
-
-            const gender =
-                this.gender
-                    .toLowerCase();
-
-
-            const genderVoice =
-                languageVoices.find(
-                    voice =>
-                        voice.name
-                            .toLowerCase()
-                            .includes(gender)
-                );
-
-
-            if (genderVoice) {
-
-                return genderVoice;
-            }
-        }
-
-
-        return languageVoices[0];
+    preferences: {
+      conversationMode: "natural",
+      continuousConversation: true,
+      pauseRecognition: true,
+      voiceInterruption: true,
+      voiceResponse: true,
+      theme: "system",
+      animations: true,
+      reducedMotion: false
     },
 
-
-    /* =================================================
-       FALAR
-    ================================================= */
-
-    speak(
-        text
-    ) {
-
-        return new Promise(
-            resolve => {
-
-                if (
-                    !text ||
-                    !text.trim()
-                ) {
-
-                    resolve();
-
-                    return;
-                }
-
-
-                if (
-                    !("speechSynthesis" in window)
-                ) {
-
-                    console.warn(
-                        "Speech Synthesis não disponível."
-                    );
-
-                    resolve();
-
-                    return;
-                }
-
-
-                this.stopSpeaking();
-
-
-                const utterance =
-                    new SpeechSynthesisUtterance(
-                        text
-                    );
-
-
-                const voice =
-                    this.selectVoice();
-
-
-                if (voice) {
-
-                    utterance.voice =
-                        voice;
-
-                    utterance.lang =
-                        voice.lang;
-
-                } else {
-
-                    utterance.lang =
-                        this.language;
-                }
-
-
-                utterance.rate =
-                    this.speed;
-
-
-                utterance.pitch =
-                    this.pitch;
-
-
-                utterance.volume =
-                    this.volume;
-
-
-                this.currentUtterance =
-                    utterance;
-
-
-                utterance.onstart =
-                    () => {
-
-                        this.speaking =
-                            true;
-
-
-                        if (
-                            typeof setMachineState ===
-                            "function"
-                        ) {
-
-                            setMachineState(
-                                STATE.SPEAKING
-                            );
-                        }
-
-
-                        console.log(
-                            "MachineVoice → falando"
-                        );
-                    };
-
-
-                utterance.onend =
-                    () => {
-
-                        this.speaking =
-                            false;
-
-
-                        this.currentUtterance =
-                            null;
-
-
-                        if (
-                            typeof setMachineState ===
-                            "function"
-                        ) {
-
-                            if (
-                                microphoneActive
-                            ) {
-
-                                setMachineState(
-                                    STATE.LISTENING
-                                );
-
-                            } else {
-
-                                setMachineState(
-                                    STATE.IDLE
-                                );
-                            }
-                        }
-
-
-                        console.log(
-                            "MachineVoice → terminou"
-                        );
-
-
-                        resolve();
-                    };
-
-
-                utterance.onerror =
-                    (event) => {
-
-                        this.speaking =
-                            false;
-
-
-                        this.currentUtterance =
-                            null;
-
-
-                        console.warn(
-                            "MachineVoice:",
-                            event.error
-                        );
-
-
-                        if (
-                            typeof setMachineState ===
-                            "function"
-                        ) {
-
-                            setMachineState(
-
-                                microphoneActive
-                                    ? STATE.LISTENING
-                                    : STATE.IDLE
-                            );
-                        }
-
-
-                        resolve();
-                    };
-
-
-                window
-                    .speechSynthesis
-                    .speak(
-                        utterance
-                    );
-            }
-        );
+    profile: {
+      name: "",
+      email: "",
+      photo: ""
     },
 
-
-    /* =================================================
-       PARAR
-    ================================================= */
-
-    stopSpeaking() {
-
-        if (
-            !("speechSynthesis" in window)
-        ) {
-
-            return;
-        }
-
-
-        try {
-
-            window
-                .speechSynthesis
-                .cancel();
-
-        } catch (error) {
-
-            console.warn(
-                "Não foi possível parar a voz.",
-                error
-            );
-        }
-
-
-        this.speaking =
-            false;
-
-
-        this.currentUtterance =
-            null;
+    evolution: {
+      stage: 1,
+      progress: 0,
+      nextStage: 2,
+      permanentCapabilities: [],
+      temporaryConcessions: []
     },
 
+    creator: {
+      niche: null,
+      audience: null,
+      goals: [],
+      accounts: []
+    },
 
-    /* =================================================
-       ESTADO
-    ================================================= */
+    lastResult: null,
 
-    isSpeaking() {
+    error: null
+  };
 
-        return this.speaking;
+
+  /* =======================================================
+     DOM
+     ======================================================= */
+
+  const DOM = {};
+
+  function cacheDOM() {
+
+    DOM.app = document.getElementById("app");
+
+    DOM.machine = document.getElementById("machine");
+
+    DOM.machineHomeButton =
+      document.getElementById("machineHomeButton");
+
+    DOM.settingsButton =
+      document.getElementById("settingsButton");
+
+    DOM.voiceButton =
+      document.getElementById("voiceButton");
+
+    DOM.keyboardButton =
+      document.getElementById("keyboardButton");
+
+    DOM.machineResponse =
+      document.getElementById("machineResponse");
+
+    DOM.machineStatusBar =
+      document.getElementById("machineStatusBar");
+
+    DOM.processingIndicator =
+      document.getElementById("processingIndicator");
+
+    DOM.globalToast =
+      document.getElementById("globalToast");
+
+    DOM.globalKeyboardLayer =
+      document.getElementById("globalKeyboardLayer");
+
+    DOM.globalVoiceLayer =
+      document.getElementById("globalVoiceLayer");
+
+    DOM.connectionIndicator =
+      document.getElementById("connectionIndicator");
+
+    DOM.appNavigation =
+      document.getElementById("appNavigation");
+
+    DOM.profileForm =
+      document.getElementById("profileForm");
+
+    DOM.profileName =
+      document.getElementById("profileName");
+
+    DOM.profileEmail =
+      document.getElementById("profileEmail");
+
+    DOM.profileFormMessage =
+      document.getElementById("profileFormMessage");
+
+    DOM.keyboardInput =
+      document.getElementById("keyboardInput");
+
+    DOM.keyboardCounter =
+      document.getElementById("keyboardCounter");
+
+    DOM.globalKeyboardInput =
+      document.getElementById("globalKeyboardInput");
+
+    DOM.globalKeyboardCounter =
+      document.getElementById("globalKeyboardCounter");
+
+    DOM.globalKeyboardSend =
+      document.getElementById("globalKeyboardSend");
+
+    DOM.voiceState =
+      document.getElementById("voiceState");
+
+    DOM.voiceHint =
+      document.getElementById("voiceHint");
+  }
+
+
+  /* =======================================================
+     UTILITÁRIOS
+     ======================================================= */
+
+  function $(selector, parent = document) {
+    return parent.querySelector(selector);
+  }
+
+  function $$(selector, parent = document) {
+    return Array.from(parent.querySelectorAll(selector));
+  }
+
+  function exists(element) {
+    return element !== null && element !== undefined;
+  }
+
+  function normalizeText(text) {
+    return String(text || "")
+      .trim()
+      .replace(/\s+/g, " ");
+  }
+
+  function escapeHTML(text) {
+    const div = document.createElement("div");
+    div.textContent = String(text || "");
+    return div.innerHTML;
+  }
+
+
+  /* =======================================================
+     ESTADO DA MÁQUINA
+     ======================================================= */
+
+  const MACHINE_STATES = {
+    IDLE: "idle",
+    LISTENING: "listening",
+    THINKING: "thinking",
+    SPEAKING: "speaking",
+    WAITING: "waiting",
+    WORKING: "working",
+    ERROR: "error"
+  };
+
+
+  function setMachineState(newState) {
+
+    if (!newState) {
+      newState = MACHINE_STATES.IDLE;
     }
-};
+
+    state.machineState = newState;
+
+    state.isListening =
+      newState === MACHINE_STATES.LISTENING;
+
+    state.isThinking =
+      newState === MACHINE_STATES.THINKING;
+
+    state.isSpeaking =
+      newState === MACHINE_STATES.SPEAKING;
+
+    state.isWaiting =
+      newState === MACHINE_STATES.WAITING;
+
+    state.isWorking =
+      newState === MACHINE_STATES.WORKING;
+
+    if (DOM.machine) {
+      DOM.machine.dataset.state = newState;
+    }
+
+    updateMachineStatus();
+  }
 
 
-/* =====================================================
-   CONFIGURAÇÃO INICIAL
-===================================================== */
+  function updateMachineStatus() {
 
-MachineVoice.configure({
+    if (!DOM.machineStatusBar) {
+      return;
+    }
 
-    language:
-        "pt-PT",
-
-    gender:
-        "male",
-
-    speed:
-        0.95,
-
-    pitch:
-        0.80,
-
-    volume:
-        1.0
-});
-
-
-/* =====================================================
-   CARREGAR VOZES DO NAVEGADOR
-===================================================== */
-
-if (
-    "speechSynthesis" in window
-) {
-
-    window
-        .speechSynthesis
-        .addEventListener(
-
-            "voiceschanged",
-
-            function() {
-
-                const voices =
-                    MachineVoice.getVoices();
-
-
-                console.log(
-                    "Vozes disponíveis:",
-                    voices
-                );
-
-
-                const portugueseVoices =
-                    voices.filter(
-
-                        voice =>
-                            voice.lang
-                                .toLowerCase()
-                                .startsWith("pt")
-                    );
-
-
-                console.log(
-                    "Vozes portuguesas:",
-                    portugueseVoices
-                );
-            }
-        );
-}
-
-
-/* =====================================================
-   TESTE MANUAL
-===================================================== */
-
-window.testMachineVoice =
-    function() {
-
-        MachineVoice.speak(
-            "Olá. Eu sou a Máquina. Estou aqui contigo."
-        );
+    const labels = {
+      idle: "Pronta",
+      listening: "A ouvir",
+      thinking: "A pensar",
+      speaking: "A falar",
+      waiting: "À espera",
+      working: "A trabalhar",
+      error: "Erro"
     };
 
-
-/* =====================================================
-   DEBUG
-===================================================== */
-
-console.log(
-    "MachineVoice disponível:",
-    MachineVoice
-);
-
-console.log(
-    "Voz configurada:",
-    MachineVoice.voiceName
-);
-
-console.log(
-    "Idioma configurado:",
-    MachineVoice.language
-);
-
-console.log(
-    "MachineVoice V6.4 carregada."
-);
+    DOM.machineStatusBar.textContent =
+      labels[state.machineState] || "Pronta";
+  }
 
 
-/* =====================================================
-   INICIAL
-===================================================== */
+  /* =======================================================
+     NAVEGAÇÃO
+     ======================================================= */
 
-setMachineState(
-    STATE.IDLE
-);
+  function getScreenElement(screenName) {
+
+    const id = CONFIG.screens[screenName] || screenName;
+
+    return document.getElementById(id);
+  }
+
+
+  function showScreen(screenName, options = {}) {
+
+    const target = getScreenElement(screenName);
+
+    if (!target) {
+      console.warn(
+        "[HM] Ecrã não encontrado:",
+        screenName
+      );
+      return false;
+    }
+
+    const current = state.screen;
+
+    if (
+      current !== screenName &&
+      !options.skipHistory
+    ) {
+      state.navigationHistory.push(current);
+      state.previousScreen = current;
+    }
+
+    $$(".screen").forEach(screen => {
+      screen.classList.remove("active");
+    });
+
+    target.classList.add("active");
+
+    state.screen = screenName;
+
+    updateNavigation();
+
+    window.scrollTo({
+      top: 0,
+      behavior: "auto"
+    });
+
+    return true;
+  }
+
+
+  function goBack() {
+
+    if (state.navigationHistory.length === 0) {
+      return showScreen("machine", {
+        skipHistory: true
+      });
+    }
+
+    const previous =
+      state.navigationHistory.pop();
+
+    return showScreen(previous, {
+      skipHistory: true
+    });
+  }
+
+
+  function goHome() {
+
+    state.navigationHistory = [];
+
+    return showScreen("machine", {
+      skipHistory: true
+    });
+  }
+
+
+  function updateNavigation() {
+
+    if (!DOM.appNavigation) {
+      return;
+    }
+
+    const buttons =
+      $$("button", DOM.appNavigation);
+
+    buttons.forEach(button => {
+
+      const target =
+        button.dataset.screen ||
+        button.dataset.navigate;
+
+      button.classList.toggle(
+        "active",
+        target === state.screen
+      );
+
+    });
+  }
+
+
+  /* =======================================================
+     TOAST
+     ======================================================= */
+
+  let toastTimer = null;
+
+  function toast(message, type = "info") {
+
+    if (!DOM.globalToast) {
+      return;
+    }
+
+    clearTimeout(toastTimer);
+
+    DOM.globalToast.textContent =
+      normalizeText(message);
+
+    DOM.globalToast.dataset.type = type;
+
+    DOM.globalToast.classList.add("active");
+
+    toastTimer = setTimeout(() => {
+      DOM.globalToast.classList.remove("active");
+    }, 3000);
+  }
+
+
+  /* =======================================================
+     RESPOSTA DA MÁQUINA
+     ======================================================= */
+
+  function showMachineResponse(message) {
+
+    if (!DOM.machineResponse) {
+      return;
+    }
+
+    DOM.machineResponse.innerHTML =
+      escapeHTML(message);
+
+    DOM.machineResponse.classList.add("active");
+  }
+
+
+  function clearMachineResponse() {
+
+    if (!DOM.machineResponse) {
+      return;
+    }
+
+    DOM.machineResponse.textContent = "";
+
+    DOM.machineResponse.classList.remove("active");
+  }
+
+
+  /* =======================================================
+     PROCESSAMENTO
+     ======================================================= */
+
+  function setProcessing(active) {
+
+    if (!DOM.processingIndicator) {
+      return;
+    }
+
+    DOM.processingIndicator.classList.toggle(
+      "active",
+      Boolean(active)
+    );
+  }
+
+
+  /* =======================================================
+     CONVERSAÇÃO
+     ======================================================= */
+
+  function startConversation() {
+
+    state.conversation.active = true;
+    state.isPaused = false;
+
+    setMachineState(
+      MACHINE_STATES.LISTENING
+    );
+
+    toast("A Máquina está a ouvir.");
+  }
+
+
+  function pauseConversation() {
+
+    state.isPaused = true;
+
+    setMachineState(
+      MACHINE_STATES.WAITING
+    );
+
+    toast("A Máquina está à espera.");
+  }
+
+
+  function resumeConversation() {
+
+    state.isPaused = false;
+    state.conversation.active = true;
+
+    setMachineState(
+      MACHINE_STATES.LISTENING
+    );
+
+    toast("A Máquina voltou a ouvir.");
+  }
+
+
+  function stopConversation() {
+
+    state.conversation.active = false;
+    state.isPaused = false;
+
+    setMachineState(
+      MACHINE_STATES.IDLE
+    );
+  }
+
+
+  /* =======================================================
+     INTERPRETAÇÃO INICIAL
+     ======================================================= */
+
+  function interpretMessage(text) {
+
+    const message =
+      normalizeText(text).toLowerCase();
+
+    if (!message) {
+      return {
+        intent: "empty",
+        subject: null,
+        text: ""
+      };
+    }
+
+    if (
+      message.includes("espera máquina") ||
+      message.includes("espera maquina") ||
+      message.includes("volto já") ||
+      message.includes("volto ja")
+    ) {
+      return {
+        intent: "pause",
+        subject: "conversation",
+        text: message
+      };
+    }
+
+    if (
+      message === "voltei" ||
+      message.includes("já voltei") ||
+      message.includes("ja voltei")
+    ) {
+      return {
+        intent: "resume",
+        subject: "conversation",
+        text: message
+      };
+    }
+
+    if (
+      message.includes("para máquina") ||
+      message.includes("para maquina") ||
+      message.includes("pára máquina") ||
+      message.includes("pára maquina")
+    ) {
+      return {
+        intent: "stop",
+        subject: "conversation",
+        text: message
+      };
+    }
+
+    if (
+      message.includes("analisa minha conta") ||
+      message.includes("analisar minha conta") ||
+      message.includes("analisa a minha conta")
+    ) {
+      return {
+        intent: "analyze_account",
+        subject: "creator_account",
+        text: message
+      };
+    }
+
+    if (
+      message.includes("tendências") ||
+      message.includes("tendencias") ||
+      message.includes("o que está viral") ||
+      message.includes("o que esta viral")
+    ) {
+      return {
+        intent: "trends",
+        subject: "trends",
+        text: message
+      };
+    }
+
+    if (
+      message.includes("ideias de conteúdo") ||
+      message.includes("ideias de conteudo") ||
+      message.includes("cria ideias")
+    ) {
+      return {
+        intent: "ideas",
+        subject: "content",
+        text: message
+      };
+    }
+
+    if (
+      message.includes("roteiro") ||
+      message.includes("roteiros")
+    ) {
+      return {
+        intent: "scripts",
+        subject: "content",
+        text: message
+      };
+    }
+
+    if (
+      message.includes("planejamento") ||
+      message.includes("planeamento") ||
+      message.includes("calendário") ||
+      message.includes("calendario")
+    ) {
+      return {
+        intent: "planning",
+        subject: "content",
+        text: message
+      };
+    }
+
+    return {
+      intent: "general_conversation",
+      subject: "general",
+      text: message
+    };
+  }
+
+
+  /* =======================================================
+     EXECUÇÃO DE MENSAGEM
+     ======================================================= */
+
+  async function processMessage(text) {
+
+    const message = normalizeText(text);
+
+    if (!message) {
+      return;
+    }
+
+    state.conversation.lastUserMessage =
+      message;
+
+    state.conversation.history.push({
+      role: "user",
+      content: message,
+      timestamp: Date.now()
+    });
+
+    const interpretation =
+      interpretMessage(message);
+
+    state.conversation.intent =
+      interpretation.intent;
+
+    state.conversation.subject =
+      interpretation.subject;
+
+    if (interpretation.intent === "pause") {
+      pauseConversation();
+      return;
+    }
+
+    if (interpretation.intent === "resume") {
+      resumeConversation();
+      return;
+    }
+
+    if (interpretation.intent === "stop") {
+      stopConversation();
+      return;
+    }
+
+    setMachineState(
+      MACHINE_STATES.THINKING
+    );
+
+    setProcessing(true);
+
+    try {
+
+      const result =
+        await routeIntent(interpretation);
+
+      if (result) {
+        state.lastResult = result;
+      }
+
+    } catch (error) {
+
+      console.error(
+        "[HM] Erro ao processar mensagem:",
+        error
+      );
+
+      state.error = error;
+
+      setMachineState(
+        MACHINE_STATES.ERROR
+      );
+
+      toast(
+        "Ocorreu um erro ao processar o pedido.",
+        "error"
+      );
+
+    } finally {
+
+      setProcessing(false);
+    }
+  }
+
+
+  /* =======================================================
+     ORQUESTRAÇÃO INICIAL
+     ======================================================= */
+
+  async function routeIntent(interpretation) {
+
+    switch (interpretation.intent) {
+
+      case "analyze_account":
+
+        showScreen("accountAnalysis");
+
+        return {
+          type: "account_analysis",
+          status: "pending",
+          message:
+            "Vou preparar a análise da conta."
+        };
+
+
+      case "trends":
+
+        showScreen("trends");
+
+        return {
+          type: "trends",
+          status: "pending",
+          message:
+            "Vou preparar a análise das tendências."
+        };
+
+
+      case "ideas":
+
+        showScreen("ideas");
+
+        return {
+          type: "ideas",
+          status: "pending",
+          message:
+            "Vou preparar ideias de conteúdo."
+        };
+
+
+      case "scripts":
+
+        showScreen("scripts");
+
+        return {
+          type: "scripts",
+          status: "pending",
+          message:
+            "Vou preparar os roteiros."
+        };
+
+
+      case "planning":
+
+        showScreen("planning");
+
+        return {
+          type: "planning",
+          status: "pending",
+          message:
+            "Vou preparar o planeamento."
+        };
+
+
+      case "general_conversation":
+
+        showScreenResponse(
+          "Estou contigo. Diz-me o que precisas."
+        );
+
+        return {
+          type: "conversation",
+          status: "ready"
+        };
+
+
+      default:
+
+        showScreenResponse(
+          "Entendi. Vou analisar o teu pedido."
+        );
+
+        return {
+          type: "unknown",
+          status: "pending"
+        };
+    }
+  }
+
+
+  function showScreenResponse(message) {
+
+    showMachineResponse(message);
+
+    state.conversation.lastMachineMessage =
+      message;
+
+    state.conversation.history.push({
+      role: "machine",
+      content: message,
+      timestamp: Date.now()
+    });
+
+    setMachineState(
+      MACHINE_STATES.SPEAKING
+    );
+
+    setTimeout(() => {
+
+      if (
+        state.conversation.active &&
+        !state.isPaused
+      ) {
+        setMachineState(
+          MACHINE_STATES.LISTENING
+        );
+      } else {
+        setMachineState(
+          MACHINE_STATES.IDLE
+        );
+      }
+
+    }, 1200);
+  }
+
+
+  /* =======================================================
+     EVENTOS BÁSICOS
+     ======================================================= */
+
+  function bindNavigationEvents() {
+
+    $$(".back-button").forEach(button => {
+
+      button.addEventListener("click", () => {
+        goBack();
+      });
+
+    });
+
+
+    $("[data-back]") &&
+      $$("[data-back]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+          const target =
+            button.dataset.back;
+
+          if (target) {
+            showScreen(target);
+          } else {
+            goBack();
+          }
+
+        });
+
+      });
+
+
+    $$("[data-screen]").forEach(button => {
+
+      button.addEventListener("click", () => {
+
+        const target =
+          button.dataset.screen;
+
+        if (target) {
+          showScreen(target);
+        }
+
+      });
+
+    });
+
+
+    $$("[data-navigate]").forEach(button => {
+
+      button.addEventListener("click", () => {
+
+        const target =
+          button.dataset.navigate;
+
+        if (target) {
+          showScreen(target);
+        }
+
+      });
+
+    });
+  }
+
+
+  function bindMachineEvents() {
+
+    if (DOM.machineHomeButton) {
+
+      DOM.machineHomeButton
+        .addEventListener("click", goHome);
+
+    }
+
+
+    if (DOM.settingsButton) {
+
+      DOM.settingsButton
+        .addEventListener("click", () => {
+          showScreen("settings");
+        });
+
+    }
+
+
+    if (DOM.voiceButton) {
+
+      DOM.voiceButton
+        .addEventListener("click", () => {
+
+          if (state.isPaused) {
+            resumeConversation();
+            return;
+          }
+
+                    if (state.conversation.active) {
+            pauseConversation();
+            return;
+          }
+
+          startConversation();
+
+        });
+
+    }
+
+
+    if (DOM.keyboardButton) {
+
+      DOM.keyboardButton
+        .addEventListener("click", () => {
+
+          showScreen("keyboard");
+
+        });
+
+    }
+  }
+
+
+  /* =======================================================
+     TECLADO
+     ======================================================= */
+
+  function bindKeyboardEvents() {
+
+    const inputs = [
+      DOM.keyboardInput,
+      DOM.globalKeyboardInput
+    ].filter(Boolean);
+
+    inputs.forEach(input => {
+
+      input.addEventListener("input", () => {
+
+        const counter =
+          input === DOM.keyboardInput
+            ? DOM.keyboardCounter
+            : DOM.globalKeyboardCounter;
+
+        if (counter) {
+          counter.textContent =
+            input.value.length;
+        }
+
+      });
+
+
+      input.addEventListener("keydown", event => {
+
+        if (
+          event.key === "Enter" &&
+          !event.shiftKey
+        ) {
+
+          event.preventDefault();
+
+          processMessage(input.value);
+
+          input.value = "";
+
+        }
+
+      });
+
+    });
+
+
+    if (DOM.globalKeyboardSend) {
+
+      DOM.globalKeyboardSend
+        .addEventListener("click", () => {
+
+          if (!DOM.globalKeyboardInput) {
+            return;
+          }
+
+          const value =
+            DOM.globalKeyboardInput.value;
+
+          processMessage(value);
+
+          DOM.globalKeyboardInput.value = "";
+
+        });
+
+    }
+  }
+
+
+  /* =======================================================
+     CONEXÃO
+     ======================================================= */
+
+  function updateConnectionState() {
+
+    state.isOnline = navigator.onLine;
+
+    document.body.classList.toggle(
+      "is-online",
+      state.isOnline
+          );
+
+    document.body.classList.toggle(
+      "is-offline",
+      !state.isOnline
+    );
+
+    if (DOM.connectionIndicator) {
+
+      DOM.connectionIndicator
+        .setAttribute(
+          "data-status",
+          state.isOnline
+            ? "online"
+            : "offline"
+        );
+
+    }
+  }
+
+
+  /* =======================================================
+     EVENTOS DE INTERNET
+     ======================================================= */
+
+  function bindConnectionEvents() {
+
+    window.addEventListener(
+      "online",
+      updateConnectionState
+    );
+
+    window.addEventListener(
+      "offline",
+      updateConnectionState
+    );
+
+    updateConnectionState();
+  }
+
+
+  /* =======================================================
+     INICIALIZAÇÃO
+     ======================================================= */
+
+  function initialize() {
+
+    if (state.initialized) {
+      return;
+    }
+
+    cacheDOM();
+
+    bindNavigationEvents();
+
+    bindMachineEvents();
+
+    bindKeyboardEvents();
+
+    bindConnectionEvents();
+
+    setMachineState(
+      MACHINE_STATES.IDLE
+    );
+
+    showScreen(
+      "machine",
+      {
+        skipHistory: true
+      }
+    );
+
+    state.initialized = true;
+
+    console.log(
+      `[HM] ${CONFIG.appName} ${CONFIG.version} iniciado.`
+    );
+  }
+
+
+  /* =======================================================
+     API INTERNA
+     ======================================================= */
+
+  return {
+
+    CONFIG,
+    state,
+    DOM,
+    MACHINE_STATES,
+
+    initialize,
+
+    showScreen,
+         goBack,
+    goHome,
+
+    setMachineState,
+
+    startConversation,
+    pauseConversation,
+    resumeConversation,
+    stopConversation,
+
+    processMessage,
+
+    toast,
+
+    showMachineResponse,
+    clearMachineResponse,
+
+    getScreenElement
+  };
+
+})();
+
+
+/* =========================================================
+   INICIALIZAÇÃO DA APLICAÇÃO
+   ========================================================= */
+
+if (
+  document.readyState === "loading"
+) {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    () => HM.initialize(),
+    { once: true }
+  );
+
+} else {
+
+  HM.initialize();
+
+     }
