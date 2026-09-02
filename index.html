@@ -3949,3 +3949,168 @@
             </span>
 
     </div>
+<!-- CAMADA DE ESTADO DA MÁQUINA -->
+        <div class="machine-state-layer"
+             id="machineStateLayer"
+             aria-hidden="true">
+
+            <span id="machineStateText">
+                A Máquina está em repouso.
+            </span>
+
+        </div>
+
+
+        <!-- ÁREA DE RESPOSTA DA MÁQUINA -->
+        <div class="machine-response"
+             id="machineResponse"
+             aria-hidden="true">
+
+            <div class="machine-response-content">
+
+                <span class="machine-response-label">
+                    MÁQUINA
+                </span>
+
+                <p id="machineResponseText"></p>
+
+            </div>
+
+            <button type="button"
+                    class="machine-response-close"
+                    id="machineResponseClose"
+                    aria-label="Fechar resposta">
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- INDICADOR DE PROCESSAMENTO -->
+        <div class="processing-indicator"
+             id="processingIndicator"
+             aria-hidden="true">
+
+            <div class="processing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <span id="processingText">
+                A Máquina está a pensar...
+            </span>
+
+        </div>
+
+
+        <!-- ACESSIBILIDADE / LEITOR DE ESTADO -->
+        <div class="sr-only"
+             aria-live="polite"
+             aria-atomic="true"
+             id="accessibilityStatus">
+        </div>
+        <!-- ÁREA DE DADOS DA CONTA -->
+        <div class="account-data"
+             id="accountData"
+             aria-hidden="true">
+
+            <span id="accountUserId"></span>
+            <span id="accountProvider"></span>
+            <span id="accountCreatedAt"></span>
+
+        </div>
+
+
+        <!-- ESTADO DE AUTENTICAÇÃO -->
+        <div class="auth-state"
+             id="authState"
+             aria-hidden="true">
+
+            <span id="authStateText">
+                Não autenticado
+            </span>
+
+        </div>
+
+
+        <!-- DADOS DE CONTEXTO DA MÁQUINA -->
+        <div class="machine-context"
+             id="machineContext"
+             aria-hidden="true">
+
+            <span id="contextUserName"></span>
+            <span id="contextLanguage">pt-MZ</span>
+            <span id="contextVoice">duarte</span>
+
+        </div>
+
+
+        <!-- ÁREA PARA RESULTADOS GERADOS -->
+        <div class="generated-data"
+             id="generatedData"
+             aria-hidden="true">
+
+            <div id="generatedTitle"></div>
+            <div id="generatedSummary"></div>
+            <div id="generatedDetails"></div>
+
+        </div>
+
+
+        <!-- ESTADO DE CONEXÃO -->
+        <div class="connection-state"
+             id="connectionState"
+             aria-hidden="true">
+
+            <span id="connectionStateText">
+                Desconectado
+            </span>
+
+                </div>
+                <!-- DADOS DE SESSÃO DA MÁQUINA -->
+        <div class="session-data"
+             id="sessionData"
+             aria-hidden="true">
+
+            <span id="sessionId"></span>
+            <span id="sessionStartedAt"></span>
+            <span id="sessionState">idle</span>
+
+        </div>
+
+
+        <!-- ÁREA DE CONTEXTO DA CONVERSA -->
+        <div class="conversation-context"
+             id="conversationContext"
+             aria-hidden="true">
+
+            <span id="conversationTopic"></span>
+            <span id="conversationIntent"></span>
+            <span id="conversationLastRequest"></span>
+
+        </div>
+
+
+        <!-- FILA DE TAREFAS DA MÁQUINA -->
+        <div class="machine-task-data"
+             id="machineTaskData"
+             aria-hidden="true">
+
+            <span id="currentTask"></span>
+            <span id="currentTaskStatus"></span>
+            <span id="currentTaskProgress">0</span>
+
+        </div>
+
+
+        <!-- CONTROLO DE PAUSA -->
+        <div class="pause-state"
+             id="pauseState"
+             aria-hidden="true">
+
+            <span id="pauseStateText">
+                A Máquina está disponível.
+            </span>
+
+            </div>
