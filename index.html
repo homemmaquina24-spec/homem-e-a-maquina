@@ -5152,3 +5152,892 @@
   >
 
         </div>
+<!-- =========================================================
+     PARTE 30 — CONTROLO DE CAPACIDADES E PERMISSÕES
+     ========================================================= -->
+
+<div
+  id="capabilitiesController"
+  hidden
+>
+
+  <input type="hidden" id="capabilityConversation" value="true">
+  <input type="hidden" id="capabilityVoice" value="true">
+  <input type="hidden" id="capabilityKeyboard" value="true">
+
+  <input type="hidden" id="capabilityAccountAnalysis" value="false">
+  <input type="hidden" id="capabilityContentAnalysis" value="false">
+  <input type="hidden" id="capabilityAudienceAnalysis" value="false">
+  <input type="hidden" id="capabilityTrends" value="false">
+
+  <input type="hidden" id="capabilityStrategy" value="false">
+  <input type="hidden" id="capabilityIdeas" value="false">
+  <input type="hidden" id="capabilityScripts" value="false">
+  <input type="hidden" id="capabilityImages" value="false">
+  <input type="hidden" id="capabilityVideos" value="false">
+  <input type="hidden" id="capabilityPlanning" value="false">
+
+  <input type="hidden" id="capabilityAutonomousMode" value="false">
+  <input type="hidden" id="capabilityPublishing" value="false">
+  <input type="hidden" id="capabilityContinuousMonitoring" value="false">
+
+</div>
+
+
+<!-- =========================================================
+     PERMISSÕES PARA CONTAS EXTERNAS
+     ========================================================= -->
+
+<div
+  id="externalPermissionsController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="permissionSocialAccounts"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="permissionAccountRead"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="permissionContentRead"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="permissionMetricsRead"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="permissionContentCreate"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="permissionContentPublish"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE PLANO
+     ========================================================= -->
+
+<div
+  id="planController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="currentPlan"
+    value="free"
+  >
+
+  <input
+    type="hidden"
+    id="planStatus"
+    value="active"
+  >
+
+  <input
+    type="hidden"
+    id="planStartedAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="planExpiresAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="planUsage"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="planUsageLimit"
+    value="0"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLO DE EVOLUÇÃO DA MÁQUINA
+     ========================================================= -->
+
+<div
+  id="machineEvolutionController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="machineEvolutionStage"
+    value="1"
+  >
+
+  <input
+    type="hidden"
+    id="machineEvolutionProgress"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="machineEvolutionNextStage"
+    value="2"
+  >
+
+  <input
+    type="hidden"
+    id="machinePermanentCapabilities"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="machineTemporaryConcessions"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="machineConcessionExpiresAt"
+    value=""
+  >
+
+    </div>
+    <!-- =========================================================
+     PARTE 31 — CONTROLADOR DE IDIOMA, VOZ E APARÊNCIA
+     ========================================================= -->
+
+<div
+  id="preferencesController"
+  hidden
+>
+
+  <!-- Idioma -->
+  <input
+    type="hidden"
+    id="preferredLanguage"
+    value="pt-MZ"
+  >
+
+  <input
+    type="hidden"
+    id="availableLanguages"
+    value="pt-MZ,en-US,es-ES"
+  >
+
+
+  <!-- Voz -->
+  <input
+    type="hidden"
+    id="preferredVoice"
+    value="duarte"
+  >
+
+  <input
+    type="hidden"
+    id="voicePitch"
+    value="-10"
+  >
+
+  <input
+    type="hidden"
+    id="voiceRate"
+    value="-10"
+  >
+
+  <input
+    type="hidden"
+    id="voiceVolume"
+    value="0"
+  >
+
+
+  <!-- Conversação -->
+  <input
+    type="hidden"
+    id="conversationMode"
+    value="natural"
+  >
+
+  <input
+    type="hidden"
+    id="continuousConversation"
+    value="true"
+  >
+
+  <input
+    type="hidden"
+    id="pauseRecognition"
+    value="true"
+  >
+
+  <input
+    type="hidden"
+    id="voiceInterruption"
+    value="true"
+  >
+
+  <input
+    type="hidden"
+    id="voiceResponse"
+    value="true"
+  >
+
+
+  <!-- Aparência -->
+  <input
+    type="hidden"
+    id="preferredTheme"
+    value="system"
+  >
+
+  <input
+    type="hidden"
+    id="animationsEnabled"
+    value="true"
+  >
+
+  <input
+    type="hidden"
+    id="reducedMotion"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE TERMOS E PRIVACIDADE
+     ========================================================= -->
+
+<div
+  id="legalController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="termsAccepted"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="privacyAccepted"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="termsVersion"
+    value="1.0"
+  >
+
+  <input
+    type="hidden"
+    id="privacyVersion"
+    value="1.0"
+  >
+
+  <input
+    type="hidden"
+    id="termsAcceptedAt"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE MEMÓRIA DA MÁQUINA
+     ========================================================= -->
+
+<div
+  id="memoryController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="memoryEnabled"
+    value="true"
+  >
+
+  <input
+    type="hidden"
+    id="memoryUserName"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="memoryPreferredLanguage"
+    value="pt-MZ"
+  >
+
+  <input
+    type="hidden"
+    id="memoryPreferredVoice"
+    value="duarte"
+  >
+
+  <input
+    type="hidden"
+    id="memoryLastSubject"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="memoryLastIntent"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="memoryLastTask"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DO ORQUESTRADOR
+     ========================================================= -->
+
+<div
+  id="orchestratorController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="orchestratorState"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="orchestratorIntent"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="orchestratorSubject"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="orchestratorAction"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="orchestratorProvider"
+    value="internal"
+  >
+
+  <input
+    type="hidden"
+    id="orchestratorExternalAI"
+    value="available"
+  >
+
+    </div>
+    <!-- =========================================================
+     PARTE 32 — CONTROLADOR DE RESULTADOS E CONTEÚDO
+     ========================================================= -->
+
+<div
+  id="resultsController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="resultId"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="resultType"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="resultTitle"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="resultSummary"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="resultContent"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="resultCreatedAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="resultUpdatedAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="resultSource"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE ANÁLISE
+     ========================================================= -->
+
+<div
+  id="analysisController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="analysisTarget"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="analysisDepth"
+    value="standard"
+  >
+
+  <input
+    type="hidden"
+    id="analysisStatus"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="analysisProgress"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="analysisStartedAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="analysisCompletedAt"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE CRIAÇÃO DE CONTEÚDO
+     ========================================================= -->
+
+<div
+  id="contentCreationController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="creationType"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creationPlatform"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creationNiche"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creationAudience"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creationQuantity"
+    value="1"
+  >
+
+  <input
+    type="hidden"
+    id="creationStatus"
+    value="idle"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE CONTA DE CRIADOR
+     ========================================================= -->
+
+<div
+  id="creatorAccountController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="creatorAccountId"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creatorAccountPlatform"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creatorAccountUsername"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creatorAccountNiche"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="creatorAccountAuthorized"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="creatorAccountConnected"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE MODO AUTÓNOMO
+     ========================================================= -->
+
+<div
+  id="autonomousController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="autonomousEnabled"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="autonomousTask"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="autonomousFrequency"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="autonomousLastRun"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="autonomousNextRun"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="autonomousStatus"
+    value="inactive"
+  >
+
+    </div>
+    <!-- =========================================================
+     PARTE 33 — CONTROLADOR DE CONTEÚDO GERADO
+     ========================================================= -->
+
+<div
+  id="generatedContentController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="generatedContentId"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="generatedContentType"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="generatedContentTitle"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="generatedContentDescription"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="generatedContentText"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="generatedContentPlatform"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="generatedContentStatus"
+    value="empty"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE IDEIAS
+     ========================================================= -->
+
+<div
+  id="ideasController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="ideasNiche"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="ideasAudience"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="ideasTrend"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="ideasQuantity"
+    value="3"
+  >
+
+  <input
+    type="hidden"
+    id="ideasGenerated"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE ROTEIROS
+     ========================================================= -->
+
+<div
+  id="scriptsController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="scriptTopic"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="scriptPlatform"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="scriptDuration"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="scriptStyle"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="scriptContent"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE PLANEAMENTO
+     ========================================================= -->
+
+<div
+  id="planningController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="planningPeriod"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="planningPlatform"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="planningFrequency"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="planningGoal"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="planningContent"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE TENDÊNCIAS
+     ========================================================= -->
+
+<div
+  id="trendsController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="trendPlatform"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="trendNiche"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="trendRegion"
+    value="MZ"
+  >
+
+  <input
+    type="hidden"
+    id="trendStatus"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="trendResults"
+    value=""
+  >
+
+      </div>
