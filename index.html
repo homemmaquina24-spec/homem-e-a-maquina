@@ -6041,3 +6041,624 @@
   >
 
       </div>
+<!-- =========================================================
+     PARTE 34 — CONTROLADOR DE CONTAS E PLATAFORMAS
+     ========================================================= -->
+
+<div
+  id="accountsController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="accountsCount"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="activeAccountId"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="activeAccountPlatform"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="activeAccountUsername"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="activeAccountStatus"
+    value="disconnected"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     PLATAFORMAS DISPONÍVEIS
+     ========================================================= -->
+
+<div
+  id="platformsController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="platformTikTok"
+    value="available"
+  >
+
+  <input
+    type="hidden"
+    id="platformInstagram"
+    value="available"
+  >
+
+  <input
+    type="hidden"
+    id="platformYouTube"
+    value="available"
+  >
+
+  <input
+    type="hidden"
+    id="platformFacebook"
+    value="available"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE AUTORIZAÇÃO
+     ========================================================= -->
+
+<div
+  id="authorizationController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="authorizationPlatform"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="authorizationStatus"
+    value="not-authorized"
+  >
+
+  <input
+    type="hidden"
+    id="authorizationScope"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="authorizationCreatedAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="authorizationUpdatedAt"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE MÉTRICAS
+     ========================================================= -->
+
+<div
+  id="metricsController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="metricsAccountId"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="metricsFollowers"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="metricsFollowing"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="metricsViews"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="metricsLikes"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="metricsComments"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="metricsShares"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="metricsUpdatedAt"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE PUBLICAÇÃO
+     ========================================================= -->
+
+<div
+  id="publishingController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="publishingAccountId"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="publishingPlatform"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="publishingContentId"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="publishingStatus"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="publishingAuthorizationRequired"
+    value="true"
+  >
+
+    </div>
+    <!-- =========================================================
+     PARTE 35 — CONTROLADOR DE SEGURANÇA E CONSENTIMENTO
+     ========================================================= -->
+
+<div
+  id="securityController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="securityAuthenticated"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="securityEmailVerified"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="securitySessionValid"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="securityLastCheck"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONSENTIMENTOS DO UTILIZADOR
+     ========================================================= -->
+
+<div
+  id="consentController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="consentTerms"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="consentPrivacy"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="consentDataProcessing"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="consentExternalAccounts"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="consentContentPublishing"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE NOTIFICAÇÕES
+     ========================================================= -->
+
+<div
+  id="notificationsController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="notificationsEnabled"
+    value="true"
+  >
+
+  <input
+    type="hidden"
+    id="notificationsCount"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="lastNotificationId"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE ERROS
+     ========================================================= -->
+
+<div
+  id="errorController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="lastErrorCode"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="lastErrorMessage"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="lastErrorSource"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="lastErrorTime"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE CARREGAMENTO
+     ========================================================= -->
+
+<div
+  id="loadingController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="loadingActive"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="loadingType"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="loadingMessage"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE AÇÕES DO UTILIZADOR
+     ========================================================= -->
+
+<div
+  id="userActionController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="userAction"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="userActionTarget"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="userActionTime"
+    value=""
+  >
+
+      </div>
+      <!-- =========================================================
+     PARTE 36 — CONTROLADOR DE FLUXO DA MÁQUINA
+     ========================================================= -->
+
+<div
+  id="machineFlowController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="machineFlowState"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="machinePreviousState"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="machineTargetState"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="machineTransition"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="machineTransitionTime"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     ESTADOS DA MÁQUINA
+     ========================================================= -->
+
+<div
+  id="machineStates"
+  hidden
+>
+
+  <input type="hidden" id="stateIdle" value="idle">
+  <input type="hidden" id="stateListening" value="listening">
+  <input type="hidden" id="stateThinking" value="thinking">
+  <input type="hidden" id="stateSpeaking" value="speaking">
+  <input type="hidden" id="stateWaiting" value="waiting">
+  <input type="hidden" id="stateWorking" value="working">
+  <input type="hidden" id="statePaused" value="paused">
+  <input type="hidden" id="stateError" value="error">
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE RECONHECIMENTO DE VOZ
+     ========================================================= -->
+
+<div
+  id="speechRecognitionController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="speechRecognitionSupported"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="speechRecognitionActive"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="speechRecognitionInterim"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="speechRecognitionFinal"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="speechRecognitionLanguage"
+    value="pt-MZ"
+  >
+
+  <input
+    type="hidden"
+    id="speechRecognitionError"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE SÍNTESE DE VOZ
+     ========================================================= -->
+
+<div
+  id="speechSynthesisController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="speechSynthesisSupported"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="speechSynthesisActive"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="speechSynthesisVoice"
+    value="duarte"
+  >
+
+  <input
+    type="hidden"
+    id="speechSynthesisText"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="speechSynthesisRate"
+    value="-10"
+  >
+
+  <input
+    type="hidden"
+    id="speechSynthesisPitch"
+    value="-10"
+  >
+
+  <input
+    type="hidden"
+    id="speechSynthesisVolume"
+    value="0"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE PAUSA NATURAL
+     ========================================================= -->
+
+<div
+  id="naturalPauseController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="naturalPauseActive"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="naturalPauseDetected"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="naturalPauseStartedAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="naturalPauseDuration"
+    value="0"
+  >
+
+    </div>
