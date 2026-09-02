@@ -4301,3 +4301,854 @@
             <span id="previousScreen"></span>
 
             </div>
+<!-- =========================================================
+     PARTE 26 — ESTRUTURA DE CONTROLO DA APLICAÇÃO
+     ========================================================= -->
+
+<div id="uiState" hidden>
+
+  <!-- Ecrã atualmente ativo -->
+  <input
+    type="hidden"
+    id="activeScreen"
+    value="machine"
+  >
+
+  <!-- Estado geral da interface -->
+  <input
+    type="hidden"
+    id="uiMode"
+    value="normal"
+  >
+
+  <!-- Última ação executada -->
+  <input
+    type="hidden"
+    id="lastAction"
+    value=""
+  >
+
+  <!-- Origem da navegação -->
+  <input
+    type="hidden"
+    id="navigationOrigin"
+    value="machine"
+  >
+
+  <!-- Último resultado apresentado -->
+  <input
+    type="hidden"
+    id="lastResult"
+    value=""
+  >
+
+  <!-- Última tarefa da Máquina -->
+  <input
+    type="hidden"
+    id="lastTask"
+    value=""
+  >
+
+  <!-- Estado de carregamento -->
+  <input
+    type="hidden"
+    id="loadingState"
+    value="idle"
+  >
+
+  <!-- Estado de erro -->
+  <input
+    type="hidden"
+    id="uiError"
+    value=""
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE ROTAS INTERNAS
+     ========================================================= -->
+
+<nav
+  id="appNavigation"
+  class="app-navigation"
+  aria-label="Navegação principal"
+  hidden
+>
+
+  <button
+    type="button"
+    class="nav-item"
+    data-screen="machine"
+  >
+    Máquina
+  </button>
+
+  <button
+    type="button"
+    class="nav-item"
+    data-screen="creator"
+  >
+    Criador
+  </button>
+
+  <button
+    type="button"
+    class="nav-item"
+    data-screen="accounts"
+  >
+    Contas
+  </button>
+
+  <button
+    type="button"
+    class="nav-item"
+    data-screen="results"
+  >
+    Resultados
+  </button>
+
+  <button
+    type="button"
+    class="nav-item"
+    data-screen="evolution"
+  >
+    Evolução
+  </button>
+
+  <button
+    type="button"
+    class="nav-item"
+    data-screen="settings"
+  >
+    Configurações
+  </button>
+
+</nav>
+
+
+<!-- =========================================================
+     ÁREA GLOBAL DE AÇÕES DA MÁQUINA
+     ========================================================= -->
+
+<div
+  id="machineActionLayer"
+  class="machine-action-layer"
+  aria-hidden="true"
+>
+
+  <button
+    type="button"
+    id="machineStopButton"
+    class="machine-action-button"
+    data-machine-action="stop"
+  >
+    Parar
+  </button>
+
+  <button
+    type="button"
+    id="machinePauseButton"
+    class="machine-action-button"
+    data-machine-action="pause"
+  >
+    Esperar
+  </button>
+
+  <button
+    type="button"
+    id="machineResumeButton"
+    class="machine-action-button"
+    data-machine-action="resume"
+  >
+    Continuar
+  </button>
+
+</div>
+
+
+<!-- =========================================================
+     INDICADOR GLOBAL DE ESTADO DA MÁQUINA
+     ========================================================= -->
+
+<div
+  id="machineStatusBar"
+  class="machine-status-bar"
+  role="status"
+  aria-live="polite"
+>
+
+  <span
+    id="machineStatusIndicator"
+    class="machine-status-indicator"
+    data-status="idle"
+  ></span>
+
+  <span
+    id="machineStatusText"
+  >
+    A Máquina está pronta.
+  </span>
+
+</div>
+
+
+<!-- =========================================================
+     ÁREA GLOBAL PARA PEDIDOS DE CONFIRMAÇÃO
+     ========================================================= -->
+
+<div
+  id="actionConfirmationLayer"
+  class="action-confirmation-layer"
+  aria-hidden="true"
+>
+
+  <div class="action-confirmation-content">
+
+    <p
+      id="actionConfirmationText"
+      class="action-confirmation-text"
+    ></p>
+
+    <div class="action-confirmation-actions">
+
+      <button
+        type="button"
+        id="actionConfirmButton"
+        class="primary-button"
+      >
+        Confirmar
+      </button>
+
+      <button
+        type="button"
+        id="actionCancelButton"
+        class="secondary-button"
+      >
+        Cancelar
+      </button>
+
+    </div>
+
+  </div>
+
+    </div>
+    <!-- =========================================================
+     PARTE 27 — ÁREA GLOBAL DE DIÁLOGO E RESPOSTA
+     ========================================================= -->
+
+<div
+  id="globalDialogLayer"
+  class="global-dialog-layer"
+  aria-hidden="true"
+>
+
+  <div
+    id="globalDialog"
+    class="global-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="globalDialogTitle"
+  >
+
+    <div class="global-dialog-header">
+
+      <h2 id="globalDialogTitle">
+        Máquina
+      </h2>
+
+      <button
+        type="button"
+        id="globalDialogClose"
+        class="icon-button"
+        aria-label="Fechar"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div
+      id="globalDialogBody"
+      class="global-dialog-body"
+    ></div>
+
+    <div
+      id="globalDialogActions"
+      class="global-dialog-actions"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     ÁREA DE RESPOSTA RÁPIDA DA MÁQUINA
+     ========================================================= -->
+
+<div
+  id="quickResponse"
+  class="quick-response"
+  aria-hidden="true"
+>
+
+  <div class="quick-response-machine">
+
+    <div
+      class="quick-response-orb"
+      aria-hidden="true"
+    ></div>
+
+  </div>
+
+  <div class="quick-response-content">
+
+    <span
+      id="quickResponseLabel"
+      class="quick-response-label"
+    >
+      Máquina
+    </span>
+
+    <p
+      id="quickResponseText"
+      class="quick-response-text"
+    ></p>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     ÁREA DE PROGRESSO DE TAREFA
+     ========================================================= -->
+
+<div
+  id="taskProgress"
+  class="task-progress"
+  aria-hidden="true"
+>
+
+  <div class="task-progress-header">
+
+    <span id="taskProgressTitle">
+      A Máquina está a trabalhar
+    </span>
+
+    <span id="taskProgressPercent">
+      0%
+    </span>
+
+  </div>
+
+  <div class="task-progress-track">
+
+    <div
+      id="taskProgressBar"
+      class="task-progress-bar"
+      style="width: 0%;"
+    ></div>
+
+  </div>
+
+  <p
+    id="taskProgressDescription"
+    class="task-progress-description"
+  >
+    A preparar a tarefa...
+  </p>
+
+</div>
+
+
+<!-- =========================================================
+     ÁREA DE RESULTADO RESUMIDO
+     ========================================================= -->
+
+<div
+  id="resultSummaryLayer"
+  class="result-summary-layer"
+  aria-hidden="true"
+>
+
+  <div class="result-summary-header">
+
+    <span class="result-summary-label">
+      Resultado
+    </span>
+
+    <button
+      type="button"
+      id="resultSummaryClose"
+      class="icon-button"
+      aria-label="Fechar resultado"
+    >
+      ×
+    </button>
+
+  </div>
+
+  <h3
+    id="resultSummaryTitle"
+    class="result-summary-title"
+  ></h3>
+
+  <p
+    id="resultSummaryText"
+    class="result-summary-text"
+  ></p>
+
+  <button
+    type="button"
+    id="resultSummaryDetails"
+    class="primary-button"
+  >
+    Ver detalhes
+  </button>
+
+</div>
+
+
+<!-- =========================================================
+     ÁREA DE ALERTAS DA APLICAÇÃO
+     ========================================================= -->
+
+<div
+  id="alertLayer"
+  class="alert-layer"
+  aria-live="assertive"
+  aria-atomic="true"
+>
+
+  <div
+    id="appAlert"
+    class="app-alert"
+    role="alert"
+  >
+
+    <span
+      id="appAlertIcon"
+      class="app-alert-icon"
+      aria-hidden="true"
+    ></span>
+
+    <span
+      id="appAlertText"
+      class="app-alert-text"
+    ></span>
+
+    <button
+      type="button"
+      id="appAlertClose"
+      class="icon-button"
+      aria-label="Fechar alerta"
+    >
+      ×
+    </button>
+
+  </div>
+
+    </div>
+    <!-- =========================================================
+     PARTE 28 — ÁREA GLOBAL DE CONTROLO DE VOZ
+     ========================================================= -->
+
+<div
+  id="globalVoiceLayer"
+  class="global-voice-layer"
+  aria-hidden="true"
+>
+
+  <div
+    id="globalVoiceIndicator"
+    class="global-voice-indicator"
+  >
+
+    <div
+      id="globalVoiceOrb"
+      class="global-voice-orb"
+      aria-hidden="true"
+    ></div>
+
+    <div class="global-voice-info">
+
+      <span
+        id="globalVoiceState"
+        class="global-voice-state"
+      >
+        Ouvir
+      </span>
+
+      <span
+        id="globalVoiceHint"
+        class="global-voice-hint"
+      >
+        Estou a ouvir-te.
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <div
+    id="globalVoiceActions"
+    class="global-voice-actions"
+  >
+
+    <button
+      type="button"
+      id="globalVoicePause"
+      class="secondary-button"
+      data-voice-action="pause"
+    >
+      Esperar
+    </button>
+
+    <button
+      type="button"
+      id="globalVoiceStop"
+      class="secondary-button"
+      data-voice-action="stop"
+    >
+      Parar
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLO GLOBAL DE ÁUDIO
+     ========================================================= -->
+
+<div
+  id="audioController"
+  class="audio-controller"
+  aria-hidden="true"
+>
+
+  <audio
+    id="machineAudio"
+    preload="auto"
+  ></audio>
+
+  <audio
+    id="voicePreviewAudio"
+    preload="auto"
+  ></audio>
+
+</div>
+
+
+<!-- =========================================================
+     ÁREA GLOBAL DE DIGITAÇÃO
+     ========================================================= -->
+
+<div
+  id="globalKeyboardLayer"
+  class="global-keyboard-layer"
+  aria-hidden="true"
+>
+
+  <div class="global-keyboard">
+
+    <div class="global-keyboard-header">
+
+      <span>
+        Fala com a Máquina
+      </span>
+
+      <button
+        type="button"
+        id="globalKeyboardClose"
+        class="icon-button"
+        aria-label="Fechar teclado"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <textarea
+      id="globalKeyboardInput"
+      class="global-keyboard-input"
+      rows="3"
+      maxlength="4000"
+      placeholder="Escreve aqui..."
+      autocomplete="off"
+      spellcheck="true"
+    ></textarea>
+
+    <div class="global-keyboard-footer">
+
+      <span
+        id="globalKeyboardCounter"
+        class="input-counter"
+      >
+        0 / 4000
+      </span>
+
+      <button
+        type="button"
+        id="globalKeyboardSend"
+        class="primary-button"
+      >
+        Enviar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     INDICADOR DE CONEXÃO
+     ========================================================= -->
+
+<div
+  id="connectionIndicator"
+  class="connection-indicator"
+  role="status"
+  aria-live="polite"
+>
+
+  <span
+    id="connectionDot"
+    class="connection-dot"
+    data-connection="offline"
+  ></span>
+
+  <span
+    id="connectionText"
+  >
+    A verificar ligação...
+  </span>
+
+      </div>
+      <!-- =========================================================
+     PARTE 29 — ÁREA GLOBAL DE AUTENTICAÇÃO
+     ========================================================= -->
+
+<div
+  id="authLayer"
+  class="auth-layer"
+  aria-hidden="true"
+>
+
+  <div
+    id="authLoading"
+    class="auth-loading"
+    aria-live="polite"
+  >
+
+    <div
+      class="auth-loading-machine"
+      aria-hidden="true"
+    ></div>
+
+    <p id="authLoadingText">
+      A verificar a tua conta...
+    </p>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     DADOS DE UTILIZADOR ATUAL
+     ========================================================= -->
+
+<div
+  id="currentUserData"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="currentUserId"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="currentUserName"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="currentUserEmail"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="currentUserPhoto"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="currentUserProvider"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="currentUserAuthenticated"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLO DE SESSÃO
+     ========================================================= -->
+
+<div
+  id="sessionController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="sessionActive"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="sessionStartedAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="sessionLastActivity"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="sessionConversationActive"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="sessionVoiceActive"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="sessionPaused"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLO DE CONVERSAÇÃO
+     ========================================================= -->
+
+<div
+  id="conversationController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="conversationActive"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="conversationTurn"
+    value="0"
+  >
+
+  <input
+    type="hidden"
+    id="conversationLastUserText"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="conversationLastMachineText"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="conversationSubject"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="conversationIntent"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="conversationWaiting"
+    value="false"
+  >
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLADOR DE TAREFAS
+     ========================================================= -->
+
+<div
+  id="taskController"
+  hidden
+>
+
+  <input
+    type="hidden"
+    id="taskActive"
+    value="false"
+  >
+
+  <input
+    type="hidden"
+    id="taskType"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="taskStatus"
+    value="idle"
+  >
+
+  <input
+    type="hidden"
+    id="taskStartedAt"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="taskCompletedAt"
+    value=""
+  >
+
+        </div>
