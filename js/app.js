@@ -3589,3 +3589,3181 @@ if (HM.DOM.voiceButton) {
      ========================================================= */
 
 })();
+/* =========================================================
+   HOMEM E A MÁQUINA
+   app.js — PARTE 6
+   PERSISTÊNCIA • PREFERÊNCIAS • PERFIL • EVOLUÇÃO
+   ========================================================= */
+
+(function () {
+  "use strict";
+
+  const HM = window.HM;
+
+  if (!HM) {
+    console.error("HM não foi inicializado.");
+    return;
+  }
+
+
+  /* =========================================================
+     1. ARMAZENAMENTO LOCAL DE PREFERÊNCIAS
+     ========================================================= */
+
+  HM.storage = {
+
+    prefix: "hm_machine_",
+
+    set(key, value) {
+      try {
+        localStorage.setItem(
+          this.prefix + key,
+          JSON.stringify(value)
+        );
+
+        return true;
+      } catch (error) {
+        console.warn(
+          "Não foi possível guardar:",
+          key,
+          error
+        );
+
+        return false;
+      }
+    },
+
+    get(key, fallback = null) {
+      try {
+        const value = localStorage.getItem(
+          this.prefix + key
+        );
+
+        if (value === null) {
+          return fallback;
+        }
+
+        return JSON.parse(value);
+
+      } catch (error) {
+        console.warn(
+          "Não foi possível ler:",
+          key,
+          error
+        );
+
+        return fallback;
+      }
+    },
+
+    remove(key) {
+      try {
+        localStorage.removeItem(
+          this.prefix + key
+        );
+
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+  };
+
+
+  /* =========================================================
+     2. PREFERÊNCIAS
+     ========================================================= */
+
+  HM.preferences = {
+
+    defaults: {
+      language: "pt-BR",
+      voice: "duarte",
+      theme: "dark",
+      continuousConversation: true,
+      pauseRecognition: true,
+      voiceInterruption: true,
+      voiceResponse: true,
+      animations: true,
+      reducedMotion: false
+    },
+
+    load() {
+      const saved =
+        HM.storage.get(
+          "preferences",
+          {}
+        );
+
+      HM.state.preferences = {
+        ...this.defaults,
+        ...saved
+      };
+
+      if (HM.state.language === undefined) {
+        HM.state.language =
+          HM.state.preferences.language;
+      }
+
+      if (HM.state.voice === undefined) {
+        HM.state.voice =
+          HM.state.preferences.voice;
+      }
+
+      this.apply();
+    },
+
+    save() {
+      HM.storage.set(
+        "preferences",
+        HM.state.preferences
+      );
+    },
+
+    update(key, value) {
+      if (!(key in this.defaults)) {
+        return;
+      }
+
+      HM.state.preferences[key] = value;
+
+      if (key === "language") {
+        HM.state.language = value;
+      }
+
+      if (key === "voice") {
+        HM.state.voice = value;
+      }
+
+      if (key === "theme") {
+        HM.applyTheme(value);
+      }
+
+      this.save();
+    },
+
+    apply() {
+      const p = HM.state.preferences;
+
+      if (p.theme) {
+        HM.applyTheme(p.theme);
+      }
+
+      document.documentElement.classList.toggle(
+        "reduced-motion",
+        Boolean(p.reducedMotion)
+      );
+    }
+  };
+
+
+  /* =========================================================
+     3. PERFIL LOCAL
+     ========================================================= */
+
+  HM.profile = {
+
+    defaults: {
+      name: "",
+      email: "",
+      photoURL: ""
+    },
+
+    load() {
+      const saved =
+        HM.storage.get(
+          "profile",
+          {}
+        );
+
+      HM.state.profile = {
+        ...this.defaults,
+        ...saved
+      };
+
+      this.updateUI();
+    },
+
+    save(profile) {
+      const current =
+        HM.state.profile || this.defaults;
+
+      HM.state.profile = {
+        ...current,
+        ...profile
+      };
+
+      HM.storage.set(
+        "profile",
+        HM.state.profile
+      );
+
+      this.updateUI();
+    },
+
+    updateUI() {
+      const profile =
+        HM.state.profile || this.defaults;
+
+      document
+        .querySelectorAll("[data-profile-name]")
+        .forEach(element => {
+          element.textContent =
+            profile.name || "Utilizador";
+        });
+
+      document
+        .querySelectorAll("[data-profile-email]")
+        .forEach(element => {
+          element.textContent =
+            profile.email || "";
+        });
+
+      document
+        .querySelectorAll("[data-profile-photo]")
+        .forEach(element => {
+          if (profile.photoURL) {
+            element.src = profile.photoURL;
+            element.classList.add("has-photo");
+          } else {
+            element.removeAttribute("src");
+            element.classList.remove("has-photo");
+          }
+        });
+
+      const nameInput =
+        document.querySelector(
+          "[data-profile-input='name']"
+        );
+
+      const emailInput =
+        document.querySelector(
+          "[data-profile-input='email']"
+        );
+
+      if (nameInput && !nameInput.value) {
+        nameInput.value =
+          profile.name || "";
+      }
+
+      if (emailInput && !emailInput.value) {
+        emailInput.value =
+          profile.email || "";
+      }
+    }
+  };
+
+
+  /* =========================================================
+     4. EVOLUÇÃO DA MÁQUINA
+     ========================================================= */
+
+  HM.evolution = {
+
+    defaults: {
+      level: 1,
+      experience: 0,
+      permanentCapabilities: [],
+      temporaryConcessions: [],
+      history: []
+    },
+
+    load() {
+      const saved =
+        HM.storage.get(
+          "evolution",
+          {}
+        );
+
+      HM.state.evolution = {
+        ...this.defaults,
+        ...saved
+      };
+
+      this.updateUI();
+    },
+
+    save() {
+      HM.storage.set(
+        "evolution",
+        HM.state.evolution
+      );
+    },
+
+    addExperience(amount, reason) {
+      const value =
+        Math.max(0, Number(amount) || 0);
+
+      HM.state.evolution.experience += value;
+
+      this.checkProgression(reason);
+
+      this.save();
+      this.updateUI();
+    },
+
+    checkProgression(reason) {
+      const evolution =
+        HM.state.evolution;
+
+      const thresholds = [
+        100,
+        300,
+        600,
+        1000,
+        1500
+      ];
+
+      const nextThreshold =
+        thresholds[evolution.level - 1];
+
+      if (
+        nextThreshold &&
+        evolution.experience >= nextThreshold
+      ) {
+        this.evolve(reason);
+      }
+    },
+
+    evolve(reason) {
+      const evolution =
+        HM.state.evolution;
+
+      evolution.level += 1;
+
+      evolution.history.push({
+        level: evolution.level,
+        reason: reason || "Evolução da relação",
+        timestamp: Date.now()
+      });
+
+      this.save();
+      this.updateUI();
+
+      HM.showToast(
+        "A tua Máquina evoluiu."
+      );
+    },
+
+    grantPermanent(capability) {
+      if (!capability) return;
+
+      const list =
+        HM.state.evolution.permanentCapabilities;
+
+      if (!list.includes(capability)) {
+        list.push(capability);
+        this.save();
+        this.updateUI();
+      }
+    },
+
+    grantTemporary(capability, days = 30) {
+      if (!capability) return;
+
+      const expiresAt =
+        Date.now() +
+        (days * 24 * 60 * 60 * 1000);
+
+      const list =
+        HM.state.evolution.temporaryConcessions;
+
+      list.push({
+        capability,
+        grantedAt: Date.now(),
+        expiresAt
+      });
+
+      this.save();
+      this.updateUI();
+    },
+
+    hasCapability(capability) {
+      const evolution =
+        HM.state.evolution;
+
+      if (
+        evolution.permanentCapabilities
+          .includes(capability)
+      ) {
+        return true;
+      }
+
+      const now = Date.now();
+
+      return evolution.temporaryConcessions.some(
+        item =>
+          item.capability === capability &&
+          item.expiresAt > now
+      );
+    },
+
+    cleanExpired() {
+      const evolution =
+        HM.state.evolution;
+
+      const now = Date.now();
+
+      evolution.temporaryConcessions =
+        evolution.temporaryConcessions.filter(
+          item => item.expiresAt > now
+        );
+
+      this.save();
+    },
+
+    updateUI() {
+      const evolution =
+        HM.state.evolution;
+
+      document
+        .querySelectorAll("[data-machine-level]")
+        .forEach(element => {
+          element.textContent =
+            String(evolution.level);
+        });
+
+      document
+        .querySelectorAll("[data-machine-experience]")
+        .forEach(element => {
+          element.textContent =
+            String(evolution.experience);
+        });
+    }
+  };
+
+
+  /* =========================================================
+     5. ESTADO DA RELAÇÃO COM A MÁQUINA
+     ========================================================= */
+
+  HM.relationship = {
+
+    record(event, details = {}) {
+      if (!HM.state.evolution) {
+        HM.evolution.load();
+      }
+
+      HM.state.evolution.history.push({
+        event,
+        details,
+        timestamp: Date.now()
+      });
+
+      HM.evolution.save();
+    },
+
+    reward(event) {
+      const rewards = {
+        first_conversation: 10,
+        completed_task: 15,
+        returned_to_machine: 5,
+        completed_profile: 10,
+        authorized_account: 20
+      };
+
+      const amount =
+        rewards[event] || 0;
+
+      if (amount > 0) {
+        HM.evolution.addExperience(
+          amount,
+          event
+        );
+      }
+
+      this.record(event);
+    }
+  };
+
+
+  /* =========================================================
+     6. PERSISTÊNCIA DA SESSÃO DA MÁQUINA
+     ========================================================= */
+
+  HM.session = {
+
+    save() {
+      if (!HM.state) return;
+
+      const session = {
+        screen: HM.state.screen,
+        language: HM.state.language,
+        voice: HM.state.voice,
+        conversation: {
+          active:
+            HM.state.conversation.active,
+          continuous:
+            HM.state.conversation.continuous,
+          subject:
+            HM.state.conversation.subject,
+          intent:
+            HM.state.conversation.intent
+        }
+      };
+
+      HM.storage.set(
+        "session",
+        session
+      );
+    },
+
+    restore() {
+      const session =
+        HM.storage.get(
+          "session",
+          null
+        );
+
+      if (!session) return;
+
+      if (session.language) {
+        HM.state.language =
+          session.language;
+      }
+
+      if (session.voice) {
+        HM.state.voice =
+          session.voice;
+      }
+
+      if (session.conversation) {
+        HM.state.conversation = {
+          ...HM.state.conversation,
+          ...session.conversation
+        };
+      }
+    },
+
+    clear() {
+      HM.storage.remove("session");
+    }
+  };
+
+
+  /* =========================================================
+     7. GUARDAR AUTOMATICAMENTE ESTADO IMPORTANTE
+     ========================================================= */
+
+  let saveTimer = null;
+
+  HM.autoSave = function () {
+    clearTimeout(saveTimer);
+
+    saveTimer = setTimeout(() => {
+      HM.preferences.save();
+      HM.session.save();
+      HM.evolution.save();
+    }, 250);
+  };
+
+
+  /* =========================================================
+     8. OBSERVAR ALTERAÇÕES DE NAVEGAÇÃO
+     ========================================================= */
+
+  const originalShowScreen =
+    HM.showScreen;
+
+  if (
+    typeof originalShowScreen === "function" &&
+    !HM.__showScreenWrapped
+  ) {
+    HM.__showScreenWrapped = true;
+
+    HM.showScreen = function (screenName) {
+      const previous =
+        HM.state.screen;
+
+      const result =
+        originalShowScreen.call(
+          HM,
+          screenName
+        );
+
+      HM.context.lastScreen =
+        previous;
+
+      HM.autoSave();
+
+      return result;
+    };
+  }
+
+
+  /* =========================================================
+     9. CARREGAR DADOS
+     ========================================================= */
+
+  HM.loadApplicationData = function () {
+    HM.preferences.load();
+    HM.profile.load();
+    HM.evolution.load();
+    HM.evolution.cleanExpired();
+    HM.session.restore();
+  };
+
+
+  /* =========================================================
+     10. EVENTOS DE PREFERÊNCIAS
+     ========================================================= */
+
+  document.addEventListener(
+    "change",
+    function (event) {
+      const element =
+        event.target;
+
+      if (!element) return;
+
+      const preference =
+        element.dataset.preference;
+
+      if (!preference) return;
+
+      let value;
+
+      if (
+        element.type === "checkbox"
+      ) {
+        value = element.checked;
+      } else {
+        value = element.value;
+      }
+
+      HM.preferences.update(
+        preference,
+        value
+      );
+    }
+  );
+
+
+  /* =========================================================
+     11. BOTÃO DE LIMPAR CONVERSA
+     ========================================================= */
+
+  document.addEventListener(
+    "click",
+    function (event) {
+      const button =
+        event.target.closest(
+          "[data-clear-conversation]"
+        );
+
+      if (!button) return;
+
+      HM.memory.clear();
+
+      HM.showMachineResponse(
+        "A conversa foi limpa. Podemos começar novamente."
+      );
+
+      HM.showToast(
+        "Conversa limpa."
+      );
+    }
+  );
+
+
+  /* =========================================================
+     12. PERFIL
+     ========================================================= */
+
+  document.addEventListener(
+    "submit",
+    function (event) {
+      const form =
+        event.target.closest(
+          "[data-profile-form]"
+        );
+
+      if (!form) return;
+
+      event.preventDefault();
+
+      const nameInput =
+        form.querySelector(
+          "[data-profile-input='name']"
+        );
+
+      const emailInput =
+        form.querySelector(
+          "[data-profile-input='email']"
+        );
+
+      const name =
+        nameInput ?
+        nameInput.value.trim() :
+        "";
+
+      const email =
+        emailInput ?
+        emailInput.value.trim() :
+        "";
+
+      HM.profile.save({
+        name,
+        email
+      });
+
+      HM.relationship.reward(
+        "completed_profile"
+      );
+
+      HM.showToast(
+        "Perfil guardado."
+      );
+    }
+  );
+
+
+  /* =========================================================
+     13. EXPOR CONTROLES
+     ========================================================= */
+
+  HM.savePreferences = function () {
+    HM.preferences.save();
+  };
+
+  HM.saveProfile = function (profile) {
+    HM.profile.save(profile);
+  };
+
+  HM.getProfile = function () {
+    return {
+      ...(HM.state.profile || {})
+    };
+  };
+
+  HM.getMachineLevel = function () {
+    return HM.state.evolution
+      ? HM.state.evolution.level
+      : 1;
+  };
+
+  HM.hasMachineCapability = function (
+    capability
+  ) {
+    return HM.evolution.hasCapability(
+      capability
+    );
+  };
+
+
+  /* =========================================================
+     14. INICIALIZAÇÃO DOS DADOS
+     ========================================================= */
+
+  HM.loadApplicationData();
+
+  console.log(
+    "HM — persistência, perfil e evolução carregados."
+  );
+
+})();
+/* =========================================================
+   HOMEM E A MÁQUINA
+   app.js — PARTE 7
+   CONTAS • AUTORIZAÇÕES • PLATAFORMAS
+   ========================================================= */
+
+(function () {
+  "use strict";
+
+  const HM = window.HM;
+
+  if (!HM) {
+    console.error("HM não foi inicializado.");
+    return;
+  }
+
+
+  /* =========================================================
+     1. GERENCIADOR DE CONTAS
+     ========================================================= */
+
+  HM.accounts = {
+
+    list: [],
+
+    load() {
+      const saved =
+        HM.storage.get("accounts", []);
+
+      this.list = Array.isArray(saved)
+        ? saved
+        : [];
+
+      this.updateUI();
+    },
+
+    save() {
+      HM.storage.set(
+        "accounts",
+        this.list
+      );
+
+      this.updateUI();
+    },
+
+    add(account) {
+      if (!account) return null;
+
+      const item = {
+        id:
+          account.id ||
+          "account_" + Date.now(),
+
+        platform:
+          account.platform || "unknown",
+
+        username:
+          account.username || "",
+
+        displayName:
+          account.displayName || "",
+
+        authorized:
+          Boolean(account.authorized),
+
+        authorizationStatus:
+          account.authorizationStatus ||
+          "pending",
+
+        connectedAt:
+          account.connectedAt ||
+          Date.now(),
+
+        metadata:
+          account.metadata || {}
+      };
+
+      const existing =
+        this.list.find(
+          current =>
+            current.platform === item.platform &&
+            current.username === item.username
+        );
+
+      if (existing) {
+        Object.assign(
+          existing,
+          item
+        );
+      } else {
+        this.list.push(item);
+      }
+
+      this.save();
+
+      return item;
+    },
+
+    get(id) {
+      return this.list.find(
+        account =>
+          account.id === id
+      ) || null;
+    },
+
+    remove(id) {
+      this.list =
+        this.list.filter(
+          account =>
+            account.id !== id
+        );
+
+      this.save();
+    },
+
+    update(id, changes) {
+      const account =
+        this.get(id);
+
+      if (!account) return null;
+
+      Object.assign(
+        account,
+        changes || {}
+      );
+
+      this.save();
+
+      return account;
+    },
+
+    authorized() {
+      return this.list.filter(
+        account =>
+          account.authorized === true &&
+          account.authorizationStatus === "authorized"
+      );
+    },
+
+    updateUI() {
+      document
+        .querySelectorAll(
+          "[data-account-list]"
+        )
+        .forEach(container => {
+
+          if (!this.list.length) {
+            return;
+          }
+
+          container.innerHTML =
+            this.list.map(
+              account => `
+                <div class="account-item"
+                     data-account-id="${HM.escapeHTML(account.id)}">
+
+                  <div class="account-item-info">
+                    <strong>
+                      ${HM.escapeHTML(
+                        account.displayName ||
+                        account.username ||
+                        "Conta"
+                      )}
+                    </strong>
+
+                    <span>
+                      ${HM.escapeHTML(
+                        account.platform
+                      )}
+                    </span>
+                  </div>
+
+                  <div class="account-item-status">
+                    ${
+                      account.authorized
+                        ? "Autorizada"
+                        : "Não autorizada"
+                    }
+                  </div>
+
+                </div>
+              `
+            ).join("");
+        });
+    }
+  };
+
+
+  /* =========================================================
+     2. AUTORIZAÇÕES
+     ========================================================= */
+
+  HM.authorization = {
+
+    pending: null,
+
+    request(platform, scopes = []) {
+      this.pending = {
+        platform,
+        scopes: Array.isArray(scopes)
+          ? scopes
+          : [],
+        createdAt: Date.now()
+      };
+
+      HM.state.pendingAuthorization =
+        this.pending;
+
+      return this.pending;
+    },
+
+    approve(data) {
+      if (!data) return null;
+
+      const account =
+        HM.accounts.add({
+          ...data,
+          authorized: true,
+          authorizationStatus: "authorized"
+        });
+
+      this.pending = null;
+      HM.state.pendingAuthorization = null;
+
+      HM.relationship.reward(
+        "authorized_account"
+      );
+
+      return account;
+    },
+
+    revoke(accountId) {
+      const account =
+        HM.accounts.get(accountId);
+
+      if (!account) return false;
+
+      HM.accounts.update(
+        accountId,
+        {
+          authorized: false,
+          authorizationStatus: "revoked"
+        }
+      );
+
+      return true;
+    },
+
+    isAuthorized(platform) {
+      return HM.accounts.authorized()
+        .some(
+          account =>
+            account.platform === platform
+        );
+    }
+  };
+
+
+  /* =========================================================
+     3. PLATAFORMAS SUPORTADAS
+     ========================================================= */
+
+  HM.platforms = {
+
+    supported: [
+      {
+        id: "youtube",
+        name: "YouTube",
+        authorization: true
+      },
+      {
+        id: "tiktok",
+        name: "TikTok",
+        authorization: true
+      },
+      {
+        id: "instagram",
+        name: "Instagram",
+        authorization: true
+      },
+      {
+        id: "facebook",
+        name: "Facebook",
+        authorization: true
+      }
+    ],
+
+    get(id) {
+      return this.supported.find(
+        platform =>
+          platform.id === id
+      ) || null;
+    },
+
+    isSupported(id) {
+      return Boolean(
+        this.get(id)
+      );
+    }
+  };
+
+
+  /* =========================================================
+     4. INTEGRAÇÃO EXTERNA
+     A aplicação não guarda palavras-passe
+     ========================================================= */
+
+  HM.integrations = {
+
+    async connect(platform) {
+      if (
+        !HM.platforms.isSupported(platform)
+      ) {
+        throw new Error(
+          "Plataforma não suportada."
+        );
+      }
+
+      /*
+       * A autorização real será feita pelo
+       * OAuth/API oficial da plataforma.
+       *
+       * Nunca pedir ou guardar a palavra-passe
+       * da rede social dentro da Máquina.
+       */
+
+      HM.authorization.request(
+        platform
+      );
+
+      return {
+        platform,
+        status: "authorization_required"
+      };
+    },
+
+    async disconnect(accountId) {
+      return HM.authorization.revoke(
+        accountId
+      );
+    },
+
+    async getAccountData(account) {
+      if (!account) {
+        throw new Error(
+          "Conta não identificada."
+        );
+      }
+
+      if (!account.authorized) {
+        throw new Error(
+          "A conta ainda não está autorizada."
+        );
+      }
+
+      /*
+       * Esta função será ligada posteriormente
+       * ao backend/orquestrador e às APIs oficiais.
+       */
+
+      return {
+        accountId: account.id,
+        platform: account.platform,
+        status: "awaiting_api"
+      };
+    }
+  };
+
+
+  /* =========================================================
+     5. BOTÕES DE CONEXÃO
+     ========================================================= */
+
+  document.addEventListener(
+    "click",
+    async function (event) {
+
+      const button =
+        event.target.closest(
+          "[data-connect-platform]"
+        );
+
+      if (!button) return;
+
+      const platform =
+        button.dataset.connectPlatform;
+
+      if (!platform) return;
+
+      try {
+
+        button.disabled = true;
+
+        const result =
+          await HM.integrations.connect(
+            platform
+          );
+
+        if (
+          result.status ===
+          "authorization_required"
+        ) {
+          HM.showToast(
+            "Autorização necessária para continuar."
+          );
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Erro ao conectar plataforma:",
+          error
+        );
+
+        HM.showToast(
+          "Não foi possível iniciar a conexão."
+        );
+
+      } finally {
+
+        button.disabled = false;
+      }
+    }
+  );
+
+
+  /* =========================================================
+     6. BOTÕES DE DESCONEXÃO
+     ========================================================= */
+
+  document.addEventListener(
+    "click",
+    async function (event) {
+
+      const button =
+        event.target.closest(
+          "[data-disconnect-account]"
+        );
+
+      if (!button) return;
+
+      const accountId =
+        button.dataset.disconnectAccount;
+
+      if (!accountId) return;
+
+      const disconnected =
+        await HM.integrations.disconnect(
+          accountId
+        );
+
+      if (disconnected) {
+        HM.showToast(
+          "Conta desconectada."
+        );
+      }
+    }
+  );
+
+
+  /* =========================================================
+     7. CARREGAR CONTAS
+     ========================================================= */
+
+  HM.accounts.load();
+
+
+  /* =========================================================
+     8. API PÚBLICA
+     ========================================================= */
+
+  HM.connectPlatform = function (
+    platform
+  ) {
+    return HM.integrations.connect(
+      platform
+    );
+  };
+
+  HM.disconnectAccount = function (
+    accountId
+  ) {
+    return HM.integrations.disconnect(
+      accountId
+    );
+  };
+
+  HM.getConnectedAccounts = function () {
+    return HM.accounts.authorized();
+  };
+
+
+  console.log(
+    "HM — contas e autorizações carregadas."
+  );
+
+})();
+/* =========================================================
+   HOMEM E A MÁQUINA
+   app.js — PARTE 8
+   INTELIGÊNCIA • IA EXTERNA • BACKEND • FERRAMENTAS
+   ========================================================= */
+
+(function () {
+  "use strict";
+
+  const HM = window.HM;
+
+  if (!HM) {
+    console.error("HM não foi inicializado.");
+    return;
+  }
+
+
+  /* =========================================================
+     1. CONFIGURAÇÃO DO MOTOR DE INTELIGÊNCIA
+     ========================================================= */
+
+  HM.intelligence = {
+
+    provider: "machine",
+
+    externalAI: {
+      enabled: true,
+      provider: null,
+      endpoint: null,
+      available: false
+    },
+
+    backend: {
+      enabled: false,
+      endpoint: null,
+      available: false
+    },
+
+    capabilities: {
+      conversation: true,
+      context: true,
+      memory: true,
+      orchestration: true,
+      planning: true,
+      tools: true,
+      externalAI: true
+    },
+
+    setExternalAI(config = {}) {
+      this.externalAI = {
+        ...this.externalAI,
+        ...config
+      };
+    },
+
+    setBackend(config = {}) {
+      this.backend = {
+        ...this.backend,
+        ...config
+      };
+    }
+  };
+
+
+  /* =========================================================
+     2. REGISTO DE FERRAMENTAS
+     ========================================================= */
+
+  HM.tools = {
+
+    registry: {},
+
+    register(name, handler, options = {}) {
+      if (!name || typeof handler !== "function") {
+        return false;
+      }
+
+      this.registry[name] = {
+        name,
+        handler,
+        description:
+          options.description || "",
+        requiresAuthorization:
+          Boolean(options.requiresAuthorization),
+        platform:
+          options.platform || null
+      };
+
+      return true;
+    },
+
+    has(name) {
+      return Boolean(
+        this.registry[name]
+      );
+    },
+
+    get(name) {
+      return this.registry[name] || null;
+    },
+
+    async execute(name, input = {}) {
+      const tool =
+        this.get(name);
+
+      if (!tool) {
+        throw new Error(
+          "Ferramenta não encontrada: " + name
+        );
+      }
+
+      if (tool.requiresAuthorization) {
+        if (
+          !tool.platform ||
+          !HM.authorization.isAuthorized(
+            tool.platform
+          )
+        ) {
+          throw new Error(
+            "Esta ferramenta requer autorização."
+          );
+        }
+      }
+
+      return tool.handler(input);
+    }
+  };
+
+
+  /* =========================================================
+     3. CAMADA DE BACKEND
+     ========================================================= */
+
+  HM.backend = {
+
+    async request(path, payload = {}) {
+
+      const config =
+        HM.intelligence.backend;
+
+      if (
+        !config.enabled ||
+        !config.endpoint
+      ) {
+        throw new Error(
+          "Backend ainda não configurado."
+        );
+      }
+
+      const response =
+        await fetch(
+          config.endpoint + path,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify(payload)
+          }
+        );
+
+      if (!response.ok) {
+        throw new Error(
+          "Erro do servidor: " +
+          response.status
+        );
+      }
+
+      return response.json();
+    }
+  };
+
+
+  /* =========================================================
+     4. IA EXTERNA
+     ========================================================= */
+
+  HM.externalAI = {
+
+    async ask(message, context = {}) {
+
+      const config =
+        HM.intelligence.externalAI;
+
+      if (
+        !config.enabled ||
+        !config.endpoint
+      ) {
+        throw new Error(
+          "IA externa não configurada."
+        );
+      }
+
+      /*
+       * IMPORTANTE:
+       * Nenhuma chave secreta deve ser colocada
+       * neste ficheiro ou publicada no GitHub Pages.
+       *
+       * A chamada real deve passar pelo backend
+       * seguro da aplicação.
+       */
+
+      return HM.backend.request(
+        config.endpoint,
+        {
+          message,
+          context
+        }
+      );
+    }
+  };
+
+
+  /* =========================================================
+     5. PREPARAÇÃO DO PEDIDO
+     ========================================================= */
+
+  HM.intelligence.prepareRequest = function (
+    message
+  ) {
+    return {
+      message: String(message || "").trim(),
+
+      context:
+        HM.conversation &&
+        typeof HM.conversation.getContext ===
+          "function"
+          ? HM.conversation.getContext()
+          : {},
+
+      user: {
+        authenticated:
+          Boolean(HM.state.authenticated),
+
+        profile:
+          HM.state.profile || {}
+      },
+
+      machine: {
+        level:
+          HM.getMachineLevel
+            ? HM.getMachineLevel()
+            : 1
+      }
+    };
+  };
+
+
+  /* =========================================================
+     6. RESOLVER QUANDO USAR FERRAMENTA OU IA
+     ========================================================= */
+
+  HM.intelligence.resolve = async function (
+    message,
+    interpreted
+  ) {
+
+    const data =
+      interpreted || {};
+
+    const intent =
+      data.intent || "general";
+
+    /*
+     * A Máquina decide primeiro o que precisa
+     * ser feito.
+     *
+     * A IA externa é apenas apoio quando a
+     * capacidade própria ainda não é suficiente.
+     */
+
+    const internalIntents = [
+      "pause",
+      "resume",
+      "stop",
+      "general",
+      "ideas",
+      "scripts",
+      "planning",
+      "strategy",
+      "audience",
+      "trends",
+      "analyze_account",
+      "analyze_content"
+    ];
+
+    if (
+      internalIntents.includes(intent)
+    ) {
+      return HM.orchestrator.execute({
+        ...data,
+        message
+      });
+    }
+
+    if (
+      HM.intelligence.externalAI.available
+    ) {
+      return HM.externalAI.ask(
+        message,
+        HM.intelligence.prepareRequest(
+          message
+        )
+      );
+    }
+
+    return HM.orchestrator.execute({
+      ...data,
+      message
+    });
+  };
+
+
+  /* =========================================================
+     7. TAREFAS COM FERRAMENTAS
+     ========================================================= */
+
+  HM.runToolTask = async function (
+    toolName,
+    input = {},
+    taskLabel = "A Máquina está a trabalhar."
+  ) {
+
+    const task =
+      HM.taskManager.create(
+        "tool",
+        taskLabel
+      );
+
+    HM.taskManager.start(task);
+
+    try {
+
+      HM.taskManager.progress(
+        20,
+        "A preparar a tarefa."
+      );
+
+      const result =
+        await HM.tools.execute(
+          toolName,
+          input
+        );
+
+      HM.taskManager.progress(
+        90,
+        "A organizar o resultado."
+      );
+
+      HM.taskManager.finish(
+        result
+      );
+
+      return result;
+
+    } catch (error) {
+
+      HM.taskManager.fail(
+        error.message ||
+        "Não foi possível executar a ferramenta."
+      );
+
+      throw error;
+    }
+  };
+
+
+  /* =========================================================
+     8. FERRAMENTAS BASE
+     ========================================================= */
+
+  HM.tools.register(
+    "open_screen",
+    async ({ screen }) => {
+
+      if (!screen) {
+        throw new Error(
+          "Ecrã não especificado."
+        );
+      }
+
+      HM.showScreen(screen);
+
+      return {
+        success: true,
+        screen
+      };
+    },
+    {
+      description:
+        "Abre um ecrã da aplicação."
+    }
+  );
+
+
+  HM.tools.register(
+    "show_result",
+    async ({ result }) => {
+
+      if (!result) {
+        throw new Error(
+          "Resultado não especificado."
+        );
+      }
+
+      HM.results.show(result);
+
+      return {
+        success: true
+      };
+    },
+    {
+      description:
+        "Apresenta um resultado ao utilizador."
+    }
+  );
+
+
+  HM.tools.register(
+    "get_accounts",
+    async () => {
+
+      return {
+        accounts:
+          HM.getConnectedAccounts
+            ? HM.getConnectedAccounts()
+            : []
+      };
+    },
+    {
+      description:
+        "Obtém as contas autorizadas."
+    }
+  );
+
+
+  /* =========================================================
+     9. ENTRADA PRINCIPAL DA INTELIGÊNCIA
+     ========================================================= */
+
+  HM.machineThink = async function (
+    message
+  ) {
+
+    const text =
+      String(message || "").trim();
+
+    if (!text) return null;
+
+    const interpreted =
+      typeof HM.interpretMessage ===
+      "function"
+        ? HM.interpretMessage(text)
+        : {
+            intent: "general",
+            subject: null,
+            message: text
+          };
+
+    HM.context.set(
+      interpreted.subject,
+      interpreted.intent,
+      text
+    );
+
+    HM.setMachineState("THINKING");
+
+    try {
+
+      const result =
+        await HM.intelligence.resolve(
+          text,
+          interpreted
+        );
+
+      HM.context.setResult(
+        result
+      );
+
+      return result;
+
+    } catch (error) {
+
+      console.error(
+        "Erro na inteligência:",
+        error
+      );
+
+      HM.state.error =
+        error.message ||
+        "Erro de inteligência.";
+
+      HM.setMachineState("ERROR");
+
+      throw error;
+    }
+  };
+
+
+  /* =========================================================
+     10. API PÚBLICA
+     ========================================================= */
+
+  HM.askMachine = function (
+    message
+  ) {
+    return HM.machineThink(
+      message
+    );
+  };
+
+
+  HM.registerMachineTool = function (
+    name,
+    handler,
+    options
+  ) {
+    return HM.tools.register(
+      name,
+      handler,
+      options
+    );
+  };
+
+
+  console.log(
+    "HM — camada de inteligência preparada."
+  );
+
+})();
+/* =========================================================
+   HOMEM E A MÁQUINA
+   app.js — PARTE 9
+   AUTENTICAÇÃO • FIREBASE • SESSÃO • GOOGLE
+   ========================================================= */
+
+(function () {
+  "use strict";
+
+  const HM = window.HM;
+
+  if (!HM) {
+    console.error("HM não foi inicializado.");
+    return;
+  }
+
+
+  /* =========================================================
+     1. ESTADO DE AUTENTICAÇÃO
+     ========================================================= */
+
+  HM.auth = {
+
+    initialized: false,
+    firebaseAvailable: false,
+    currentUser: null,
+    unsubscribe: null,
+
+    providers: {
+      email: true,
+      google: true
+    },
+
+    setUser(user) {
+      this.currentUser = user || null;
+
+      HM.state.authenticated =
+        Boolean(user);
+
+      HM.state.user =
+        user || null;
+
+      HM.state.online =
+        navigator.onLine;
+
+      if (user) {
+        HM.profile.save({
+          name:
+            user.displayName ||
+            HM.state.profile.name ||
+            "",
+
+          email:
+            user.email ||
+            HM.state.profile.email ||
+            "",
+
+          photoURL:
+            user.photoURL ||
+            HM.state.profile.photoURL ||
+            ""
+        });
+      }
+
+      this.updateUI();
+    },
+
+    updateUI() {
+      const user =
+        this.currentUser;
+
+      document
+        .querySelectorAll(
+          "[data-auth-user-name]"
+        )
+        .forEach(element => {
+          element.textContent =
+            user?.displayName ||
+            HM.state.profile?.name ||
+            "Utilizador";
+        });
+
+      document
+        .querySelectorAll(
+          "[data-auth-user-email]"
+        )
+        .forEach(element => {
+          element.textContent =
+            user?.email ||
+            HM.state.profile?.email ||
+            "";
+        });
+
+      document
+        .querySelectorAll(
+          "[data-authenticated]"
+        )
+        .forEach(element => {
+          element.hidden =
+            !Boolean(user);
+        });
+
+      document
+        .querySelectorAll(
+          "[data-unauthenticated]"
+        )
+        .forEach(element => {
+          element.hidden =
+            Boolean(user);
+        });
+    }
+  };
+
+
+  /* =========================================================
+     2. DETETAR FIREBASE
+     ========================================================= */
+
+  function getFirebase() {
+
+    if (
+      window.firebase &&
+      window.firebase.auth
+    ) {
+      return window.firebase;
+    }
+
+    if (
+      window.HMFirebase
+    ) {
+      return window.HMFirebase;
+    }
+
+    return null;
+  }
+
+
+  /* =========================================================
+     3. INICIALIZAR AUTENTICAÇÃO
+     ========================================================= */
+
+  HM.initializeAuth = function () {
+
+    const firebase =
+      getFirebase();
+
+    if (!firebase) {
+
+      HM.auth.firebaseAvailable =
+        false;
+
+      console.warn(
+        "Firebase Authentication ainda não está disponível."
+      );
+
+      HM.auth.updateUI();
+
+      return false;
+    }
+
+    HM.auth.firebaseAvailable =
+      true;
+
+    try {
+
+      const auth =
+        firebase.auth();
+
+      HM.auth.initialized =
+        true;
+
+      HM.auth.unsubscribe =
+        auth.onAuthStateChanged(
+          user => {
+
+            HM.auth.setUser(
+              user
+            );
+
+            if (user) {
+              HM.relationship.reward(
+                "returned_to_machine"
+              );
+            }
+          }
+        );
+
+      return true;
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao inicializar Firebase Auth:",
+        error
+      );
+
+      HM.auth.firebaseAvailable =
+        false;
+
+      return false;
+    }
+  };
+
+
+  /* =========================================================
+     4. EMAIL E PALAVRA-PASSE
+     ========================================================= */
+
+  HM.registerWithEmail = async function (
+    email,
+    password,
+    displayName
+  ) {
+
+    const firebase =
+      getFirebase();
+
+    if (!firebase) {
+      throw new Error(
+        "Firebase Authentication não está disponível."
+      );
+    }
+
+    if (!email || !password) {
+      throw new Error(
+        "Email e palavra-passe são obrigatórios."
+      );
+    }
+
+    const auth =
+      firebase.auth();
+
+    const credential =
+      await auth.createUserWithEmailAndPassword(
+        email.trim(),
+        password
+      );
+
+    const user =
+      credential.user;
+
+    if (
+      user &&
+      displayName &&
+      user.updateProfile
+    ) {
+      await user.updateProfile({
+        displayName:
+          displayName.trim()
+      });
+    }
+
+    HM.auth.setUser(
+      user
+    );
+
+    return user;
+  };
+
+
+  HM.loginWithEmail = async function (
+    email,
+    password
+  ) {
+
+    const firebase =
+      getFirebase();
+
+    if (!firebase) {
+      throw new Error(
+        "Firebase Authentication não está disponível."
+      );
+    }
+
+    if (!email || !password) {
+      throw new Error(
+        "Email e palavra-passe são obrigatórios."
+      );
+    }
+
+    const auth =
+      firebase.auth();
+
+    const credential =
+      await auth.signInWithEmailAndPassword(
+        email.trim(),
+        password
+      );
+
+    HM.auth.setUser(
+      credential.user
+    );
+
+    return credential.user;
+  };
+
+
+  /* =========================================================
+     5. GOOGLE
+     ========================================================= */
+
+  HM.loginWithGoogle = async function () {
+
+    const firebase =
+      getFirebase();
+
+    if (!firebase) {
+      throw new Error(
+        "Firebase Authentication não está disponível."
+      );
+    }
+
+    const auth =
+      firebase.auth();
+
+    const provider =
+      new firebase.auth.GoogleAuthProvider();
+
+    provider.setCustomParameters({
+      prompt: "select_account"
+    });
+
+    /*
+     * Popup é utilizado como primeira opção.
+     * Não misturamos popup e redirect no mesmo clique.
+     * Isto evita o problema de executar dois fluxos
+     * de autenticação simultaneamente.
+     */
+
+    try {
+
+      const result =
+        await auth.signInWithPopup(
+          provider
+        );
+
+      HM.auth.setUser(
+        result.user
+      );
+
+      return result.user;
+
+    } catch (error) {
+
+      console.error(
+        "Google Authentication:",
+        error
+      );
+
+      /*
+       * O erro é devolvido ao controlador da interface.
+       * Não fazemos redirect automaticamente aqui,
+       * evitando abrir uma nova aba ou criar um segundo
+       * fluxo sem autorização do utilizador.
+       */
+
+      throw error;
+    }
+  };
+
+
+  /* =========================================================
+     6. TERMINAR SESSÃO
+     ========================================================= */
+
+  HM.logout = async function () {
+
+    const firebase =
+      getFirebase();
+
+    if (!firebase) {
+      HM.auth.setUser(
+        null
+      );
+
+      return;
+    }
+
+    try {
+
+      await firebase
+        .auth()
+        .signOut();
+
+      HM.auth.setUser(
+        null
+      );
+
+      HM.session.clear();
+
+      HM.showToast(
+        "Sessão terminada."
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao terminar sessão:",
+        error
+      );
+
+      HM.showToast(
+        "Não foi possível terminar a sessão."
+      );
+
+      throw error;
+    }
+  };
+
+
+  /* =========================================================
+     7. RECUPERAÇÃO DE PALAVRA-PASSE
+     ========================================================= */
+
+  HM.resetPassword = async function (
+    email
+  ) {
+
+    const firebase =
+      getFirebase();
+
+    if (!firebase) {
+      throw new Error(
+        "Firebase Authentication não está disponível."
+      );
+    }
+
+    if (!email) {
+      throw new Error(
+        "Introduz o teu email."
+      );
+    }
+
+    await firebase
+      .auth()
+      .sendPasswordResetEmail(
+        email.trim()
+      );
+
+    HM.showToast(
+      "Se o email estiver associado a uma conta, o pedido de recuperação foi enviado."
+    );
+  };
+
+
+  /* =========================================================
+     8. FORMULÁRIO DE LOGIN
+     ========================================================= */
+
+  document.addEventListener(
+    "submit",
+    async function (event) {
+
+      const form =
+        event.target.closest(
+          "[data-login-form]"
+        );
+
+      if (!form) return;
+
+      event.preventDefault();
+
+      const email =
+        form.querySelector(
+          "[name='email']"
+        )?.value || "";
+
+      const password =
+        form.querySelector(
+          "[name='password']"
+        )?.value || "";
+
+      try {
+
+        await HM.loginWithEmail(
+          email,
+          password
+        );
+
+        HM.showToast(
+          "Entrada efetuada com sucesso."
+        );
+
+        HM.showScreen(
+          "machine"
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Login:",
+          error
+        );
+
+        HM.showToast(
+          "Não foi possível entrar. Verifica os dados e tenta novamente."
+        );
+      }
+    }
+  );
+
+
+  /* =========================================================
+     9. FORMULÁRIO DE REGISTO
+     ========================================================= */
+
+  document.addEventListener(
+    "submit",
+    async function (event) {
+
+      const form =
+        event.target.closest(
+          "[data-register-form]"
+        );
+
+      if (!form) return;
+
+      event.preventDefault();
+
+      const name =
+        form.querySelector(
+          "[name='name']"
+        )?.value || "";
+
+      const email =
+        form.querySelector(
+          "[name='email']"
+        )?.value || "";
+
+      const password =
+        form.querySelector(
+          "[name='password']"
+        )?.value || "";
+
+      try {
+
+        await HM.registerWithEmail(
+          email,
+          password,
+          name
+        );
+
+        HM.showToast(
+          "Conta criada com sucesso."
+        );
+
+        HM.showScreen(
+          "machine"
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Registo:",
+          error
+        );
+
+        HM.showToast(
+          "Não foi possível criar a conta."
+        );
+      }
+    }
+  );
+
+
+  /* =========================================================
+     10. BOTÃO GOOGLE
+     ========================================================= */
+
+  document.addEventListener(
+    "click",
+    async function (event) {
+
+      const button =
+        event.target.closest(
+          "[data-google-login]"
+        );
+
+      if (!button) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (button.dataset.busy === "true") {
+        return;
+      }
+
+      button.dataset.busy =
+        "true";
+
+      button.disabled =
+        true;
+
+      try {
+
+        await HM.loginWithGoogle();
+
+        HM.showToast(
+          "Entrada com Google efetuada."
+        );
+
+        HM.showScreen(
+          "machine"
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Google:",
+          error
+        );
+
+        let message =
+          "Não foi possível entrar com Google.";
+
+        if (
+          error &&
+          error.code ===
+            "auth/popup-closed-by-user"
+        ) {
+          message =
+            "A janela do Google foi fechada.";
+        }
+
+        if (
+          error &&
+          error.code ===
+            "auth/popup-blocked"
+        ) {
+          message =
+            "O navegador bloqueou a janela de autenticação.";
+        }
+
+        HM.showToast(
+          message
+        );
+
+      } finally {
+
+        button.dataset.busy =
+          "false";
+
+        button.disabled =
+          false;
+      }
+    },
+    true
+  );
+
+
+  /* =========================================================
+     11. BOTÃO SAIR
+     ========================================================= */
+
+  document.addEventListener(
+    "click",
+    function (event) {
+
+      const button =
+        event.target.closest(
+          "[data-logout]"
+        );
+
+      if (!button) return;
+
+      event.preventDefault();
+
+      HM.logout();
+    }
+  );
+
+
+  /* =========================================================
+     12. RECUPERAÇÃO DE PALAVRA-PASSE
+     ========================================================= */
+
+  document.addEventListener(
+    "submit",
+    async function (event) {
+
+      const form =
+        event.target.closest(
+          "[data-reset-password-form]"
+        );
+
+      if (!form) return;
+
+      event.preventDefault();
+
+      const email =
+        form.querySelector(
+          "[name='email']"
+        )?.value || "";
+
+      try {
+
+        await HM.resetPassword(
+          email
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Recuperação:",
+          error
+        );
+
+        HM.showToast(
+          "Não foi possível processar o pedido."
+        );
+      }
+    }
+  );
+
+
+  /* =========================================================
+     13. INICIALIZAR
+     ========================================================= */
+
+  HM.initializeAuth();
+
+  console.log(
+    "HM — autenticação preparada."
+  );
+
+})();
+/* =========================================================
+   HOMEM E A MÁQUINA
+   app.js — PARTE 10
+   FORMULÁRIOS • CRIADOR • RESULTADOS • AÇÕES
+   ========================================================= */
+
+(function () {
+  "use strict";
+
+  const HM = window.HM;
+
+  if (!HM) {
+    console.error("HM não foi inicializado.");
+    return;
+  }
+
+
+  /* =========================================================
+     1. ESTADO DO CRIADOR
+     ========================================================= */
+
+  HM.creator = {
+
+    data: {
+      platform: "",
+      niche: "",
+      objective: "",
+      audience: "",
+      contentType: "",
+      frequency: "",
+      accountUrl: ""
+    },
+
+    load() {
+      const saved =
+        HM.storage.get(
+          "creator",
+          {}
+        );
+
+      this.data = {
+        ...this.data,
+        ...saved
+      };
+
+      this.updateUI();
+    },
+
+    save(data = {}) {
+      this.data = {
+        ...this.data,
+        ...data
+      };
+
+      HM.storage.set(
+        "creator",
+        this.data
+      );
+
+      this.updateUI();
+    },
+
+    updateUI() {
+      Object.keys(this.data)
+        .forEach(key => {
+
+          const elements =
+            document.querySelectorAll(
+              `[data-creator-value="${key}"]`
+            );
+
+          elements.forEach(element => {
+            element.textContent =
+              this.data[key] || "—";
+          });
+        });
+    }
+  };
+
+
+  /* =========================================================
+     2. FORMULÁRIO DO CRIADOR
+     ========================================================= */
+
+  document.addEventListener(
+    "submit",
+    function (event) {
+
+      const form =
+        event.target.closest(
+          "[data-creator-form]"
+        );
+
+      if (!form) return;
+
+      event.preventDefault();
+
+      const data = {};
+
+      form
+        .querySelectorAll(
+          "input, select, textarea"
+        )
+        .forEach(input => {
+
+          if (!input.name) return;
+
+          data[input.name] =
+            input.value.trim();
+        });
+
+      HM.creator.save(data);
+
+      HM.showToast(
+        "Informações guardadas."
+      );
+    }
+  );
+
+
+  /* =========================================================
+     3. CRIAR TAREFA DE ANÁLISE
+     ========================================================= */
+
+  HM.createAnalysisTask = async function (
+    type,
+    data = {}
+  ) {
+
+    const labels = {
+      account:
+        "A Máquina está a analisar a conta.",
+
+      content:
+        "A Máquina está a analisar o conteúdo.",
+
+      audience:
+        "A Máquina está a analisar o público.",
+
+      trends:
+        "A Máquina está a analisar tendências."
+    };
+
+    const task =
+      HM.taskManager.create(
+        "creator_" + type,
+        labels[type] ||
+          "A Máquina está a preparar a análise."
+      );
+
+    HM.taskManager.start(task);
+
+    try {
+
+      HM.taskManager.progress(
+        15,
+        "A compreender o pedido."
+      );
+
+      const request = {
+        type,
+        creator:
+          HM.creator.data,
+        input: data,
+        context:
+          HM.conversation.getContext()
+      };
+
+      HM.taskManager.progress(
+        35,
+        "A organizar os dados."
+      );
+
+      /*
+       * A partir daqui o backend/API poderá
+       * executar a análise real.
+       *
+       * Não simulamos dados externos como se
+       * fossem resultados reais.
+       */
+
+      let result = {
+        type,
+        status: "ready_for_integration",
+        request
+      };
+
+      HM.taskManager.progress(
+        70,
+        "A preparar o resultado."
+      );
+
+      HM.taskManager.progress(
+        90,
+        "A finalizar."
+      );
+
+      HM.taskManager.finish(
+        result
+      );
+
+      HM.results.current = {
+        title:
+          labels[type] ||
+          "Resultado da análise",
+
+        summary:
+          "A estrutura da análise foi preparada. " +
+          "A fonte de dados real será ligada através " +
+          "da integração correspondente.",
+
+        data: result
+      };
+
+      return HM.results.current;
+
+    } catch (error) {
+
+      HM.taskManager.fail(
+        error.message
+      );
+
+      throw error;
+    }
+  };
+
+
+  /* =========================================================
+     4. AÇÕES DO CRIADOR
+     ========================================================= */
+
+  const creatorActions = {
+    account: "account",
+    analyzeAccount: "account",
+    content: "content",
+    analyzeContent: "content",
+    audience: "audience",
+    trends: "trends"
+  };
+
+
+  document.addEventListener(
+    "click",
+    async function (event) {
+
+      const button =
+        event.target.closest(
+          "[data-creator-action]"
+        );
+
+      if (!button) return;
+
+      event.preventDefault();
+
+      const action =
+        button.dataset.creatorAction;
+
+      const type =
+        creatorActions[action] ||
+        action;
+
+      try {
+
+        button.disabled = true;
+
+        const result =
+          await HM.createAnalysisTask(
+            type,
+            {
+              url:
+                button.dataset.url ||
+                HM.creator.data.accountUrl ||
+                ""
+            }
+          );
+
+        HM.results.show(
+          result
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Ação do criador:",
+          error
+        );
+
+        HM.showToast(
+          "Não foi possível concluir a ação."
+        );
+
+      } finally {
+
+        button.disabled = false;
+      }
+    }
+  );
+
+
+  /* =========================================================
+     5. CRIAÇÃO DE IDEIAS
+     ========================================================= */
+
+  HM.createIdeas = async function (
+    quantity = 5
+  ) {
+
+    const task =
+      HM.taskManager.create(
+        "ideas",
+        "A Máquina está a criar ideias."
+      );
+
+    HM.taskManager.start(task);
+
+    try {
+
+      HM.taskManager.progress(
+        25,
+        "A compreender o nicho."
+      );
+
+      const ideas = [];
+
+      const total =
+        Math.max(
+          1,
+          Math.min(
+            Number(quantity) || 5,
+            50
+          )
+        );
+
+      for (
+        let i = 1;
+        i <= total;
+        i++
+      ) {
+
+        ideas.push({
+          number: i,
+          title:
+            "Ideia " + i,
+          status:
+            "aguarda geração inteligente",
+          niche:
+            HM.creator.data.niche || ""
+        });
+
+        if (i % 5 === 0) {
+          const progress =
+            Math.min(
+              85,
+              25 +
+              Math.round(
+                (i / total) * 60
+              )
+            );
+
+          HM.taskManager.progress(
+            progress,
+            "A organizar as ideias."
+          );
+        }
+      }
+
+      const result = {
+        type: "ideas",
+        title: "Ideias de conteúdo",
+        summary:
+          "A estrutura para " +
+          total +
+          " ideias foi preparada.",
+        items: ideas
+      };
+
+      HM.taskManager.finish(
+        result
+      );
+
+      HM.results.current =
+        result;
+
+      return result;
+
+    } catch (error) {
+
+      HM.taskManager.fail(
+        error.message
+      );
+
+      throw error;
+    }
+  };
+
+
+  /* =========================================================
+     6. CRIAÇÃO DE ROTEIROS
+     ========================================================= */
+
+  HM.createScripts = async function (
+    quantity = 1
+  ) {
+
+    const total =
+      Math.max(
+        1,
+        Math.min(
+          Number(quantity) || 1,
+          20
+        )
+      );
+
+    const task =
+      HM.taskManager.create(
+        "scripts",
+        "A Máquina está a preparar os roteiros."
+      );
+
+    HM.taskManager.start(task);
+
+    HM.taskManager.progress(
+      30,
+      "A definir a estrutura."
+    );
+
+    const scripts =
+      Array.from(
+        { length: total },
+        (_, index) => ({
+          number: index + 1,
+          status:
+            "aguarda geração inteligente"
+        })
+      );
+
+    HM.taskManager.progress(
+      80,
+      "A organizar os roteiros."
+    );
+
+    const result = {
+      type: "scripts",
+      title: "Roteiros",
+      summary:
+        "A estrutura dos roteiros foi preparada.",
+      items: scripts
+    };
+
+    HM.taskManager.finish(
+      result
+    );
+
+    HM.results.current =
+      result;
+
+    return result;
+  };
+
+
+  /* =========================================================
+     7. PLANEAMENTO
+     ========================================================= */
+
+  HM.createPlan = async function (
+    days = 7
+  ) {
+
+    const total =
+      Math.max(
+        1,
+        Math.min(
+          Number(days) || 7,
+          90
+        )
+      );
+
+    const task =
+      HM.taskManager.create(
+        "planning",
+        "A Máquina está a preparar o planeamento."
+      );
+
+    HM.taskManager.start(task);
+
+    HM.taskManager.progress(
+      25,
+      "A definir os objetivos."
+    );
+
+    const plan =
+      Array.from(
+        { length: total },
+        (_, index) => ({
+          day: index + 1,
+          status:
+            "aguarda conteúdo definido"
+        })
+      );
+
+    HM.taskManager.progress(
+      75,
+      "A organizar o calendário."
+    );
+
+    const result = {
+      type: "planning",
+      title: "Planeamento",
+      summary:
+        "A estrutura do planeamento foi preparada.",
+      days: plan
+    };
+
+    HM.taskManager.finish(
+      result
+    );
+
+    HM.results.current =
+      result;
+
+    return result;
+  };
+
+
+  /* =========================================================
+     8. BOTÕES DE IDEIAS / ROTEIROS / PLANEAMENTO
+     ========================================================= */
+
+  document.addEventListener(
+    "click",
+    async function (event) {
+
+      const button =
+        event.target.closest(
+          "[data-create-content]"
+        );
+
+      if (!button) return;
+
+      event.preventDefault();
+
+      const type =
+        button.dataset.createContent;
+
+      try {
+
+        button.disabled = true;
+
+        let result;
+
+        if (type === "ideas") {
+          result =
+            await HM.createIdeas(
+              button.dataset.quantity || 5
+            );
+        }
+
+        else if (type === "scripts") {
+          result =
+            await HM.createScripts(
+              button.dataset.quantity || 1
+            );
+        }
+
+        else if (type === "planning") {
+          result =
+            await HM.createPlan(
+              button.dataset.days || 7
+            );
+        }
+
+        else {
+          throw new Error(
+            "Tipo de conteúdo desconhecido."
+          );
+        }
+
+        HM.results.show(
+          result
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Criação de conteúdo:",
+          error
+        );
+
+        HM.showToast(
+          "Não foi possível preparar o conteúdo."
+        );
+
+      } finally {
+
+        button.disabled = false;
+      }
+    }
+  );
+
+
+  /* =========================================================
+     9. CARREGAR DADOS DO CRIADOR
+     ========================================================= */
+
+  HM.creator.load();
+
+
+  /* =========================================================
+     10. API PÚBLICA
+     ========================================================= */
+
+  HM.analyzeAccount =
+    function (data) {
+      return HM.createAnalysisTask(
+        "account",
+        data
+      );
+    };
+
+  HM.analyzeContent =
+    function (data) {
+      return HM.createAnalysisTask(
+        "content",
+        data
+      );
+    };
+
+  HM.analyzeAudience =
+    function (data) {
+      return HM.createAnalysisTask(
+        "audience",
+        data
+      );
+    };
+
+  HM.analyzeTrends =
+    function (data) {
+      return HM.createAnalysisTask(
+        "trends",
+        data
+      );
+    };
+
+
+  console.log(
+    "HM — módulo do Criador carregado."
+  );
+
+})();
